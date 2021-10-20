@@ -83,42 +83,42 @@ end
 % SSRT Aligned
 bbdfAverage = nanmean(bbdf_depth_norm_SSD(:,:,:),3);
 bbdfAverageSmooth = H_2DSMOOTH(bbdfAverage);
+clim_x = [-10 10];
 
-figure('Renderer', 'painters', 'Position', [100 100 1500 300]);
-subplot(1,3,1)
+figure('Renderer', 'painters', 'Position', [100 100 1500 700]);
+subplot(2,3,1)
 imagesc('XData',[-200:1000],'YData',1:171,'CData',bbdfAverageSmooth)
 xlim([-200 1000]); ylim([1 171]);
 colorbar; vline(0,'k'); vline(mean(bayesianSSRT.ssrt_mean),'k--')
 set(gca,'YDir','Reverse')
-set(gca,'CLim',[-5 5])
+set(gca,'CLim',[-8 8])
 colormap(parula) 
 
 bbdfAverage_Eu = nanmean(bbdf_depth_norm_SSD(:,:,[1 2 3 4 5 6]),3);
 bbdfAverageSmooth_Eu = H_2DSMOOTH(bbdfAverage_Eu);
-subplot(1,3,2)
+subplot(2,3,2)
 imagesc('XData',[-200:1000],'YData',1:171,'CData',bbdfAverageSmooth_Eu)
 xlim([-200 1000]); ylim([1 171]);
 colorbar; vline(0,'k'); vline(mean(bayesianSSRT.ssrt_mean(executiveBeh.nhpSessions.EuSessions)),'k--')
 set(gca,'YDir','Reverse')
-set(gca,'CLim',[-7 7])
+set(gca,'CLim',clim_x)
 colormap(parula) 
 
 bbdfAverage_X = nanmean(bbdf_depth_norm_SSD(:,:,[7:end]),3);
 bbdfAverageSmooth_X = H_2DSMOOTH(bbdfAverage_X);
-subplot(1,3,3)
+subplot(2,3,3)
 imagesc('XData',[-200:1000],'YData',1:171,'CData',bbdfAverageSmooth_X)
 xlim([-200 1000]); ylim([1 171]);
 colorbar; vline(0,'k'); vline(mean(bayesianSSRT.ssrt_mean(executiveBeh.nhpSessions.XSessions)),'k--')
 set(gca,'YDir','Reverse')
-set(gca,'CLim',[-7 7])
+set(gca,'CLim',clim_x)
 colormap(parula) 
 
 % Tone aligned
 bbdfAverage_tone = nanmean(bbdf_depth_norm_Tone(:,:,:),3);
 bbdfAverageSmooth_tone = H_2DSMOOTH(bbdfAverage_tone);
 
-figure('Renderer', 'painters', 'Position', [100 100 1500 300]);
-subplot(1,3,1)
+subplot(2,3,4)
 imagesc('XData',[-600:100],'YData',1:171,'CData',bbdfAverageSmooth_tone)
 xlim([-600 100]); ylim([1 171]);
 colorbar; vline(0,'k')
@@ -128,22 +128,22 @@ colormap(parula)
 
 bbdfAverage_Eu_tone = nanmean(bbdf_depth_norm_Tone(:,:,[1 2 3 4 5 6]),3);
 bbdfAverageSmooth_Eu_tone = H_2DSMOOTH(bbdfAverage_Eu_tone);
-subplot(1,3,2)
+subplot(2,3,5)
 imagesc('XData',[-600:100],'YData',1:171,'CData',bbdfAverageSmooth_Eu_tone)
 xlim([-600 100]); ylim([1 171]);
 colorbar; vline(0,'k'); vline(mean(bayesianSSRT.ssrt_mean(executiveBeh.nhpSessions.EuSessions)),'k--')
 set(gca,'YDir','Reverse')
-set(gca,'CLim',[-8 8])
+set(gca,'CLim',clim_x)
 colormap(parula) 
 
 bbdfAverage_X_tone = nanmean(bbdf_depth_norm_Tone(:,:,[7:end]),3);
 bbdfAverageSmooth_X_tone = H_2DSMOOTH(bbdfAverage_X_tone);
-subplot(1,3,3)
+subplot(2,3,6)
 imagesc('XData',[-600:100],'YData',1:171,'CData',bbdfAverageSmooth_X_tone)
 xlim([-600 100]); ylim([1 171]);
 colorbar; vline(0,'k')
 set(gca,'YDir','Reverse')
-set(gca,'CLim',[-8 8])
+set(gca,'CLim',clim_x)
 colormap(parula) 
 % 
 
@@ -222,27 +222,27 @@ testfigure(2,3)=gramm('x',time,'y',[bbdf_depth_cancLatency_SSD(laminarTable.monk
 
 % GRAMM Setup %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 testfigure(1,1).stat_summary();
-testfigure(1,1).axe_property('XLim',[-200 1000]); testfigure(1,1).axe_property('YLim',[0.0002 0.002]); 
+testfigure(1,1).axe_property('XLim',[-200 1000]); testfigure(1,1).axe_property('YLim',[0.0002 0.0025]); 
 testfigure(1,1).geom_vline('xintercept',0,'style','k-'); testfigure.set_names('y','');
 
 testfigure(1,2).stat_summary();
-testfigure(1,2).axe_property('XLim',[-200 1000]); testfigure(1,2).axe_property('YLim',[0.0002 0.002]); 
+testfigure(1,2).axe_property('XLim',[-200 1000]); testfigure(1,2).axe_property('YLim',[0.0002 0.0025]); 
 testfigure(1,2).geom_vline('xintercept',0,'style','k-'); testfigure.set_names('y','');
 
 testfigure(1,3).stat_summary();
-testfigure(1,3).axe_property('XLim',[-200 1000]); testfigure(1,3).axe_property('YLim',[0.0002 0.002]); 
+testfigure(1,3).axe_property('XLim',[-200 1000]); testfigure(1,3).axe_property('YLim',[0.0002 0.0025]); 
 testfigure(1,3).geom_vline('xintercept',0,'style','k-'); testfigure.set_names('y','');
 
 testfigure(2,1).stat_summary();
-testfigure(2,1).axe_property('XLim',[-200 1000]); testfigure(2,1).axe_property('YLim',[0.0002 0.002]); 
+testfigure(2,1).axe_property('XLim',[-200 1000]); testfigure(2,1).axe_property('YLim',[0.0005 0.0035]); 
 testfigure(2,1).geom_vline('xintercept',0,'style','k-'); testfigure.set_names('y','');
 
 testfigure(2,2).stat_summary();
-testfigure(2,2).axe_property('XLim',[-200 1000]); testfigure(2,2).axe_property('YLim',[0.0002 0.002]); 
+testfigure(2,2).axe_property('XLim',[-200 1000]); testfigure(2,2).axe_property('YLim',[0.0005 0.0035]); 
 testfigure(2,2).geom_vline('xintercept',0,'style','k-'); testfigure.set_names('y','');
 
 testfigure(2,3).stat_summary();
-testfigure(2,3).axe_property('XLim',[-200 1000]); testfigure(2,3).axe_property('YLim',[0.0002 0.002]); 
+testfigure(2,3).axe_property('XLim',[-200 1000]); testfigure(2,3).axe_property('YLim',[0.0005 0.0035]); 
 testfigure(2,3).geom_vline('xintercept',0,'style','k-'); testfigure.set_names('y','');
 
 figure('Renderer', 'painters', 'Position', [100 100 1500 600]);
@@ -266,7 +266,7 @@ testfigure(1,1)=gramm('x',time,'y',[bbdf_depth_cancLatency_SSD(laminarContacts.u
 testfigure(1,1).stat_summary();
 testfigure(1,1).axe_property('XLim',[-200 1000]);
 testfigure(1,1).geom_vline('xintercept',0,'style','k-');
-testfigure(1,1).axe_property('YLim',[0.00025 0.00175]);
+testfigure(1,1).axe_property('YLim',[0.00025 0.002]);
 testfigure.set_names('y','');
 
 
