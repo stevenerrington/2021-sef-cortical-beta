@@ -6,10 +6,7 @@ targetWin = [0 200];
 parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     
     lfp = corticalLFPcontacts.all(lfpIdx)
-    session = sessionLFPmap.session(lfp);
-    session = sessionLFPmap.session(lfp);
-    baselineWin = [-200-bayesianSSRT.ssrt_mean(session) -200];
-    
+    session = sessionLFPmap.session(lfp);   
     
     % Get session name (to load in relevant file)
     sessionName = FileNames{session};
@@ -68,40 +65,3 @@ betaBurstTable = table(session, monkey,...
 writetable(betaBurstTable,...
     'D:\projectCode\project_stoppingLFP\data\exportJASP\LFP_pBurst_resting.csv','WriteRowNames',true)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-%% ARCHIVE
-
-% 
-% stoppingBeta.timing.bl_canceled = SEF_stoppingLFP_getAverageBurstTimeTarget...
-%     (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap);
-% stoppingBeta.timing.bl_noncanceled = SEF_stoppingLFP_getAverageBurstTimeTarget...
-%     (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap);
-% stoppingBeta.timing.bl_nostop = SEF_stoppingLFP_getAverageBurstTimeTarget...
-%     (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap);
-% 
-% 
-% 
-% 
-% [nanmean(stoppingBeta.timing.bl_canceled.(label)) ...
-%     sem(stoppingBeta.timing.bl_canceled.(label))]*100
-% [nanmean(stoppingBeta.timing.bl_nostop.(label)) ...
-%     sem(stoppingBeta.timing.bl_nostop.(label))]*100
-% [nanmean(stoppingBeta.timing.bl_noncanceled.(label)) ...
-%     sem(stoppingBeta.timing.bl_noncanceled.(label))]*100
-% 
-% 
