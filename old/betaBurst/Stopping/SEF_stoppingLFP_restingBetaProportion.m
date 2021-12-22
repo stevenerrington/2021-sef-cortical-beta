@@ -42,37 +42,66 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     betaBaseline_LFP_canc(lfpIdx,1) = mean(baseline_betaBurstFlag(executiveBeh.ttx_canc{session}));
     betaBaseline_LFP_nostop(lfpIdx,1) = mean(baseline_betaBurstFlag(executiveBeh.ttx.GO{session}));
     
+    targetBaseline_LFP_noncanc(lfpIdx,1) = mean(target_betaBurstFlag(executiveBeh.ttx.sNC{session}));
+    targetBaseline_LFP_canc(lfpIdx,1) = mean(target_betaBurstFlag(executiveBeh.ttx_canc{session}));
+    targetBaseline_LFP_nostop(lfpIdx,1) = mean(target_betaBurstFlag(executiveBeh.ttx.GO{session}));
 end
 
 [mean(betaBaseline_LFP_canc), sem(betaBaseline_LFP_canc)]*100
 [mean(betaBaseline_LFP_nostop), sem(betaBaseline_LFP_nostop)]*100
 [mean(betaBaseline_LFP_noncanc), sem(betaBaseline_LFP_noncanc)]*100
 
+[mean(targetBaseline_LFP_canc), sem(betaBaseline_LFP_canc)]*100
+[mean(targetBaseline_LFP_nostop), sem(betaBaseline_LFP_nostop)]*100
+[mean(targetBaseline_LFP_noncanc), sem(betaBaseline_LFP_noncanc)]*100
 
-
-[mean(betaBaseline_LFP_canc(corticalLFPcontacts.subset.x)), sem(betaBaseline_LFP_canc(corticalLFPcontacts.subset.x))]*100
-[mean(betaBaseline_LFP_nostop(corticalLFPcontacts.subset.x)), sem(betaBaseline_LFP_nostop(corticalLFPcontacts.subset.x))]*100
-[mean(betaBaseline_LFP_noncanc(corticalLFPcontacts.subset.x)), sem(betaBaseline_LFP_noncanc(corticalLFPcontacts.subset.x))]*100
 
 
 %%
+session = sessionLFPmap.session(corticalLFPcontacts.all);
+monkey = sessionLFPmap.monkeyName(corticalLFPcontacts.all);
+
+betaBurstTable = table(session, monkey,...
+    betaBaseline_LFP_canc, betaBaseline_LFP_noncanc, betaBaseline_LFP_nostop,...
+    targetBaseline_LFP_canc, targetBaseline_LFP_noncanc, targetBaseline_LFP_nostop);
+
+writetable(betaBurstTable,...
+    'D:\projectCode\project_stoppingLFP\data\exportJASP\LFP_pBurst_resting.csv','WriteRowNames',true)
 
 
-stoppingBeta.timing.bl_canceled = SEF_stoppingLFP_getAverageBurstTimeTarget...
-    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap);
-stoppingBeta.timing.bl_noncanceled = SEF_stoppingLFP_getAverageBurstTimeTarget...
-    (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap);
-stoppingBeta.timing.bl_nostop = SEF_stoppingLFP_getAverageBurstTimeTarget...
-    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap);
 
 
 
 
-[nanmean(stoppingBeta.timing.bl_canceled.(label)) ...
-    sem(stoppingBeta.timing.bl_canceled.(label))]*100
-[nanmean(stoppingBeta.timing.bl_nostop.(label)) ...
-    sem(stoppingBeta.timing.bl_nostop.(label))]*100
-[nanmean(stoppingBeta.timing.bl_noncanceled.(label)) ...
-    sem(stoppingBeta.timing.bl_noncanceled.(label))]*100
 
 
+
+
+
+
+
+
+
+
+
+%% ARCHIVE
+
+% 
+% stoppingBeta.timing.bl_canceled = SEF_stoppingLFP_getAverageBurstTimeTarget...
+%     (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap);
+% stoppingBeta.timing.bl_noncanceled = SEF_stoppingLFP_getAverageBurstTimeTarget...
+%     (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap);
+% stoppingBeta.timing.bl_nostop = SEF_stoppingLFP_getAverageBurstTimeTarget...
+%     (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap);
+% 
+% 
+% 
+% 
+% [nanmean(stoppingBeta.timing.bl_canceled.(label)) ...
+%     sem(stoppingBeta.timing.bl_canceled.(label))]*100
+% [nanmean(stoppingBeta.timing.bl_nostop.(label)) ...
+%     sem(stoppingBeta.timing.bl_nostop.(label))]*100
+% [nanmean(stoppingBeta.timing.bl_noncanceled.(label)) ...
+%     sem(stoppingBeta.timing.bl_noncanceled.(label))]*100
+% 
+% 

@@ -101,12 +101,12 @@ end
 
 for LFPthreshold = 1:10
     [ttest_raw(LFPthreshold,1), ttest_raw_p(LFPthreshold,1), ~, ttest_raw_stats{LFPthreshold,1}] = ttest(testRaw(:,LFPthreshold));
-    [ttest_raw_shuffled(LFPthreshold,1), ttest_raw_shuffled_p(LFPthreshold,1), ~, ttest_raw_shuffled_stats{LFPthreshold,1}] = ttest2(testRaw(:,LFPthreshold),testRaw_shuffled(:,LFPthreshold));
+    [ttest_raw_shuffled(LFPthreshold,1), ttest_raw_shuffled_p(LFPthreshold,1), ~, ttest_raw_shuffled_stats{LFPthreshold,1}] = ttest(testRaw(:,LFPthreshold),testRaw_shuffled(:,LFPthreshold));
     ttest_norm(LFPthreshold,1) = ttest(testNorm(:,LFPthreshold));
     ttest_normMean(LFPthreshold,1) = ttest(testRawMean(:,LFPthreshold));
 end
 
-
+fprintf('6x threshold stats: t (%i) = %.3f, p = %.3f \n', ttest_raw_shuffled_stats{6}.df, ttest_raw_shuffled_stats{6}.tstat,ttest_raw_shuffled_p(6))
 
 %%
 

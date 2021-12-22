@@ -1,5 +1,4 @@
 %% Calculate proportion of trials with burst (-200-SSRT to -200 ms pre-target)
-
 parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     
     lfp = corticalLFPcontacts.all(lfpIdx)
@@ -34,7 +33,6 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     
 end
 
-
 %% Create boxplot
 time = [-1000:2000];
 
@@ -64,7 +62,6 @@ stoppingBoxplot_Figure.draw();
 
 
 %% Export to JASP
-
 session = sessionLFPmap.session(corticalLFPcontacts.all);
 monkey = sessionLFPmap.monkeyName(corticalLFPcontacts.all);
 
@@ -74,53 +71,3 @@ betaBurstTable = table(session, monkey,...
 
 writetable(betaBurstTable,...
     'D:\projectCode\project_stoppingLFP\data\exportJASP\LFP_pBurst_trial.csv','WriteRowNames',true)
-
-
-%% Calculate proportion of trials with burst (-400 to -200 ms pre-target)
-
-parfor lfpIdx = 1:length(corticalLFPcontacts.all)
-    
-    lfp = corticalLFPcontacts.all(lfpIdx)
-    session = sessionLFPmap.session(lfp);
-    baselineWin = [-400 -200];
-    
-    
-    % Get session name (to load in relevant file)
-    sessionName = FileNames{session};
-    fprintf('Analysing LFP number %i of %i. \n',lfpIdx,length(corticalLFPcontacts.all));
-    
-    % Load in beta output data for session
-    loadname_target = ['betaBurst\target\lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_target'];
-    betaOutput_target = parload([outputDir loadname_target]);
-    
-    [betaOutput_target] = thresholdBursts(betaOutput_target.betaOutput, sessionThreshold(session));
-    
-    trials = [];
-    trials.canceled = executiveBeh.ttx_canc{session};
-    trials.noncanceled = executiveBeh.ttx.sNC{session};
-    trials.nostop = executiveBeh.ttx.GO{session};
-    
-    baseline_betaBurstFlag = [];
-    target_betaBurstFlag = [];
-    
-    
-    for trl = 1:length(betaOutput_target.burstData.burstTime)
-        baseline_betaBurstFlag(trl,:) = ~isempty(find(betaOutput_target.burstData.burstTime{trl} >= baselineWin(1) &...
-            betaOutput_target.burstData.burstTime{trl} <= baselineWin(2)));
-        
-    end
-    
-    betaBaseline_LFP_noncanc(lfpIdx,1) = mean(baseline_betaBurstFlag(executiveBeh.ttx.sNC{session}));
-    betaBaseline_LFP_canc(lfpIdx,1) = mean(baseline_betaBurstFlag(executiveBeh.ttx_canc{session}));
-    betaBaseline_LFP_nostop(lfpIdx,1) = mean(baseline_betaBurstFlag(executiveBeh.ttx.GO{session}));
-    
-end
-
-[mean(betaBaseline_LFP_canc), sem(betaBaseline_LFP_canc)]*100
-[mean(betaBaseline_LFP_nostop), sem(betaBaseline_LFP_nostop)]*100
-[mean(betaBaseline_LFP_noncanc), sem(betaBaseline_LFP_noncanc)]*100
-
-
-[mean(betaBaseline_LFP_canc(corticalLFPcontacts.subset.x)), sem(betaBaseline_LFP_canc(corticalLFPcontacts.subset.x))]*100
-[mean(betaBaseline_LFP_nostop(corticalLFPcontacts.subset.x)), sem(betaBaseline_LFP_nostop(corticalLFPcontacts.subset.x))]*100
-[mean(betaBaseline_LFP_noncanc(corticalLFPcontacts.subset.x)), sem(betaBaseline_LFP_noncanc(corticalLFPcontacts.subset.x))]*100
