@@ -77,7 +77,7 @@ meanBurstTimeTable = table(noncanceled_pBurst, nostop_pBurst,...
     noncanceledBurstFreq, nostopBurstFreq, monkeyLabel);
 
 writetable(meanBurstTimeTable,...
-    'D:\projectCode\project_stoppingLFP\data\exportJASP\LFP_errorBurstProperties_0_300.csv','WriteRowNames',true)
+    'D:\projectCode\project_stoppingLFP\data\exportJASP\LFP_errorBurstProperties_300_600.csv','WriteRowNames',true)
 
 
 %% Produce error-related activity figure
