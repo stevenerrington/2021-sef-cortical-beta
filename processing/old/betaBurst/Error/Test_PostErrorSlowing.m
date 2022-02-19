@@ -63,9 +63,13 @@ for lfpIdx = 1:length(corticalLFPcontacts.all)
     clear a 
     a = logTable{(lfpIdx)};
     
-    rt_ttest(lfpIdx,1) = ttest2(a(a(:,1) == 1,2),a(a(:,1) == 0,2));
-    rt_ttest(lfpIdx,2) = mean(a(a(:,1) == 1,2))-mean(a(a(:,1) == 0,2)); % +ve is greater slowing with burst
+    [h, ~, ~, tstat_a] = ttest2(a(a(:,1) == 1,2),a(a(:,1) == 0,2));
+    
+    rt_ttest(lfpIdx,1) = h;
+    rt_ttest(lfpIdx,2) = nanmean(a(a(:,1) == 1,2))-nanmean(a(a(:,1) == 0,2)); % +ve is greater slowing with burst
+    rt_ttest(lfpIdx,3) = tstat_a.tstat; % +ve is greater slowing with burst
 
+    
 end
 
 %%
@@ -86,14 +90,19 @@ explode = [1 1 1];
 pie(pContactType,explode)
 
 clear rtAdjustment_a
-posIdx = find(rt_ttest(:,1) == 1 & rt_ttest(:,2) > 0);
-lfpIdx = posIdx(7);
+posIdx = find(rt_ttest(:,1) == 1);
+[~,closestIndex] = sort(abs(rt_ttest(posIdx,2)-max(rt_ttest(posIdx,2))));
+[~,closestIndex] = sort(abs(rt_ttest(posIdx,3)-max(rt_ttest(posIdx,3))));
+
+
+
+lfpIdx = posIdx(closestIndex == 2) 
+
 rtAdjustment_a(1,1)= gramm('x',logTable{(lfpIdx)}(:,1),...
     'y',logTable{(lfpIdx)}(:,2));
 rtAdjustment_a(1,1).stat_summary('geom',{'bar','black_errorbar'});
-
 rtAdjustment_a(1,1).axe_property('XLim',[-0.5 1.5]);
-rtAdjustment_a(1,1).axe_property('YLim',[-100 100]);
+rtAdjustment_a(1,1).axe_property('YLim',[-200 200]);
 figure('Renderer', 'painters', 'Position', [100 100 300 250]);
 rtAdjustment_a.draw();
 

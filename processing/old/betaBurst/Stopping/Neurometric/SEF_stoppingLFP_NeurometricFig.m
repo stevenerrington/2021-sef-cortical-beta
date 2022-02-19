@@ -75,7 +75,9 @@ revisedNeurometricFigure.draw();
 
 
 %%
-[lfpPlotIdx,~] = find(mean(testRaw,2) == min(mean(testRaw,2)))
+% [lfpPlotIdx,~] = find(mean(testRaw,2) == min(mean(testRaw,2)))
+[lfpPlotIdx,~] = find(testRaw == min(abs(testRaw(:,6))));
+lfpPlotIdx = lfpPlotIdx(1);
 
 clear thresholdValues thresholdLabels
 thresholdValues = reshape(testRaw-testRaw_shuffled,5090,1);

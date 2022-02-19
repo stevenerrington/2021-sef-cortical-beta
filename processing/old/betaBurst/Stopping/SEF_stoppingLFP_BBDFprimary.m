@@ -70,91 +70,91 @@ time = [-1000:2000];
 ssrt_time = [-500:1000];
 
 % Fixation aligned
-eventBBDFfigure(1,1)=gramm('x',time,'y',[bbdf_canceled_fixation;...
+errorBBDFfigure(1,1)=gramm('x',time,'y',[bbdf_canceled_fixation;...
     bbdf_nostop_fixation;bbdf_noncanceled_fixation],...
     'color',[repmat({'Canceled'},length(bbdf_canceled_fixation),1);...
     repmat({'No-stop'},length(bbdf_nostop_fixation),1);...
     repmat({'Non-canceled'},length(bbdf_noncanceled_fixation),1)]);
 
 % Target aligned
-eventBBDFfigure(1,2)=gramm('x',time,'y',[bbdf_canceled_target;...
+errorBBDFfigure(1,2)=gramm('x',time,'y',[bbdf_canceled_target;...
     bbdf_nostop_target;bbdf_noncanceled_target],...
     'color',[repmat({'Canceled'},length(bbdf_canceled_target),1);...
     repmat({'No-stop'},length(bbdf_nostop_target),1);...
     repmat({'Non-canceled'},length(bbdf_noncanceled_target),1)]);
 
 % Stop-Signal aligned
-eventBBDFfigure(1,3)=gramm('x',time,'y',[bbdf_canceled_stopSignal;...
+errorBBDFfigure(1,3)=gramm('x',time,'y',[bbdf_canceled_stopSignal;...
     bbdf_nostop_stopSignal;bbdf_noncanceled_stopSignal],...
     'color',[repmat({'Canceled'},length(bbdf_canceled_stopSignal),1);...
     repmat({'No-stop'},length(bbdf_nostop_stopSignal),1);...
     repmat({'Non-canceled'},length(bbdf_noncanceled_stopSignal),1)]);
 
 % SSRT aligned
-eventBBDFfigure(2,1)=gramm('x',ssrt_time,'y',[bbdf_canceled_ssrt;...
+errorBBDFfigure(2,1)=gramm('x',ssrt_time,'y',[bbdf_canceled_ssrt;...
     bbdf_nostop_ssrt],...
     'color',[repmat({'Canceled'},length(bbdf_canceled_ssrt),1);...
     repmat({'No-stop'},length(bbdf_nostop_ssrt),1)]);
 
 % Saccade aligned
-eventBBDFfigure(2,2)=gramm('x',time,'y',[bbdf_noncanceled_saccade;...
+errorBBDFfigure(2,2)=gramm('x',time,'y',[bbdf_noncanceled_saccade;...
     bbdf_nostop_saccade],'color',[repmat({'Non-canceled'},length(bbdf_noncanceled_saccade),1);...
     repmat({'No-stop'},length(bbdf_nostop_saccade),1)]);
 
 % Tone aligned
-eventBBDFfigure(2,3)=gramm('x',time,'y',[bbdf_canceled_tone;...
+errorBBDFfigure(2,3)=gramm('x',time,'y',[bbdf_canceled_tone;...
     bbdf_nostop_tone;bbdf_noncanceled_tone],...
     'color',[repmat({'Canceled'},length(bbdf_canceled_tone),1);...
     repmat({'No-stop'},length(bbdf_nostop_tone),1);...
     repmat({'Non-canceled'},length(bbdf_noncanceled_tone),1)]);
 
 % GRAMM Setup %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-eventBBDFfigure(1,1).stat_summary();
-eventBBDFfigure(1,1).axe_property('XLim',[-800 800]);
-eventBBDFfigure(1,1).geom_vline('xintercept',0,'style','k-');
-eventBBDFfigure(1,1).axe_property('YLim',[0.0000 0.0035]);
-eventBBDFfigure(1,1).no_legend();
+errorBBDFfigure(1,1).stat_summary();
+errorBBDFfigure(1,1).axe_property('XLim',[-800 800]);
+errorBBDFfigure(1,1).geom_vline('xintercept',0,'style','k-');
+errorBBDFfigure(1,1).axe_property('YLim',[0.0000 0.0035]);
+errorBBDFfigure(1,1).no_legend();
 
-eventBBDFfigure(1,2).stat_summary();
-eventBBDFfigure(1,2).axe_property('XLim',[-200 600]);
-eventBBDFfigure(1,2).geom_vline('xintercept',0,'style','k-');
-eventBBDFfigure(1,2).axe_property('YLim',[0.0005 0.0025]);
-eventBBDFfigure(1,2).no_legend();
+errorBBDFfigure(1,2).stat_summary();
+errorBBDFfigure(1,2).axe_property('XLim',[-200 600]);
+errorBBDFfigure(1,2).geom_vline('xintercept',0,'style','k-');
+errorBBDFfigure(1,2).axe_property('YLim',[0.0005 0.0025]);
+errorBBDFfigure(1,2).no_legend();
 
-eventBBDFfigure(1,3).stat_summary();
-eventBBDFfigure(1,3).axe_property('XLim',[-200 200]);
-eventBBDFfigure(1,3).geom_vline('xintercept',0,'style','k-');
-eventBBDFfigure(1,3).axe_property('YLim',[0.0005 0.0020]);
-eventBBDFfigure(1,3).no_legend();
+errorBBDFfigure(1,3).stat_summary();
+errorBBDFfigure(1,3).axe_property('XLim',[-200 200]);
+errorBBDFfigure(1,3).geom_vline('xintercept',0,'style','k-');
+errorBBDFfigure(1,3).axe_property('YLim',[0.0005 0.0020]);
+errorBBDFfigure(1,3).no_legend();
 
-eventBBDFfigure(2,1).stat_summary();
-eventBBDFfigure(2,1).axe_property('XLim',[-200 800]);
-eventBBDFfigure(2,1).geom_vline('xintercept',0,'style','k-');
-eventBBDFfigure(2,1).axe_property('YLim',[0.0005 0.0020]);
-eventBBDFfigure(2,1).no_legend();
+errorBBDFfigure(2,1).stat_summary();
+errorBBDFfigure(2,1).axe_property('XLim',[-200 800]);
+errorBBDFfigure(2,1).geom_vline('xintercept',0,'style','k-');
+errorBBDFfigure(2,1).axe_property('YLim',[0.0005 0.0020]);
+errorBBDFfigure(2,1).no_legend();
 
-eventBBDFfigure(2,2).stat_summary();
-eventBBDFfigure(2,2).axe_property('XLim',[-200 600]);
-eventBBDFfigure(2,2).geom_vline('xintercept',0,'style','k-');
-eventBBDFfigure(2,2).axe_property('YLim',[0.0005 0.0025]);
-eventBBDFfigure(2,2).no_legend();
+errorBBDFfigure(2,2).stat_summary();
+errorBBDFfigure(2,2).axe_property('XLim',[-200 600]);
+errorBBDFfigure(2,2).geom_vline('xintercept',0,'style','k-');
+errorBBDFfigure(2,2).axe_property('YLim',[0.0005 0.0025]);
+errorBBDFfigure(2,2).no_legend();
 
-eventBBDFfigure(2,3).stat_summary();
-eventBBDFfigure(2,3).axe_property('XLim',[-600 200]);
-eventBBDFfigure(2,3).geom_vline('xintercept',0,'style','k-');
-eventBBDFfigure(2,3).axe_property('YLim',[0.0005 0.0025]);
-eventBBDFfigure(2,3).no_legend();
+errorBBDFfigure(2,3).stat_summary();
+errorBBDFfigure(2,3).axe_property('XLim',[-600 200]);
+errorBBDFfigure(2,3).geom_vline('xintercept',0,'style','k-');
+errorBBDFfigure(2,3).axe_property('YLim',[0.0005 0.0025]);
+errorBBDFfigure(2,3).no_legend();
 
-eventBBDFfigure.set_names('y','');
-eventBBDFfigure(1,1).set_color_options('map',[colors.canceled;colors.nostop;colors.noncanc]);
-eventBBDFfigure(1,2).set_color_options('map',[colors.canceled;colors.nostop;colors.noncanc]);
-eventBBDFfigure(1,3).set_color_options('map',[colors.canceled;colors.nostop;colors.noncanc]);
-eventBBDFfigure(2,1).set_color_options('map',[colors.canceled;colors.nostop]);
-eventBBDFfigure(2,2).set_color_options('map',[colors.nostop;colors.noncanc]);
-eventBBDFfigure(2,3).set_color_options('map',[colors.canceled;colors.nostop;colors.noncanc]);
+errorBBDFfigure.set_names('y','');
+errorBBDFfigure(1,1).set_color_options('map',[colors.canceled;colors.nostop;colors.noncanc]);
+errorBBDFfigure(1,2).set_color_options('map',[colors.canceled;colors.nostop;colors.noncanc]);
+errorBBDFfigure(1,3).set_color_options('map',[colors.canceled;colors.nostop;colors.noncanc]);
+errorBBDFfigure(2,1).set_color_options('map',[colors.canceled;colors.nostop]);
+errorBBDFfigure(2,2).set_color_options('map',[colors.nostop;colors.noncanc]);
+errorBBDFfigure(2,3).set_color_options('map',[colors.canceled;colors.nostop;colors.noncanc]);
 
 figure('Renderer', 'painters', 'Position', [100 100 800 600]);
-eventBBDFfigure.draw();
+errorBBDFfigure.draw();
 
 %% BBDF effect size analysis
 ssrt_time = [-500:1000];
@@ -192,3 +192,30 @@ plot(ssrt_time,ssrt_effectSize,'color',[colors.canceled 1.0])
 plot(error_time,error_effectSize,'color',[colors.noncanc 1.0])
 xlim([-250 800]); xlabel('Time from event (ms)'); ylabel('Cohens D'); ylim([-0.25 1])
 vline(0,'k'); hline([0.2 0.5 0.8],'k--')
+
+
+%% Get error specific
+
+%% Generate Figure
+
+clear errorBBDFfigure
+time = [-1000:2000];
+
+% Saccade aligned
+errorBBDFfigure(1,1)=gramm('x',time,'y',[bbdf_noncanceled_saccade;...
+    bbdf_nostop_saccade],'color',[repmat({'Non-canceled'},length(bbdf_noncanceled_saccade),1);...
+    repmat({'No-stop'},length(bbdf_nostop_saccade),1)]);
+
+
+errorBBDFfigure(1,1).stat_summary();
+errorBBDFfigure(1,1).axe_property('XLim',[-200 1200]);
+errorBBDFfigure(1,1).geom_vline('xintercept',0,'style','k-');
+errorBBDFfigure(1,1).geom_vline('xintercept',600,'style','k-');
+errorBBDFfigure(1,1).axe_property('YLim',[0.0005 0.0035]);
+errorBBDFfigure(1,1).no_legend();
+
+errorBBDFfigure.set_names('y','');
+errorBBDFfigure(1,1).set_color_options('map',[colors.nostop;colors.noncanc]);
+
+figure('Renderer', 'painters', 'Position', [100 100 400 200]);
+errorBBDFfigure.draw();

@@ -37,8 +37,8 @@ end
 time = [-1000:2000];
 
 clear stoppingBoxplot_Figure inputLFP groupLabels epochLabels burstData
-% inputLFP = 1:length(corticalLFPcontacts.all);
-inputLFP = corticalLFPcontacts.subset.x;
+inputLFP = 1:length(corticalLFPcontacts.all);
+% inputLFP = corticalLFPcontacts.subset.x;
 
 % Boxplot
 groupLabels = [repmat({'No-stop'},length(inputLFP),1); repmat({'Non-canceled'},length(inputLFP),1); repmat({'Canceled'},length(inputLFP),1);...
@@ -49,7 +49,7 @@ burstData = [baseline_nostop(inputLFP); baseline_noncanc(inputLFP); baseline_can
 
 stoppingBoxplot_Figure(1,1)= gramm('x',groupLabels,'y',burstData,'color',epochLabels);
 stoppingBoxplot_Figure(1,1).stat_boxplot();
-% testfigure(1,1).geom_jitter('alpha',0.1,'dodge',0.75);
+stoppingBoxplot_Figure(1,1).geom_jitter('alpha',0.1,'dodge',0.75);
 stoppingBoxplot_Figure(1,1).no_legend();
 stoppingBoxplot_Figure(1,1).axe_property('YLim',[-0.05 0.40]);
 

@@ -10,7 +10,7 @@ parfor lfpIdx = 1:length(lfpList)
     
     lfp = lfpList(lfpIdx);
     session = sessionLFPmap.session(lfp);
-    timeThreshold = [bayesianSSRT.ssrt_mean(session) bayesianSSRT.ssrt_mean(session)+300];
+    timeThreshold = [bayesianSSRT.ssrt_mean(session)+200 bayesianSSRT.ssrt_mean(session)+400];
     
     %     clear betaOutput trial_betaBurst_timing burstTimes trialBurstFlag trlBurstTimes
   

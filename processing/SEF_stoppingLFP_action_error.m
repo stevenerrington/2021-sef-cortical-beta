@@ -100,7 +100,9 @@ error_figure(1,2) = gramm('x',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(
 error_figure(1,3) = gramm('x',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)],...
     'y',[burstDataNoStop(xChannels);burstDataNonCanc(xChannels)],'color',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)]);
 
-error_figure(1,1).stat_boxplot();error_figure(1,2).stat_boxplot();error_figure(1,3).stat_boxplot();
+error_figure(1,1).stat_boxplot(); error_figure(1,1).geom_jitter('alpha',0.1,'dodge',0.75);
+error_figure(1,2).stat_boxplot(); error_figure(1,2).geom_jitter('alpha',0.1,'dodge',0.75);
+error_figure(1,3).stat_boxplot(); error_figure(1,3).geom_jitter('alpha',0.1,'dodge',0.75);
 
 error_figure.set_names('y','');
 error_figure(1,1).axe_property('YLim',[0 1.0]); error_figure(1,2).axe_property('YLim',[0 1.0]); error_figure(1,3).axe_property('YLim',[0 1.0]); 

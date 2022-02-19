@@ -41,3 +41,34 @@ writetable(beta_postOut,...
     'D:\projectCode\project_stoppingLFP\data\exportJASP\beta_postOut.csv',...
     'WriteRowNames',true);
 
+
+%% 
+
+for i = 1:509
+    
+    baseline_canceled = beta_postOut(:,[1,2,3,4,5,6,7,8,9,10,11]);
+    baseline_noncanceled = beta_postOut(:,[1,2,3,4,5,6,7,8,9,10,11]);
+    baseline_nostop = beta_postOut(:,[1,2,3,4,5,6,7,8,9,10,11]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+end
+
+
