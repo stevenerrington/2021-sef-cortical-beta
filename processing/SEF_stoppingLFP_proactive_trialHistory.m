@@ -32,7 +32,7 @@ for session = 1:29
         for varIdx = 1:length(varList)
             varType = varList{varIdx};
             
-            proactiveBeta.sessionTiming.(trialType).(varType)(session,1) = nanmean(proactiveBeta.timing.(trialType).(varType)(sessionLFPidx)); 
+            proactiveBeta.sessionTiming.(trialType).(varType)(session,1) = nanmean(proactiveBeta.timing.(['bl_' trialType]).(varType)(sessionLFPidx)); 
         end
     end
 end
@@ -94,7 +94,7 @@ proactiveBurst_figure(1,1)=gramm('x',[repmat({'Canceled'},length(inContacts),1);
     repmat({'No-stop'},length(inContacts),1)]);
 
 proactiveBurst_figure(1,1).stat_boxplot();
-% proactiveBurst_figure(1,1).geom_point('alpha',0.1);
+proactiveBurst_figure(1,1).geom_point('alpha',0.1);
 proactiveBurst_figure(1,1).no_legend();
 proactiveBurst_figure.set_color_options('map',[colors.canceled;colors.nostop;colors.noncanc]);
 
