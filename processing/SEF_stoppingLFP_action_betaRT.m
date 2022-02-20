@@ -94,23 +94,13 @@ end
 
 %% Generate figure
 figure('Renderer', 'painters', 'Position', [100 100 350 300]);
-g=gramm('x',RT_all,'y',pBurst_target_all);
+g=gramm('x',RT_all,'y',pBurst_baseline_all);
 g.geom_point(); g.stat_glm('fullrange',true,'disp_fit',true)
 g.axe_property('XLim',[50 450]);g.axe_property('YLim',[0 0.45])
 g.draw()
 
 figure('Renderer', 'painters', 'Position', [100 100 350 300]);
-g=gramm('x',RT_all,'y',pBurst_target_all,'color',sessionLabel);
+g=gramm('x',RT_all,'y',pBurst_baseline_all,'color',sessionLabel);
 g.geom_point(); g.stat_glm('fullrange',true,'disp_fit',true)
 g.axe_property('XLim',[50 450]);g.axe_property('YLim',[0 0.45])
 g.draw()
-
-
-%% Generate figure
-figure('Renderer', 'painters', 'Position', [100 100 350 300]);
-g=gramm('x',RT_beta_assoc{10}(:,3));
-g.stat_density();
-g.draw()
-
-edit examples
-

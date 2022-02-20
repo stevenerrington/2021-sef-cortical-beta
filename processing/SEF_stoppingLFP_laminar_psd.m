@@ -24,20 +24,21 @@ parfor lfpIdx = 1:length(laminarContacts)
     % Get power information %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Stop-signal (latency matched aligned)
     c_temp = []; nc_temp = []; ns_temp = [];
+    window = [1000+round(ssrt)+200:1000+round(ssrt)+400];
     
     for ii = 1:length(executiveBeh.inh_SSD{session})
         if length(executiveBeh.ttm_CGO{session,ii}.C_matched) >= 10 &&...
                 length(executiveBeh.ttm_CGO{session,ii}.GO_matched) >= 10 &&...
                 length(executiveBeh.ttm_c.NC{session,ii}.all) && 10
             
-            c_temp(ii,:) = nanmean(lfpOutput.filteredLFP.beta(executiveBeh.ttm_CGO{session,ii}.C_matched, [1000:1000+round(ssrt)]));
-            nc_temp(ii,:) = nanmean(lfpOutput.filteredLFP.beta(executiveBeh.ttm_c.NC{session,ii}.all, [1000:1000+round(ssrt)]));
-            ns_temp(ii,:) = nanmean(lfpOutput.filteredLFP.beta(executiveBeh.ttm_CGO{session,ii}.GO_matched, [1000:1000+round(ssrt)]));
+            c_temp(ii,:) = nanmean(lfpOutput.filteredLFP.beta(executiveBeh.ttm_CGO{session,ii}.C_matched, window));
+            nc_temp(ii,:) = nanmean(lfpOutput.filteredLFP.beta(executiveBeh.ttm_c.NC{session,ii}.all, window));
+            ns_temp(ii,:) = nanmean(lfpOutput.filteredLFP.beta(executiveBeh.ttm_CGO{session,ii}.GO_matched, window));
             
         else
-            c_temp(ii,:) = NaN(1,length([1000:1000+round(ssrt)]));
-            nc_temp(ii,:) = NaN(1,length([1000:1000+round(ssrt)]));
-            ns_temp(ii,:) = NaN(1,length([1000:1000+round(ssrt)]));
+            c_temp(ii,:) = NaN(1,length(window));
+            nc_temp(ii,:) = NaN(1,length(window));
+            ns_temp(ii,:) = NaN(1,length(window));
         end
         
     end
@@ -46,20 +47,20 @@ parfor lfpIdx = 1:length(laminarContacts)
     % for each contact, for...
     % ... canceled trials
     stopSignal_power_canceled_unmatched(lfpIdx,1) = bandpower...
-        (nanmean(lfpOutput.filteredLFP.beta(executiveBeh.ttx_canc{session}, [1000:1000+round(ssrt)])));
+        (nanmean(lfpOutput.filteredLFP.beta(executiveBeh.ttx_canc{session}, window)));
     % ... noncanceled trials    
     stopSignal_power_noncanceled_unmatched(lfpIdx,1) = bandpower...
-        (nanmean(lfpOutput.filteredLFP.beta(executiveBeh.ttx.sNC{session}, [1000:1000+round(ssrt)])));
+        (nanmean(lfpOutput.filteredLFP.beta(executiveBeh.ttx.sNC{session}, window)));
     % ... nostop trials
     stopSignal_power_nostop_unmatched(lfpIdx,1) = bandpower...
-        (nanmean(lfpOutput.filteredLFP.beta(executiveBeh.ttx.GO{session}, [1000:1000+round(ssrt)])));
+        (nanmean(lfpOutput.filteredLFP.beta(executiveBeh.ttx.GO{session}, window)));
     
     % Average power over this stopping period:
     stopSignal_power_canceled(lfpIdx,1) = bandpower(nanmean(c_temp));
     stopSignal_power_noncanc(lfpIdx,1) = bandpower(nanmean(nc_temp));
     stopSignal_power_nostop(lfpIdx,1) = bandpower(nanmean(ns_temp));
     
-    stopSignal_power_allSSRT(lfpIdx,1) = bandpower(nanmean(lfpOutput.filteredLFP.beta(:, [1000:1000+round(ssrt)])));
+    stopSignal_power_allSSRT(lfpIdx,1) = bandpower(nanmean(lfpOutput.filteredLFP.beta(:, window)));
     stopSignal_power_all(lfpIdx,1) = bandpower(nanmean(lfpOutput.filteredLFP.beta(:, :)));
     
 end
@@ -89,7 +90,7 @@ clear CSDanalysis PSDanalysis
 parfor session = 1:16
     fprintf('Analysing session number %i of 16. \n',session);
     % Set baseline window for CSD
-    baselineWin = [-200:0]+1000;
+    baselineWin = [0:100]+1000;
     
     % Run current source density analysis
     CSDanalysis{session} = D_CSD_BASIC(LFP_aligned{session}, 'cndt', 0.4, 'spc', 150);
