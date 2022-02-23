@@ -2,6 +2,9 @@
 load('D:\projectCode\project_stoppingLFP\processing\procData\stoppingBeta.mat')
 
 %% Run extraction function to get beta-burst properties across all contacts for canceled trials...
+% ... following successful stopping (target-400:target-200)
+fixBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeTarget...
+    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
 % ... following successful stopping (ssrt:ssrt+300)
 ssrtBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeSSRT...
     (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
@@ -9,16 +12,6 @@ ssrtBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeSSRT...
 %     until)
 toneBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeTone...
     (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
-
-
-%% Get depth alignment parameters
-pBurst_depth = nan(19, 15);
-laminarAlignment.list = {[1:4],[5:8],[9:12],[13:17]};
-laminarAlignment.l2 = 1:4; laminarAlignment.l3 = 5:8;
-laminarAlignment.l5 = 9:12; laminarAlignment.l6 = 13:17;
-laminarAlignment.labels = {'L2','L3','L5','L6'};
-euPerpIdx = 1:6; xenaPerpIdx = 7:16;
-
 
 %% Extract and align pBurst by cortical depth
 perpSessions = 14:29; % This limits to the sessions in which we believe are perpendicular
@@ -34,13 +27,14 @@ for sessionIdx = 1:length(perpSessions)
         % Map the contact to a pre-assigned cortical depth (Godlove et al.,
         % 2012)
         lfp = laminarLFPidx(lfpIdx);
-        depth = corticalLFPmap.depth(lfp); 
+        depth = corticalLFPmap.depth(lfp);
         
         % Extract the proportion of beta-bursts observed during SSRT, post-SSRT and pre-tone
         % for that contact.
-        stopTime_pBurst_depth(depth,sessionIdx) = stoppingBeta.timing.canceled.pTrials_burst(lfp); 
-        cancelTime_pBurst_depth(depth,sessionIdx) = ssrtBeta.timing.canceled.pTrials_burst(lfp); 
-        toneTime_pBurst_depth(depth,sessionIdx) = toneBeta.timing.canceled.pTrials_burst(lfp); 
+        fixTime_pBurst_depth(depth,sessionIdx) = fixBeta.timing.canceled.pTrials_burst(lfp);
+        stopTime_pBurst_depth(depth,sessionIdx) = stoppingBeta.timing.canceled.pTrials_burst(lfp);
+        cancelTime_pBurst_depth(depth,sessionIdx) = ssrtBeta.timing.canceled.pTrials_burst(lfp);
+        toneTime_pBurst_depth(depth,sessionIdx) = toneBeta.timing.canceled.pTrials_burst(lfp);
     end
 end
 
@@ -56,34 +50,34 @@ normalisedBursts = cancelTime_pBurst_depth./nanmax(cancelTime_pBurst_depth);
 rawBursts = cancelTime_pBurst_depth;
 
 %% Arrange data for figure generation
-inputBurstList = {stopTime_pBurst_depth,cancelTime_pBurst_depth};
-periodName = {'Stop time','Cancel time'};
+inputBurstList = {stopTime_pBurst_depth,cancelTime_pBurst_depth, toneTime_pBurst_depth};
+periodName = {'Fix time','Stop time','Cancel time', 'Tone time'};
 
 count = 0;
 clear depthBurst depthBurstNorm label
 
-for periodIdx = 1:2
+for periodIdx = 1:length(periodName)
     clear inputBursts
-inputBursts = inputBurstList{periodIdx};
-  
-% Sort bursts into 4 separate layers (L2, L3, L5, L6)
-for sessionIdx = 1:16
-    for depthGroupIdx = 1:4
-        count = count + 1;
-
-        depthBurst(count,1) = nanmean(inputBursts...
-            (laminarAlignment.list{depthGroupIdx},sessionIdx));
-                
-        depthLabel{count,1} = laminarAlignment.labels{depthGroupIdx};
-        
-        periodLabel{count,1} = periodName{periodIdx};
-        
-        if ismember(sessionIdx,euPerpIdx); monkeyLabel{count,1} = 'Monkey Eu';
-        else; monkeyLabel{count,1} = 'Monkey X';
+    inputBursts = inputBurstList{periodIdx};
+    
+    % Sort bursts into 4 separate layers (L2, L3, L5, L6)
+    for sessionIdx = 1:16
+        for depthGroupIdx = 1:4
+            count = count + 1;
+            
+            depthBurst(count,1) = nanmean(inputBursts...
+                (laminarAlignment.list{depthGroupIdx},sessionIdx));
+            
+            depthLabel{count,1} = laminarAlignment.labels{depthGroupIdx};
+            
+            periodLabel{count,1} = periodName{periodIdx};
+            
+            if ismember(sessionIdx,euPerpIdx); monkeyLabel{count,1} = 'Monkey Eu';
+            else; monkeyLabel{count,1} = 'Monkey X';
+            end
+            
         end
-        
     end
-end  
     
 end
 
@@ -94,15 +88,15 @@ betaburst_depth_figure(1,1)= gramm('x',depthLabel,'y',depthBurst,'color',periodL
 betaburst_depth_figure(1,2)= gramm('x',depthLabel(strcmp(monkeyLabel,'Monkey Eu')),'y',depthBurst(strcmp(monkeyLabel,'Monkey Eu')),'color',periodLabel(strcmp(monkeyLabel,'Monkey Eu')));
 betaburst_depth_figure(1,3)= gramm('x',depthLabel(strcmp(monkeyLabel,'Monkey X')),'y',depthBurst(strcmp(monkeyLabel,'Monkey X')),'color',periodLabel(strcmp(monkeyLabel,'Monkey X')));
 
-betaburst_depth_figure(1,1).stat_summary('type','sem','geom',{'point','black_errorbar'});
-betaburst_depth_figure(1,2).stat_summary('type','sem','geom',{'point','black_errorbar'});
-betaburst_depth_figure(1,3).stat_summary('type','sem','geom',{'point','black_errorbar'});
+betaburst_depth_figure(1,1).stat_summary('geom',{'point','black_errorbar'});
+betaburst_depth_figure(1,2).stat_summary('geom',{'point','black_errorbar'});
+betaburst_depth_figure(1,3).stat_summary('geom',{'point','black_errorbar'});
 
-betaburst_depth_figure(1,1).axe_property('XDir','Reverse');
-betaburst_depth_figure(1,2).axe_property('XDir','Reverse');
-betaburst_depth_figure(1,3).axe_property('XDir','Reverse');
+% betaburst_depth_figure(1,1).axe_property('XDir','Reverse');
+% betaburst_depth_figure(1,2).axe_property('XDir','Reverse');
+% betaburst_depth_figure(1,3).axe_property('XDir','Reverse');
 
-betaburst_depth_figure.coord_flip();
+% betaburst_depth_figure.coord_flip();
 
 % g(1,1).axe_property('YLim',[0.25 1]);
 % g(1,2).axe_property('YLim',[0.25 1]);
