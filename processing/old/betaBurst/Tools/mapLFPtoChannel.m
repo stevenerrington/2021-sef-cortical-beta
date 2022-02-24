@@ -7,6 +7,14 @@ channelNames = {'AD17';'AD18';'AD19';'AD20';'AD21';'AD22';'AD23';'AD24';...
 site_sessionMap = {14:19,20:25,26:29,1:7,8:13};
 site_labels = {"p1","p2","p3","np1","np2"};
 
+DepthInfo = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
+    1, 1, 3, 2, 2, 3, 2, 4, 3, 4, 5, 4, 4, 6, 6];
+
+LFPRange = [5 24; 5 24; 5 24; 5 24; 5 24; 5 24; 5 24; 5 24; 5 24; 5 24; 5 24; 5 24; 5 24;
+6 22; 6 22; 8 24; 9 24; 12 24; 6 22; 13 24; 6 22; 8 24; 12 24; 12 24; 10 24;
+7 22; 7 22; 8 24; 6 21]; % these are based on Godlove, 2014 figure, 5/6.
+
+
 for sessionIdx = 1:29
     clear channelN session sessionName cortexFlag laminarFlag monkeyFlag monkeyName tempTable depth site sitelabel
     channelN = [1:24]';
@@ -34,7 +42,7 @@ for sessionIdx = 1:29
     if laminarFlag(1) == 0
         depth = nan(24,1);
     else
-        depthCount = 0;
+        depthCount = 0; %%%% THIS IS VOLATILE - CHECK ALIGNMENT. Originally 0
         for ii = 1:24
             if cortexFlag(ii) == 0
                 depth(ii,1) = nan;
