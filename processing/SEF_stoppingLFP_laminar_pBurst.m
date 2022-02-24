@@ -1,5 +1,6 @@
 %% Load dependencies
 load('D:\projectCode\project_stoppingLFP\processing\procData\stoppingBeta.mat')
+pBurst_depth = nan(19, 15);
 
 %% Run extraction function to get beta-burst properties across all contacts for canceled trials...
 % ... following successful stopping (target-400:target-200)
@@ -50,7 +51,7 @@ normalisedBursts = cancelTime_pBurst_depth./nanmax(cancelTime_pBurst_depth);
 rawBursts = cancelTime_pBurst_depth;
 
 %% Arrange data for figure generation
-inputBurstList = {stopTime_pBurst_depth,cancelTime_pBurst_depth, toneTime_pBurst_depth};
+inputBurstList = {fixTime_pBurst_depth, stopTime_pBurst_depth,cancelTime_pBurst_depth, toneTime_pBurst_depth};
 periodName = {'Fix time','Stop time','Cancel time', 'Tone time'};
 
 count = 0;
@@ -65,13 +66,17 @@ for periodIdx = 1:length(periodName)
         for depthGroupIdx = 1:4
             count = count + 1;
             
+            % Get the mean pBurst for the given depth
             depthBurst(count,1) = nanmean(inputBursts...
                 (laminarAlignment.list{depthGroupIdx},sessionIdx));
             
+            % Get the appropriate label (L2, L3, L5, L6)
             depthLabel{count,1} = laminarAlignment.labels{depthGroupIdx};
             
+            % Get the epoch label
             periodLabel{count,1} = periodName{periodIdx};
             
+            % Get the monkey label
             if ismember(sessionIdx,euPerpIdx); monkeyLabel{count,1} = 'Monkey Eu';
             else; monkeyLabel{count,1} = 'Monkey X';
             end
@@ -88,9 +93,9 @@ betaburst_depth_figure(1,1)= gramm('x',depthLabel,'y',depthBurst,'color',periodL
 betaburst_depth_figure(1,2)= gramm('x',depthLabel(strcmp(monkeyLabel,'Monkey Eu')),'y',depthBurst(strcmp(monkeyLabel,'Monkey Eu')),'color',periodLabel(strcmp(monkeyLabel,'Monkey Eu')));
 betaburst_depth_figure(1,3)= gramm('x',depthLabel(strcmp(monkeyLabel,'Monkey X')),'y',depthBurst(strcmp(monkeyLabel,'Monkey X')),'color',periodLabel(strcmp(monkeyLabel,'Monkey X')));
 
-betaburst_depth_figure(1,1).stat_summary('geom',{'point','black_errorbar'});
-betaburst_depth_figure(1,2).stat_summary('geom',{'point','black_errorbar'});
-betaburst_depth_figure(1,3).stat_summary('geom',{'point','black_errorbar'});
+betaburst_depth_figure(1,1).stat_summary('geom',{'point','line','black_errorbar'});
+betaburst_depth_figure(1,2).stat_summary('geom',{'point','line','black_errorbar'});
+betaburst_depth_figure(1,3).stat_summary('geom',{'point','line','black_errorbar'});
 
 % betaburst_depth_figure(1,1).axe_property('XDir','Reverse');
 % betaburst_depth_figure(1,2).axe_property('XDir','Reverse');

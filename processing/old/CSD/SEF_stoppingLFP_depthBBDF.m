@@ -1,46 +1,55 @@
+% Get contacts that fall in perpendicular penetration
 clear laminarContacts
 laminarContacts.all = find(corticalLFPmap.laminarFlag == 1);
 laminarTable = corticalLFPmap(laminarContacts.all,:);
-
 laminarContacts.upper = find(laminarTable.depth < 9);
 laminarContacts.lower = find(laminarTable.depth > 8);
 
+% Initialise array
 bbdf_depth_cancAll_SSD = nan(17,3001,length([1:16]));
 
 % Extract BBDF from files
 for ii = 1:length(laminarContacts.all)
+    
+    % Get admin information (session, depth, etc...)
     lfp = laminarContacts.all(ii);
     depth = corticalLFPmap.depth(lfp);
     session = corticalLFPmap.session(lfp);
     fprintf('Analysing LFP number %i of %i. \n',ii,length(laminarContacts.all));
     
+    % Load the previously extracted BBDF
     bbdfData = load(['D:\projectCode\project_stoppingLFP\data\bbdf\bbdf_' int2str(lfp)]);
     
-    bbdf_depth_cancAll_SSD(depth,:,session-13) = ...
-        nanmean(bbdfData.bbdf.ssd(executiveBeh.ttx_canc{session},:));
-
-    bbdf_depth_noncancAll_Saccade(depth,:,session-13) = ...
-        nanmean(bbdfData.bbdf.ssd(executiveBeh.ttx_canc{session},:));
-    
-    bbdf_depth_cancAll_tone(depth,:,session-13) = ...
-        nanmean(bbdfData.bbdf.tone(executiveBeh.ttx_canc{session},:));
-    
-    % Stop-signal (latency matched aligned)  %%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Latency-match BBDF
+    %  Initialise loops to be used in array
+    c_temp_fix = []; ns_temp_fix = [];
     c_temp_ssd = []; ns_temp_ssd = [];
     nc_temp_sacc = []; ns_temp_sacc = []; 
     c_temp_tone = []; ns_temp_tone = [];
     
+    % For each SSD
     for ssdIdx = 1:length(executiveBeh.inh_SSD{session})
+        % Fixation aligned BBDF
+        c_temp_fix(ssdIdx,:) = nanmean(bbdfData.bbdf.target(executiveBeh.ttm_CGO{session,ssdIdx}.C_matched, :));
+        ns_temp_fix(ssdIdx,:) = nanmean(bbdfData.bbdf.target(executiveBeh.ttm_CGO{session,ssdIdx}.GO_matched, :));
+        
+        % SSD aligned BBDF
         c_temp_ssd(ssdIdx,:) = nanmean(bbdfData.bbdf.ssd(executiveBeh.ttm_CGO{session,ssdIdx}.C_matched, :));
         ns_temp_ssd(ssdIdx,:) = nanmean(bbdfData.bbdf.ssd(executiveBeh.ttm_CGO{session,ssdIdx}.GO_matched, :));
- 
+        
+        % Saccade aligned BBDF 
         nc_temp_sacc(ssdIdx,:) = nanmean(bbdfData.bbdf.saccade(executiveBeh.ttm_c.NC{session,ssdIdx}.all, :));
         ns_temp_sacc(ssdIdx,:) = nanmean(bbdfData.bbdf.saccade(executiveBeh.ttm_c.GO_NC{session,ssdIdx}.all, :));        
 
-        c_temp_tone(ssdIdx,:) = nanmean(bbdfData.bbdf.ssd(executiveBeh.ttm_CGO{session,ssdIdx}.C_matched, :));
-        ns_temp_tone(ssdIdx,:) = nanmean(bbdfData.bbdf.ssd(executiveBeh.ttm_CGO{session,ssdIdx}.GO_matched, :));       
+        % Tone aligned BBDF 
+        c_temp_tone(ssdIdx,:) = nanmean(bbdfData.bbdf.tone(executiveBeh.ttm_CGO{session,ssdIdx}.C_matched, :));
+        ns_temp_tone(ssdIdx,:) = nanmean(bbdfData.bbdf.tone(executiveBeh.ttm_CGO{session,ssdIdx}.GO_matched, :));       
     end
     
+    % Average across SSD latency matched BBDFs
+    bbdf_depth_cancLatency_fix{ii,1} = nanmean(c_temp_fix);
+    bbdf_depth_nostopLatency_fix{ii,1} = nanmean(ns_temp_fix);   
+
     bbdf_depth_cancLatency_SSD{ii,1} = nanmean(c_temp_ssd);
     bbdf_depth_nostopLatency_SSD{ii,1} = nanmean(ns_temp_ssd);   
 
@@ -50,225 +59,217 @@ for ii = 1:length(laminarContacts.all)
     bbdf_depth_cancLatency_Tone{ii,1} = nanmean(c_temp_tone);
     bbdf_depth_nostopLatency_Tone{ii,1} = nanmean(ns_temp_tone);  
     
+    
+    bbdf_depth_cancAll_Fix(depth,:,session-13) = nanmean(c_temp_fix);
+    bbdf_depth_cancAll_SSD(depth,:,session-13) = nanmean(c_temp_ssd);
+    bbdf_depth_noncancAll_Saccade(depth,:,session-13) = nanmean(nc_temp_sacc);
+    bbdf_depth_cancAll_tone(depth,:,session-13) = nanmean(c_temp_tone);
+    
 end
 
-% Normalise data
-plotWindow = [-200:1000]+1000;
+% Set plot windows
+plotWindow_fix = [-600:0]+1000;
+plotWindow_ssd = [-200:600]+1000;
+plotWindow_saccade = [-200:600]+1000;
 plotWindow_tone = [-600:0]+1000;
 
+% Normalise data (Z-score - relative to window)
 clear bbdf_depth_norm_SSD bbdf_depth_norm_Tone bbdf_depth_norm_Saccade
 for session = 1:16
-    bbdf_depth_norm_SSD(:,:,session) = (bbdf_depth_cancAll_SSD(:,plotWindow,session)-...
-        nanmean(nanmean(bbdf_depth_cancAll_SSD(:,plotWindow,session))))./...
-        nanstd(nanstd(bbdf_depth_cancAll_SSD(:,plotWindow,session)));
+    % Take the BBDF and normalise it by calculating values relative to mean
+    % of the window
     
-    bbdf_depth_norm_Saccade(:,:,session) = (bbdf_depth_noncancAll_Saccade(:,plotWindow,session)-...
-        nanmean(nanmean(bbdf_depth_noncancAll_Saccade(:,plotWindow,session))))./...
-        nanstd(nanstd(bbdf_depth_noncancAll_Saccade(:,plotWindow,session)));
+    % ...for fixation
+    bbdf_depth_norm_Fix(:,:,session) = (bbdf_depth_cancAll_Fix(:,plotWindow_ssd,session)-...
+        nanmean(nanmean(bbdf_depth_cancAll_Fix(:,plotWindow_ssd,session))))./...
+        nanstd(nanstd(bbdf_depth_cancAll_Fix(:,plotWindow_ssd,session)));
+    
+    % ...for SSD
+    bbdf_depth_norm_SSD(:,:,session) = (bbdf_depth_cancAll_SSD(:,plotWindow_ssd,session)-...
+        nanmean(nanmean(bbdf_depth_cancAll_SSD(:,plotWindow_ssd,session))))./...
+        nanstd(nanstd(bbdf_depth_cancAll_SSD(:,plotWindow_ssd,session)));
+    
+    % ...for saccade
+    bbdf_depth_norm_Saccade(:,:,session) = (bbdf_depth_noncancAll_Saccade(:,plotWindow_saccade,session)-...
+        nanmean(nanmean(bbdf_depth_noncancAll_Saccade(:,plotWindow_saccade,session))))./...
+        nanstd(nanstd(bbdf_depth_noncancAll_Saccade(:,plotWindow_saccade,session)));
 
+    % ...for saccade
     bbdf_depth_norm_Tone(:,:,session) = (bbdf_depth_cancAll_tone(:,plotWindow_tone,session)-...
         nanmean(nanmean(bbdf_depth_cancAll_tone(:,plotWindow_tone,session))))./...
         nanstd(nanstd(bbdf_depth_cancAll_tone(:,plotWindow_tone,session)));
 end
 
-
-% Extract BBDF from files
+% Get difference between canceled and no-stop latency matched
+% (non-normalised)
 for ii = 1:length(laminarContacts.all)
-    bbdf_depth_diff{ii} = bbdf_depth_cancLatency_SSD{ii} - bbdf_depth_nostopLatency_SSD{ii};
+    bbdf_depth_diff_fix{ii} = bbdf_depth_cancLatency_fix{ii} - bbdf_depth_nostopLatency_fix{ii};
+    bbdf_depth_diff_stop{ii} = bbdf_depth_cancLatency_SSD{ii} - bbdf_depth_nostopLatency_SSD{ii};
+    bbdf_depth_diff_tone{ii} = bbdf_depth_cancLatency_Tone{ii} - bbdf_depth_nostopLatency_Tone{ii};
+    bbdf_depth_diff_sacc{ii} = bbdf_depth_noncancLatency_Sacc{ii} - bbdf_depth_nostopLatency_Sacc{ii};
 end
     
 
+%% Smooth BBDF for figures
+% Fixation-aligned session average BBDF x depth x time
+bbdfAverage_fix = nanmean(bbdf_depth_norm_Fix(:,:,:),3); % Average BBDF across sessions
+bbdfAverageSmooth_fix = H_2DSMOOTH(bbdfAverage_fix); % Smooth the BBDF across depth and time
 
-%% Produce figures
-% SSRT Aligned
-bbdfAverage = nanmean(bbdf_depth_norm_SSD(:,:,:),3);
-bbdfAverageSmooth = H_2DSMOOTH(bbdfAverage);
-clim_x = [-10 10];
+% SSD-aligned session average BBDF x depth x time
+bbdfAverage_ssd = nanmean(bbdf_depth_norm_SSD(:,:,:),3); % Average BBDF across sessions
+bbdfAverageSmooth_ssd = H_2DSMOOTH(bbdfAverage_ssd); % Smooth the BBDF across depth and time
 
-figure('Renderer', 'painters', 'Position', [100 100 1500 700]);
-subplot(2,3,1)
-imagesc('XData',[-200:1000],'YData',1:171,'CData',bbdfAverageSmooth)
-xlim([-200 1000]); ylim([1 171]);
-colorbar; vline(0,'k'); vline(mean(bayesianSSRT.ssrt_mean),'k--')
-set(gca,'YDir','Reverse')
-set(gca,'CLim',[-8 8])
-colormap(parula) 
+% Saccade-aligned session average BBDF x depth x time
+bbdfAverage_sacc = nanmean(bbdf_depth_norm_Saccade(:,:,:),3); % Average BBDF across sessions
+bbdfAverageSmooth_sacc = H_2DSMOOTH(bbdfAverage_sacc); % Smooth the BBDF across depth and time
 
-bbdfAverage_Eu = nanmean(bbdf_depth_norm_SSD(:,:,[1 2 3 4 5 6]),3);
-bbdfAverageSmooth_Eu = H_2DSMOOTH(bbdfAverage_Eu);
-subplot(2,3,2)
-imagesc('XData',[-200:1000],'YData',1:171,'CData',bbdfAverageSmooth_Eu)
-xlim([-200 1000]); ylim([1 171]);
-colorbar; vline(0,'k'); vline(mean(bayesianSSRT.ssrt_mean(executiveBeh.nhpSessions.EuSessions)),'k--')
-set(gca,'YDir','Reverse')
-set(gca,'CLim',clim_x)
-colormap(parula) 
+% Tone-aligned session average BBDF x depth x time
+bbdfAverage_tone = nanmean(bbdf_depth_norm_Tone(:,:,:),3); % Average BBDF across sessions
+bbdfAverageSmooth_tone = H_2DSMOOTH(bbdfAverage_tone); % Smooth the BBDF across depth and time
 
-bbdfAverage_X = nanmean(bbdf_depth_norm_SSD(:,:,[7:end]),3);
-bbdfAverageSmooth_X = H_2DSMOOTH(bbdfAverage_X);
-subplot(2,3,3)
-imagesc('XData',[-200:1000],'YData',1:171,'CData',bbdfAverageSmooth_X)
-xlim([-200 1000]); ylim([1 171]);
-colorbar; vline(0,'k'); vline(mean(bayesianSSRT.ssrt_mean(executiveBeh.nhpSessions.XSessions)),'k--')
+
+%% Produce figures: BBDF Heatmap
+% Set parameters
+clim_x = [-6 6];
+
+% Generate figure
+figure('Renderer', 'painters', 'Position', [100 100 1500 250]);
+
+% - Fixation aligned subplot
+subplot(1,4,1)
+imagesc('XData',[plotWindow_fix]-1000,'YData',1:171,'CData',bbdfAverageSmooth_fix)
+xlim([plotWindow_fix(1)-1000 plotWindow_fix(end)-1000]); ylim([1 171]);
+vline(0,'k');
 set(gca,'YDir','Reverse')
 set(gca,'CLim',clim_x)
 colormap(parula) 
 
-% Tone aligned
-bbdfAverage_tone = nanmean(bbdf_depth_norm_Tone(:,:,:),3);
-bbdfAverageSmooth_tone = H_2DSMOOTH(bbdfAverage_tone);
-
-subplot(2,3,4)
-imagesc('XData',[-600:100],'YData',1:171,'CData',bbdfAverageSmooth_tone)
-xlim([-600 100]); ylim([1 171]);
-colorbar; vline(0,'k')
-set(gca,'YDir','Reverse')
-set(gca,'CLim',[-8 8])
-colormap(parula) 
-
-bbdfAverage_Eu_tone = nanmean(bbdf_depth_norm_Tone(:,:,[1 2 3 4 5 6]),3);
-bbdfAverageSmooth_Eu_tone = H_2DSMOOTH(bbdfAverage_Eu_tone);
-subplot(2,3,5)
-imagesc('XData',[-600:100],'YData',1:171,'CData',bbdfAverageSmooth_Eu_tone)
-xlim([-600 100]); ylim([1 171]);
-colorbar; vline(0,'k'); vline(mean(bayesianSSRT.ssrt_mean(executiveBeh.nhpSessions.EuSessions)),'k--')
+% - Saccade aligned subplot
+subplot(1,4,2)
+imagesc('XData',[plotWindow_saccade]-1000,'YData',1:171,'CData',bbdfAverageSmooth_sacc)
+xlim([plotWindow_saccade(1)-1000 plotWindow_saccade(end)-1000]); ylim([1 171]);
+vline(0,'k');
 set(gca,'YDir','Reverse')
 set(gca,'CLim',clim_x)
 colormap(parula) 
 
-bbdfAverage_X_tone = nanmean(bbdf_depth_norm_Tone(:,:,[7:end]),3);
-bbdfAverageSmooth_X_tone = H_2DSMOOTH(bbdfAverage_X_tone);
-subplot(2,3,6)
-imagesc('XData',[-600:100],'YData',1:171,'CData',bbdfAverageSmooth_X_tone)
-xlim([-600 100]); ylim([1 171]);
-colorbar; vline(0,'k')
+% - SSD aligned subplot
+subplot(1,4,3)
+imagesc('XData',[plotWindow_ssd]-1000,'YData',1:171,'CData',bbdfAverageSmooth_ssd)
+xlim([plotWindow_ssd(1)-1000 plotWindow_ssd(end)-1000]); ylim([1 171]);
+vline(0,'k'); vline(mean(bayesianSSRT.ssrt_mean),'k--')
 set(gca,'YDir','Reverse')
 set(gca,'CLim',clim_x)
 colormap(parula) 
-% 
 
- 
-%% Produce figures
-% SSRT Aligned
-
-bbdfAverage = [];
-bbdfAverage = nanmean(bbdf_depth_norm_Saccade(:,:,:),3);
-bbdfAverageSmooth = H_2DSMOOTH(bbdfAverage);
-
-figure('Renderer', 'painters', 'Position', [100 100 1500 300]);
-subplot(1,3,1)
-imagesc('XData',[-200:1000],'YData',1:171,'CData',bbdfAverageSmooth)
-xlim([-200 1000]); ylim([1 171]);
-colorbar; vline(0,'k')
+% - Tone aligned subplot
+subplot(1,4,4)
+imagesc('XData',[plotWindow_tone]-1000,'YData',1:171,'CData',bbdfAverageSmooth_tone)
+xlim([plotWindow_tone(1)-1000 plotWindow_tone(end)-1000]); ylim([1 171]);
+vline(0,'k');
 set(gca,'YDir','Reverse')
-% set(gca,'CLim',[0.1 1.5])
-
-subplot(1,3,2)
-bbdfAverage_Eu_saccade = nanmean(bbdf_depth_norm_Saccade(:,:,[1 2 3 4 5 6]),3);
-bbdfAverageSmooth_Eu_saccade = H_2DSMOOTH(bbdfAverage_Eu_saccade);
-imagesc('XData',[-200:1000],'YData',1:171,'CData',bbdfAverageSmooth_Eu_saccade)
-xlim([-200 1000]); ylim([1 171]);
-colorbar; vline(0,'k');
-set(gca,'YDir','Reverse')
-
-subplot(1,3,3)
-bbdfAverage_X_saccade = nanmean(bbdf_depth_norm_Saccade(:,:,[7:end]),3);
-bbdfAverageSmooth_X_saccade = H_2DSMOOTH(bbdfAverage_X_saccade);
-imagesc('XData',[-200:1000],'YData',1:171,'CData',bbdfAverageSmooth_X_saccade)
-xlim([-200 1000]); ylim([1 171]);
-colorbar; vline(0,'k');
-set(gca,'YDir','Reverse')
+set(gca,'CLim',clim_x)
+colormap(parula) 
 
 
 
-
-
-%%
-clear testfigure
+%% Produce Figures: BBDF Layer
+clear bbdf_layer_epoch
 time = [-1000:2000];
 ssrt_time = [-500:1000];
 
-% Fixation aligned
-testfigure(1,1)=gramm('x',time,'y',[bbdf_depth_cancLatency_SSD(laminarTable.depth > 8);...
+% Fixation aligned (Upper layer channels only)
+bbdf_layer_epoch(1,1)=gramm('x',time,'y',[bbdf_depth_cancLatency_fix(laminarTable.depth <= 8);...
+    bbdf_depth_nostopLatency_fix(laminarTable.depth <= 8)],...
+    'color',[repmat({'Canceled'},sum(laminarTable.depth <= 8),1);...
+    repmat({'No-stop'},sum(laminarTable.depth <= 8),1)]);
+
+% SSD aligned (Upper layer channels only)
+bbdf_layer_epoch(1,2)=gramm('x',time,'y',[bbdf_depth_cancLatency_SSD(laminarTable.depth <= 8);...
+    bbdf_depth_nostopLatency_SSD(laminarTable.depth <= 8)],...
+    'color',[repmat({'Canceled'},sum(laminarTable.depth <= 8),1);...
+    repmat({'No-stop'},sum(laminarTable.depth <= 8),1)]);
+
+% Tone aligned (Upper layer channels only)
+bbdf_layer_epoch(1,3)=gramm('x',time,'y',[bbdf_depth_cancLatency_Tone(laminarTable.depth <= 8);...
+    bbdf_depth_nostopLatency_Tone(laminarTable.depth <= 8)],...
+    'color',[repmat({'Canceled'},sum(laminarTable.depth <= 8),1);...
+    repmat({'No-stop'},sum(laminarTable.depth <= 8),1)]);
+
+% Saccade aligned (Upper layer channels only)
+bbdf_layer_epoch(1,4)=gramm('x',time,'y',[bbdf_depth_noncancLatency_Sacc(laminarTable.depth <= 8);...
+    bbdf_depth_nostopLatency_Sacc(laminarTable.depth <= 8)],...
+    'color',[repmat({'Non-canceled'},sum(laminarTable.depth <= 8),1);...
+    repmat({'No-stop'},sum(laminarTable.depth <= 8),1)]);
+
+% Fixation aligned (Lower layer channels only)
+bbdf_layer_epoch(2,1)=gramm('x',time,'y',[bbdf_depth_cancLatency_fix(laminarTable.depth > 8 );...
+    bbdf_depth_nostopLatency_fix(laminarTable.depth > 8)],...
+    'color',[repmat({'Canceled'},sum(laminarTable.depth > 8),1);...
+    repmat({'No-stop'},sum(laminarTable.depth > 8),1)]);
+
+% SSD aligned (Lower layer channels only)
+bbdf_layer_epoch(2,2)=gramm('x',time,'y',[bbdf_depth_cancLatency_SSD(laminarTable.depth > 8);...
     bbdf_depth_nostopLatency_SSD(laminarTable.depth > 8)],...
     'color',[repmat({'Canceled'},sum(laminarTable.depth > 8),1);...
     repmat({'No-stop'},sum(laminarTable.depth > 8),1)]);
 
-testfigure(1,2)=gramm('x',time,'y',[bbdf_depth_cancLatency_SSD(laminarTable.monkeyFlag == 0 & laminarTable.depth > 8);...
-    bbdf_depth_nostopLatency_SSD(laminarTable.monkeyFlag == 0  & laminarTable.depth > 8)],...
-    'color',[repmat({'Canceled'},sum(laminarTable.monkeyFlag == 0  & laminarTable.depth > 8),1);...
-    repmat({'No-stop'},sum(laminarTable.monkeyFlag == 0  & laminarTable.depth > 8),1)]);
+% Tone aligned (Lower layer channels only)
+bbdf_layer_epoch(2,3)=gramm('x',time,'y',[bbdf_depth_cancLatency_Tone(laminarTable.depth > 8);...
+    bbdf_depth_nostopLatency_Tone(laminarTable.depth > 8)],...
+    'color',[repmat({'Canceled'},sum(laminarTable.depth > 8),1);...
+    repmat({'No-stop'},sum(laminarTable.depth > 8),1)]);
 
-testfigure(1,3)=gramm('x',time,'y',[bbdf_depth_cancLatency_SSD(laminarTable.monkeyFlag == 1  & laminarTable.depth > 8);...
-    bbdf_depth_nostopLatency_SSD(laminarTable.monkeyFlag == 1 & laminarTable.depth > 8)],...
-    'color',[repmat({'Canceled'},sum(laminarTable.monkeyFlag == 1 & laminarTable.depth > 8),1);...
-    repmat({'No-stop'},sum(laminarTable.monkeyFlag == 1  & laminarTable.depth > 8),1)]);
-
-testfigure(2,1)=gramm('x',time,'y',[bbdf_depth_cancLatency_SSD(laminarTable.depth < 9);...
-    bbdf_depth_nostopLatency_SSD(laminarTable.depth < 9)],...
-    'color',[repmat({'Canceled'},sum(laminarTable.depth < 9),1);...
-    repmat({'No-stop'},sum(laminarTable.depth < 9),1)]);
-
-testfigure(2,2)=gramm('x',time,'y',[bbdf_depth_cancLatency_SSD(laminarTable.monkeyFlag == 0 & laminarTable.depth < 9);...
-    bbdf_depth_nostopLatency_SSD(laminarTable.monkeyFlag == 0  & laminarTable.depth < 9)],...
-    'color',[repmat({'Canceled'},sum(laminarTable.monkeyFlag == 0  & laminarTable.depth < 9),1);...
-    repmat({'No-stop'},sum(laminarTable.monkeyFlag == 0  & laminarTable.depth < 9),1)]);
-
-testfigure(2,3)=gramm('x',time,'y',[bbdf_depth_cancLatency_SSD(laminarTable.monkeyFlag == 1  & laminarTable.depth < 9);...
-    bbdf_depth_nostopLatency_SSD(laminarTable.monkeyFlag == 1 & laminarTable.depth < 9)],...
-    'color',[repmat({'Canceled'},sum(laminarTable.monkeyFlag == 1 & laminarTable.depth < 9),1);...
-    repmat({'No-stop'},sum(laminarTable.monkeyFlag == 1  & laminarTable.depth < 9),1)]);
-
+% Saccade aligned (Lower layer channels only)
+bbdf_layer_epoch(2,4)=gramm('x',time,'y',[bbdf_depth_noncancLatency_Sacc(laminarTable.depth > 8);...
+    bbdf_depth_nostopLatency_Sacc(laminarTable.depth > 8)],...
+    'color',[repmat({'Non-canceled'},sum(laminarTable.depth > 8),1);...
+    repmat({'No-stop'},sum(laminarTable.depth > 8),1)]);
 
 % GRAMM Setup %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-testfigure(1,1).stat_summary();
-testfigure(1,1).axe_property('XLim',[-200 1000]); testfigure(1,1).axe_property('YLim',[0.0002 0.0025]); 
-testfigure(1,1).geom_vline('xintercept',0,'style','k-'); testfigure.set_names('y','');
+bbdf_layer_epoch(1,1).stat_summary();
+bbdf_layer_epoch(1,1).axe_property('XLim',[plotWindow_fix(1)-1000 plotWindow_fix(end)-1000]); bbdf_layer_epoch(1,1).axe_property('YLim',[0.0005 0.002]); 
+bbdf_layer_epoch(1,1).geom_vline('xintercept',0,'style','k-'); bbdf_layer_epoch.set_names('y','');
+bbdf_layer_epoch(1,1).no_legend();
 
-testfigure(1,2).stat_summary();
-testfigure(1,2).axe_property('XLim',[-200 1000]); testfigure(1,2).axe_property('YLim',[0.0002 0.0025]); 
-testfigure(1,2).geom_vline('xintercept',0,'style','k-'); testfigure.set_names('y','');
+bbdf_layer_epoch(1,2).stat_summary();
+bbdf_layer_epoch(1,2).axe_property('XLim',[plotWindow_ssd(1)-1000 plotWindow_ssd(end)-1000]); bbdf_layer_epoch(1,2).axe_property('YLim',[0.0005 0.002]); 
+bbdf_layer_epoch(1,2).geom_vline('xintercept',0,'style','k-'); bbdf_layer_epoch.set_names('y','');
+bbdf_layer_epoch(1,2).no_legend();
 
-testfigure(1,3).stat_summary();
-testfigure(1,3).axe_property('XLim',[-200 1000]); testfigure(1,3).axe_property('YLim',[0.0002 0.0025]); 
-testfigure(1,3).geom_vline('xintercept',0,'style','k-'); testfigure.set_names('y','');
+bbdf_layer_epoch(1,3).stat_summary();
+bbdf_layer_epoch(1,3).axe_property('XLim',[plotWindow_tone(1)-1000 plotWindow_tone(end)-1000]); bbdf_layer_epoch(1,3).axe_property('YLim',[0.0005 0.002]); 
+bbdf_layer_epoch(1,3).geom_vline('xintercept',0,'style','k-'); bbdf_layer_epoch.set_names('y','');
+bbdf_layer_epoch(1,3).no_legend();
 
-testfigure(2,1).stat_summary();
-testfigure(2,1).axe_property('XLim',[-200 1000]); testfigure(2,1).axe_property('YLim',[0.0005 0.0035]); 
-testfigure(2,1).geom_vline('xintercept',0,'style','k-'); testfigure.set_names('y','');
+bbdf_layer_epoch(1,4).stat_summary();
+bbdf_layer_epoch(1,4).axe_property('XLim',[plotWindow_saccade(1)-1000 plotWindow_saccade(end)-1000]); bbdf_layer_epoch(1,4).axe_property('YLim',[0.0005 0.002]); 
+bbdf_layer_epoch(1,4).geom_vline('xintercept',0,'style','k-'); bbdf_layer_epoch.set_names('y','');
+bbdf_layer_epoch(1,4).no_legend();
 
-testfigure(2,2).stat_summary();
-testfigure(2,2).axe_property('XLim',[-200 1000]); testfigure(2,2).axe_property('YLim',[0.0005 0.0035]); 
-testfigure(2,2).geom_vline('xintercept',0,'style','k-'); testfigure.set_names('y','');
+bbdf_layer_epoch(2,1).stat_summary();
+bbdf_layer_epoch(2,1).axe_property('XLim',[plotWindow_fix(1)-1000 plotWindow_fix(end)-1000]); bbdf_layer_epoch(2,1).axe_property('YLim',[0.0005 0.002]); 
+bbdf_layer_epoch(2,1).geom_vline('xintercept',0,'style','k-'); bbdf_layer_epoch.set_names('y','');
+bbdf_layer_epoch(2,1).no_legend();
 
-testfigure(2,3).stat_summary();
-testfigure(2,3).axe_property('XLim',[-200 1000]); testfigure(2,3).axe_property('YLim',[0.0005 0.0035]); 
-testfigure(2,3).geom_vline('xintercept',0,'style','k-'); testfigure.set_names('y','');
+bbdf_layer_epoch(2,2).stat_summary();
+bbdf_layer_epoch(2,2).axe_property('XLim',[plotWindow_ssd(1)-1000 plotWindow_ssd(end)-1000]); bbdf_layer_epoch(2,2).axe_property('YLim',[0.0005 0.002]); 
+bbdf_layer_epoch(2,2).geom_vline('xintercept',0,'style','k-'); bbdf_layer_epoch.set_names('y','');
+bbdf_layer_epoch(2,2).no_legend();
 
-figure('Renderer', 'painters', 'Position', [100 100 1500 600]);
-testfigure.draw();
+bbdf_layer_epoch(2,3).stat_summary();
+bbdf_layer_epoch(2,3).axe_property('XLim',[plotWindow_tone(1)-1000 plotWindow_tone(end)-1000]); bbdf_layer_epoch(2,3).axe_property('YLim',[0.0005 0.002]); 
+bbdf_layer_epoch(2,3).geom_vline('xintercept',0,'style','k-'); bbdf_layer_epoch.set_names('y','');
+bbdf_layer_epoch(2,3).no_legend();
 
-
-
-
-%%
-clear testfigure
-time = [-1000:2000];
-ssrt_time = [-500:1000];
-
-% Fixation aligned
-testfigure(1,1)=gramm('x',time,'y',[bbdf_depth_cancLatency_SSD(laminarContacts.upper);...
-    bbdf_depth_cancLatency_SSD(laminarContacts.lower)],...
-    'color',[repmat({'Difference - Upper'},length(laminarContacts.upper),1);...
-    repmat({'Difference - Lower'},length(laminarContacts.lower),1)]);
-
-% GRAMM Setup %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-testfigure(1,1).stat_summary();
-testfigure(1,1).axe_property('XLim',[-200 1000]);
-testfigure(1,1).geom_vline('xintercept',0,'style','k-');
-testfigure(1,1).axe_property('YLim',[0.00025 0.002]);
-testfigure.set_names('y','');
+bbdf_layer_epoch(2,4).stat_summary();
+bbdf_layer_epoch(2,4).axe_property('XLim',[plotWindow_saccade(1)-1000 plotWindow_saccade(end)-1000]); bbdf_layer_epoch(2,4).axe_property('YLim',[0.0005 0.002]); 
+bbdf_layer_epoch(2,4).geom_vline('xintercept',0,'style','k-'); bbdf_layer_epoch.set_names('y','');
+bbdf_layer_epoch(2,4).no_legend();
 
 
-figure('Renderer', 'painters', 'Position', [100 100 400 300]);
-testfigure.draw();
+figure('Renderer', 'painters', 'Position', [100 100 800 400]);
+bbdf_layer_epoch.draw();
+
+
+
