@@ -154,6 +154,6 @@ eeg_lfp_burst_epoch(1,1).stat_summary('geom',{'point','line','errorbar'});
 eeg_lfp_burst_epoch(1,1).axe_property('YLim',[0.0 0.75]);
 
 %... and print it!
-figure('Renderer', 'painters', 'Position', [100 100 500 250]);
+figure('Renderer', 'painters', 'Position', [100 100 400 300]);
 eeg_lfp_burst_epoch.draw();
 
