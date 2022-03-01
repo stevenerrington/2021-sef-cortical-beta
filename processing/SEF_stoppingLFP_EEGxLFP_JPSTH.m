@@ -68,15 +68,15 @@ for sessionIdx = 1:29
 end
 
 %%
-count = 0;
 
 jpsth_xLFP_jpsth = struct();
 jpsth_xEEG_psth = struct();
 jpsth_xLFP_psth = struct();
-jpsth_xLFP_pstch = struct();
+jpsth_EEGxLFP_pstch = struct();
 jpsth_EEGxLFP_xcorr = struct();
 jpsth_EEGxLFP_xcovar = struct();
 
+count = 0;
 
 for sessionIdx = 1:29
     % Get the admin/details
@@ -107,46 +107,68 @@ end
 
 
 %%
+corticalLayerLabels = {'Upper','Lower'};
 
-figure('Renderer', 'painters', 'Position', [100 100 1200 800]);
+for layerIdx = 1:length(corticalLayerLabels)
+    
+    inputSessions = 14:29;
+    inputContacts = [];
+    
+    if strcmp(corticalLayerLabels{layerIdx}, 'Upper')
+        inputContacts = find(corticalLFPmap.session >= 14 &...
+            corticalLFPmap.depth <= 8);
+    else
+        inputContacts = find(corticalLFPmap.session >= 14 &...
+            corticalLFPmap.depth > 8);
+    end
+    
+    figure('Renderer', 'painters', 'Position', [100 100 1200 800]);
+    
+    
+    for alignmentIdx = 1:4
+        alignmentEvent = eventAlignments{alignmentIdx};
+        alignmentZero = abs(eeg_lfp_burst.eventWindows{alignmentIdx}(1));
+        
+        
+        ax = subplot(6,4,[alignmentIdx alignmentIdx+4]); hold on
+        imagesc(jpsthBinEdge_plot{29,alignmentIdx}-alignmentZero,...
+            jpsthBinEdge_plot{29,alignmentIdx}-alignmentZero,...
+            nanmean(jpsth_xLFP_jpsth.(alignmentEvent)(:,:,inputContacts),3))
+        plot(jpsthBinEdge_plot{29,alignmentIdx}-alignmentZero, jpsthBinEdge_plot{29,alignmentIdx}-alignmentZero, 'k--')
+        minXY = min(jpsthBinEdge_plot{29,alignmentIdx}-alignmentZero);
+        maxXY = max(jpsthBinEdge_plot{29,alignmentIdx}-alignmentZero);
+        set(gca,'XLim',[minXY maxXY],'YLim',[minXY maxXY],'YDir','normal')
+        vline(0,'k'); hline(0,'k')
+        
+        colormap(turbo)
+        caxis([0 0.10])
+        
+        ax = subplot(6,4,[alignmentIdx+8]); hold on
+        area(nanmean(jpsth_xEEG_psth.(alignmentEvent)(inputSessions,:)))
+        set(ax,'XLim',[1 length(jpsthBinEdge)-1])
+        set(ax,'YLim',[0 0.075])
+        
+        ax = subplot(6,4,[alignmentIdx+12]); hold on
+        area(nanmean(jpsth_xLFP_psth.(alignmentEvent)(inputContacts,:)))
+        set(ax,'XLim',[1 length(jpsthBinEdge)-1])
+        set(ax,'YLim',[0 0.075])
+        
+        ax = subplot(6,4,[alignmentIdx+16]); hold on
+        area(nanmean(jpsth_EEGxLFP_pstch.(alignmentEvent)(inputContacts,:)))
+        set(ax,'XLim',[1 length(jpsthBinEdge)-1])
+        set(ax,'YLim',[0 0.075])
+        
+        ax = subplot(6,4,[alignmentIdx+20]); hold on
+        area(nanmean(jpsth_EEGxLFP_xcorr.(alignmentEvent)(inputContacts,:)))
+        %     set(ax,'XLim',[1 length(jpsthBinEdge)-1])
+        set(ax,'YLim',[0 0.075])
+        
+    end
+            title(corticalLayerLabels{layerIdx})
 
-for alignmentIdx = 1:4
-    alignmentEvent = eventAlignments{alignmentIdx};
-    alignmentZero = abs(eeg_lfp_burst.eventWindows{alignmentIdx}(1));
     
-    ax = subplot(6,4,[alignmentIdx alignmentIdx+4]); hold on
-    imagesc(jpsthBinEdge_plot{29,alignmentIdx}-alignmentZero,...
-        jpsthBinEdge_plot{29,alignmentIdx}-alignmentZero,...
-        nanmean(jpsth_xLFP_jpsth.(alignmentEvent),3))
-    plot(jpsthBinEdge_plot{29,alignmentIdx}-alignmentZero, jpsthBinEdge_plot{29,alignmentIdx}-alignmentZero, 'k--')
-    minXY = min(jpsthBinEdge_plot{29,alignmentIdx}-alignmentZero);
-    maxXY = max(jpsthBinEdge_plot{29,alignmentIdx}-alignmentZero);
-    set(gca,'XLim',[minXY maxXY],'YLim',[minXY maxXY],'YDir','normal')
-    vline(0,'k'); hline(0,'k')
     
-    colormap(turbo)
-    caxis([0 0.10])
-    
-    ax = subplot(6,4,[alignmentIdx+8]); hold on
-    area(nanmean(jpsth_xEEG_psth.(alignmentEvent)))
-    set(ax,'XLim',[1 length(jpsthBinEdge)-1])
-    
-    ax = subplot(6,4,[alignmentIdx+12]); hold on
-    area(nanmean(jpsth_xLFP_psth.(alignmentEvent)))
-    set(ax,'XLim',[1 length(jpsthBinEdge)-1])    
-    
-    ax = subplot(6,4,[alignmentIdx+16]); hold on
-    area(nanmean(jpsth_EEGxLFP_pstch.(alignmentEvent)))
-    set(ax,'XLim',[1 length(jpsthBinEdge)-1])    
-    
-    ax = subplot(6,4,[alignmentIdx+20]); hold on
-    bar(nanmean(jpsth_EEGxLFP_xcorr.(alignmentEvent)),'LineStyle','None')
-%     set(ax,'XLim',[1 length(jpsthBinEdge)-1])        
 end
-
-
-
-
 
 
 
