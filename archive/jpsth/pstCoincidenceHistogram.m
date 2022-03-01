@@ -29,6 +29,6 @@ function [pstch] = pstCoincidenceHistogram(jpsth,coinWidth)
 	for i = widthVector
 		pad = abs(i);
 		d = diag(jpsth,i)';
-		pstch(pad+1:end) = pstch(pad+1:end) + d;
+		pstch(pad+1:end) = d; % + pstch(pad+1:end);
 	end
 end

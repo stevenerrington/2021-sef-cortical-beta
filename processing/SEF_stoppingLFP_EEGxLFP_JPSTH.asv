@@ -74,8 +74,6 @@ jpsth_xLFP_jpsth = struct();
 jpsth_xEEG_psth = struct();
 jpsth_xLFP_psth = struct();
 jpsth_xLFP_pstch = struct();
-jpsth_EEGxLFP_xcorr = struct();
-jpsth_EEGxLFP_xcovar = struct();
 
 
 for sessionIdx = 1:29
@@ -99,15 +97,12 @@ for sessionIdx = 1:29
             jpsth_xEEG_psth.(alignmentEvent)(sessionIdx,:) = jspthAnalysis.(alignmentEvent){sessionIdx,lfpIdx}.psth_1;
             jpsth_xLFP_psth.(alignmentEvent)(count,:) = jspthAnalysis.(alignmentEvent){sessionIdx,lfpIdx}.psth_2;
             jpsth_EEGxLFP_pstch.(alignmentEvent)(count,:) = jspthAnalysis.(alignmentEvent){sessionIdx,lfpIdx}.pstch;
-            jpsth_EEGxLFP_xcorr.(alignmentEvent)(count,:) = jspthAnalysis.(alignmentEvent){sessionIdx,lfpIdx}.xcorrHist;
-            jpsth_EEGxLFP_xcovar.(alignmentEvent)(count,:) = jspthAnalysis.(alignmentEvent){sessionIdx,lfpIdx}.covariogram;
         end
     end
 end
 
 
 %%
-
 figure('Renderer', 'painters', 'Position', [100 100 1200 800]);
 
 for alignmentIdx = 1:4
@@ -136,12 +131,9 @@ for alignmentIdx = 1:4
     set(ax,'XLim',[1 length(jpsthBinEdge)-1])    
     
     ax = subplot(6,4,[alignmentIdx+16]); hold on
-    area(nanmean(jpsth_EEGxLFP_pstch.(alignmentEvent)))
+    area(nanmean(jpsth_xEEG_psth.(alignmentEvent)))
     set(ax,'XLim',[1 length(jpsthBinEdge)-1])    
     
-    ax = subplot(6,4,[alignmentIdx+20]); hold on
-    bar(nanmean(jpsth_EEGxLFP_xcorr.(alignmentEvent)),'LineStyle','None')
-%     set(ax,'XLim',[1 length(jpsthBinEdge)-1])        
 end
 
 

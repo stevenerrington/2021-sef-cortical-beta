@@ -161,3 +161,4 @@ end
 
 figure('Renderer', 'painters', 'Position', [100 100 1200 300]);
 test.draw();
+
