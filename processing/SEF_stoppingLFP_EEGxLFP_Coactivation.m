@@ -37,24 +37,38 @@ for sessionIdx = 14:29
         ch_depths = []; ch_depths = corticalLFPmap.depth(corticalLFPmap.session == session);
         
         % Here, some sessions don't have many contacts in lower layers. We
-        % account for that here.
+        % account for that here. I'm just plotting one channel per layer
+        % for greater representitiveness. More channels = greater p(burst | time)
         ch_l2 = 2;
         ch_l3 = 6;
         ch_l5 = 10;
         ch_l6 = min([max(ch_depths) 14]);
         
+        % For each trial of interest
         for ii = 1:length(trials)
+            % Get the time point of when a burst occured relative to the
+            % time of event (0; alignmentZero). Save this output as a cell
+            % array to be plotted in gramm later. Do this for:
+            %      EEG:
             rasterplot.data.(alignmentEvent).eeg{ii,1} =...
                 find(eeg_lfp_burst.EEG{1, 1}(trials(ii),:)) - alignmentZero;
+            %      L2:
             rasterplot.data.(alignmentEvent).lfp_L2{ii,1} =...
                 find(eeg_lfp_burst.LFP{1, 1}(trials(ii),:,ch_l2)) - alignmentZero;
+            %      L3:
             rasterplot.data.(alignmentEvent).lfp_L3{ii,1} =...
                 find(eeg_lfp_burst.LFP{1, 1}(trials(ii),:,ch_l3)) - alignmentZero;
+            %      L5:
             rasterplot.data.(alignmentEvent).lfp_L5{ii,1} =...
                 find(eeg_lfp_burst.LFP{1, 1}(trials(ii),:,ch_l5)) - alignmentZero;
+            %      L6:
             rasterplot.data.(alignmentEvent).lfp_L6{ii,1} =...
                 find(eeg_lfp_burst.LFP{1, 1}(trials(ii),:,ch_l6)) - alignmentZero;
         end
+        
+        % We are going to print for each session, so for this, we can just
+        % make a temporary structure holding the data for this session only (i.e. we
+        % aren't saving through the loop for each session). To do this:
         
         % Collapse data across EEG and LFP's into one array for plotting
         rasterplot.collapsed.(alignmentEvent) =...
@@ -71,18 +85,28 @@ for sessionIdx = 14:29
             repmat({'L6'},length(rasterplot.data.(alignmentEvent).lfp_L6),1)];
         
         
-        %
-        pBurst_EEG.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.EEG{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero),2));
-        pBurst_L2.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l2),2));
-        pBurst_L3.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l3),2));
-        pBurst_L5.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l5),2));
-        pBurst_L6.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l6),2));
+        % However, we will save the proportion of bursts observed in the
+        % analysis window for each epoch on each session. As we are just
+        % looking at the perp sessions (14 onwards), I will subtract 13
+        % from the array index for saving (session 14, now is index 1). I
+        % am using mean(sum(data)), as this will give the proportion of
+        % trials in which a burst was observed
+        
+        pBurst_EEG.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.EEG{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero),2) > 0 );
+        pBurst_L2.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l2),2) > 0 );
+        pBurst_L3.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l3),2) > 0 );
+        pBurst_L5.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l5),2) > 0 );
+        pBurst_L6.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l6),2) > 0 );
     end
     
     
-    %% Generate raster figure
+    %% After we have run the analysis for all epochs in a given session, we can then print the figure
+    
+    % If we choose to print the figure for each session (printFigFlag)
     if printFigFlag == 1
-        clear eeg_lfp_raster
+        clear eeg_lfp_raster % we will clear any existing gramm plot with that variable name
+        
+        % ... and will plot the:
         % Fixation/target aligned raster
         eeg_lfp_raster(1,1)=gramm('x',rasterplot.collapsed.target,'color',rasterplot.collapsed.labels.target);
         eeg_lfp_raster(1,1).geom_raster('geom',{'point'});
@@ -103,19 +127,24 @@ for sessionIdx = 14:29
         eeg_lfp_raster(1,4).geom_raster('geom',{'point'});
         eeg_lfp_raster(1,4).axe_property('YDir','reverse');
         
-        % Print the figure
+        % ... and then generate it
         figure('Position',[100 100 1200 300]);
         eeg_lfp_raster.draw();
     end
 end
 
+% We then want to look at the proportion of bursts during each epoch,
+% across sessions. To do this, we will make a boxplot.
+
 %% Figure: boxplot p(burst) x eeg/depth x epoch
-%   Initialise the array
+
+% Initialise the array
 pBurst_combined = [];
 pBurst_combined_labels = [];
 pBurst_combined_epoch = [];
 
-%   For each alignment
+% Collate the data in a way to be used by gramm
+%   For each alignment:
 for alignmentIdx = 1:4
     % Get the event label
     alignmentEvent = eventAlignments{alignmentIdx};
@@ -143,16 +172,15 @@ for alignmentIdx = 1:4
         
 end
 
-% Clear the figure from matlabs memory as we're writing it new
-clear eeg_lfp_burst_epoch
+% Setup the figure in gramm
+clear eeg_lfp_burst_epoch % Clear the figure from matlabs memory as we're writing it new
 
-% Input data into the gramm library
+% Input data into the gramm library:
 eeg_lfp_burst_epoch(1,1)= gramm('x',pBurst_combined_epoch,'y',pBurst_combined,'color',pBurst_combined_labels);
-% Set the figure up as a point/line figure with 95% CI error bar
+% Set the figure up as a point/line figure with 95% CI error bar:
 eeg_lfp_burst_epoch(1,1).stat_summary('geom',{'point','line','errorbar'});
-% Set figure parameters
+% Set figure parameters:
 eeg_lfp_burst_epoch(1,1).axe_property('YLim',[0.0 0.75]);
-
 %... and print it!
 figure('Renderer', 'painters', 'Position', [100 100 400 300]);
 eeg_lfp_burst_epoch.draw();

@@ -123,6 +123,7 @@ for sessionIdx = 1:29
         % Setup structure to save: memory limitations
         savefile_label = ['eeg_lfp_session' int2str(session) '_' alignmentEvent '.mat'];
 
+        % Collate information into one saveable structure
         eeg_lfp_burst = struct();
         eeg_lfp_burst.EEG = burstCounts_EEG;
         eeg_lfp_burst.LFP = burstCounts_LFP_raw;
@@ -132,6 +133,7 @@ for sessionIdx = 1:29
         
         % Save output for each alignment on each session
         save([saveDir savefile_label],'eeg_lfp_burst','-v7.3')
+        % This can be loaded in to future analyses.
     end
 end
 

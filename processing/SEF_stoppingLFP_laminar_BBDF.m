@@ -101,6 +101,8 @@ for session = 1:16
 end
 
 
+% Average data across sessions for upper (ch 1:8) and lower (ch 9:end) layers and save
+% output for each aligned epoch (fixation, SSD, saccade, and tone)
 for session = 1:16
     bbdf_upper_Fix{session,1} = nanmean(bbdf_depth_norm_Fix(1:8,:,session));
     bbdf_lower_Fix{session,1} = nanmean(bbdf_depth_norm_Fix(9:end,:,session));
@@ -115,10 +117,6 @@ for session = 1:16
     bbdf_lower_Tone{session,1} = nanmean(bbdf_depth_norm_Tone(9:end,:,session));  
 end
 
-
-
-
-    
 
 %% Smooth BBDF for figures
 % Fixation-aligned session average BBDF x depth x time
@@ -184,42 +182,42 @@ colormap(parula)
 
 
 %% Produce Figures: BBDF Layer
-clear bbdf_layer_epoch
+clear bbdf_layer_epoch % clear the gramm variable, incase it already exists
 
-% Fixation aligned (Upper layer channels only)
+% Input relevant data into the gramm function, and set the parameters
+% Fixation aligned
 bbdf_layer_epoch(1,1)=gramm('x',plotWindow_fix-1000,'y',[bbdf_upper_Fix; bbdf_lower_Fix],...
     'color',[repmat({'Upper'},16,1);repmat({'Lower'},16,1)]);
-
-bbdf_layer_epoch(1,2)=gramm('x',plotWindow_saccade-1000,'y',[bbdf_upper_Saccade; bbdf_lower_Saccade],...
-    'color',[repmat({'Upper'},16,1);repmat({'Lower'},16,1)]);
-
-bbdf_layer_epoch(1,3)=gramm('x',plotWindow_ssd-1000,'y',[bbdf_upper_SSD; bbdf_lower_SSD],...
-    'color',[repmat({'Upper'},16,1);repmat({'Lower'},16,1)]);
-
-bbdf_layer_epoch(1,4)=gramm('x',plotWindow_tone-1000,'y',[bbdf_upper_Tone; bbdf_lower_Tone],...
-    'color',[repmat({'Upper'},16,1);repmat({'Lower'},16,1)]);
-
-% GRAMM Setup %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 bbdf_layer_epoch(1,1).stat_summary();
 bbdf_layer_epoch(1,1).axe_property('XLim',[plotWindow_fix(1)-1000 plotWindow_fix(end)-1000]); bbdf_layer_epoch(1,1).axe_property('YLim',[-6 6]); 
 bbdf_layer_epoch(1,1).geom_vline('xintercept',0,'style','k-'); bbdf_layer_epoch.set_names('y','');
 bbdf_layer_epoch(1,1).no_legend();
 
+% Saccade aligned
+bbdf_layer_epoch(1,2)=gramm('x',plotWindow_saccade-1000,'y',[bbdf_upper_Saccade; bbdf_lower_Saccade],...
+    'color',[repmat({'Upper'},16,1);repmat({'Lower'},16,1)]);
 bbdf_layer_epoch(1,2).stat_summary();
 bbdf_layer_epoch(1,2).axe_property('XLim',[plotWindow_saccade(1)-1000 plotWindow_saccade(end)-1000]); bbdf_layer_epoch(1,2).axe_property('YLim',[-6 6]); 
 bbdf_layer_epoch(1,2).geom_vline('xintercept',0,'style','k-'); bbdf_layer_epoch.set_names('y','');
 bbdf_layer_epoch(1,2).no_legend();
 
+% SSD aligned
+bbdf_layer_epoch(1,3)=gramm('x',plotWindow_ssd-1000,'y',[bbdf_upper_SSD; bbdf_lower_SSD],...
+    'color',[repmat({'Upper'},16,1);repmat({'Lower'},16,1)]);
 bbdf_layer_epoch(1,3).stat_summary();
 bbdf_layer_epoch(1,3).axe_property('XLim',[plotWindow_ssd(1)-1000 plotWindow_ssd(end)-1000]); bbdf_layer_epoch(1,3).axe_property('YLim',[-6 6]); 
 bbdf_layer_epoch(1,3).geom_vline('xintercept',0,'style','k-'); bbdf_layer_epoch.set_names('y','');
 bbdf_layer_epoch(1,3).no_legend();
 
+% Tone aligned
+bbdf_layer_epoch(1,4)=gramm('x',plotWindow_tone-1000,'y',[bbdf_upper_Tone; bbdf_lower_Tone],...
+    'color',[repmat({'Upper'},16,1);repmat({'Lower'},16,1)]);
 bbdf_layer_epoch(1,4).stat_summary();
 bbdf_layer_epoch(1,4).axe_property('XLim',[plotWindow_tone(1)-1000 plotWindow_tone(end)-1000]); bbdf_layer_epoch(1,4).axe_property('YLim',[-6 6]); 
 bbdf_layer_epoch(1,4).geom_vline('xintercept',0,'style','k-'); bbdf_layer_epoch.set_names('y','');
 bbdf_layer_epoch(1,4).no_legend();
 
+% Generate figure
 figure('Renderer', 'painters', 'Position', [100 100 800 200]);
 bbdf_layer_epoch.draw();
 
