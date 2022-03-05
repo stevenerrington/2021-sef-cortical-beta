@@ -75,6 +75,8 @@ jpsth_xLFP_psth = struct();
 jpsth_EEGxLFP_pstch = struct();
 jpsth_EEGxLFP_xcorr = struct();
 jpsth_EEGxLFP_xcovar = struct();
+jpsth_EEGxLFP_sigHigh = struct();
+jpsth_EEGxLFP_sigLow = struct();
 
 count = 0;
 
@@ -101,6 +103,8 @@ for sessionIdx = 1:29
             jpsth_EEGxLFP_pstch.(alignmentEvent)(count,:) = jspthAnalysis.(alignmentEvent){sessionIdx,lfpIdx}.pstch;
             jpsth_EEGxLFP_xcorr.(alignmentEvent)(count,:) = jspthAnalysis.(alignmentEvent){sessionIdx,lfpIdx}.xcorrHist;
             jpsth_EEGxLFP_xcovar.(alignmentEvent)(count,:) = jspthAnalysis.(alignmentEvent){sessionIdx,lfpIdx}.covariogram;
+            jpsth_EEGxLFP_sigHigh.(alignmentEvent){count,:} = jspthAnalysis.(alignmentEvent){sessionIdx,lfpIdx}.sigPeakEndpoints;
+            jpsth_EEGxLFP_sigLow.(alignmentEvent){count,:} = jspthAnalysis.(alignmentEvent){sessionIdx,lfpIdx}.sigTroughEndpoints;
         end
     end
 end
@@ -154,12 +158,12 @@ for layerIdx = 1:length(corticalLayerLabels)
         set(ax,'YLim',[0 0.075])
         
         ax = subplot(6,4,[alignmentIdx+16]); hold on
-        area(nanmean(jpsth_EEGxLFP_pstch.(alignmentEvent)(inputContacts,:)))
+        plot(nanmean(jpsth_EEGxLFP_pstch.(alignmentEvent)(inputContacts,:)))
         set(ax,'XLim',[1 length(jpsthBinEdge)-1])
         set(ax,'YLim',[0 0.075])
         
         ax = subplot(6,4,[alignmentIdx+20]); hold on
-        area(nanmean(jpsth_EEGxLFP_xcorr.(alignmentEvent)(inputContacts,:)))
+        plot(nanmean(jpsth_EEGxLFP_xcovar.(alignmentEvent)(inputContacts,:)))
         %     set(ax,'XLim',[1 length(jpsthBinEdge)-1])
         set(ax,'YLim',[0 0.075])
         
