@@ -6,13 +6,17 @@ pBurst_depth = nan(19, 15);
 % ... following successful stopping (target-400:target-200)
 fixBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeTarget...
     (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
-% ... following successful stopping (ssrt:ssrt+300)
+% ... following successful stopping (ssrt+200:ssrt+400)
 ssrtBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeSSRT...
     (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
-% ... and prior to the tone (-300:tone; when inhibition needed to be held
+% ... and prior to the tone (-200:tone; when inhibition needed to be held
 %     until)
 toneBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeTone...
-    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
+    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [-200 0]);
+
+% ... we're also going to take a look at error beta here too.
+errorBeta_late.timing.noncanc = SEF_stoppingLFP_getAverageBurstTimeError...
+    (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [300 600]);
 
 %% Extract and align pBurst by cortical depth
 perpSessions = 14:29; % This limits to the sessions in which we believe are perpendicular
@@ -38,6 +42,56 @@ for sessionIdx = 1:length(perpSessions)
         toneTime_pBurst_depth(depth,sessionIdx) = toneBeta.timing.canceled.pTrials_burst(lfp);
     end
 end
+
+
+%% Organise data for use in JASP
+laminarContacts = corticalLFPcontacts.subset.laminar.all;
+euPerpIdx = 1:6; xPerpIdx = 7:16;
+
+for lfpIdx = 1:length(laminarContacts)
+    
+    % Get admin details
+    lfp = laminarContacts(lfpIdx);
+    session = sessionLFPmap.session(lfp);
+    sessionName = FileNames{session};
+    
+    fixTime_pBurst_lfp(lfpIdx,1) = fixBeta.timing.canceled.pTrials_burst(lfp);
+    stopTime_pBurst_lfp(lfpIdx,1) = stoppingBeta.timing.canceled.pTrials_burst(lfp);
+    cancelTime_pBurst_lfp(lfpIdx,1) = ssrtBeta.timing.canceled.pTrials_burst(lfp);
+    toneTime_pBurst_lfp(lfpIdx,1) = toneBeta.timing.canceled.pTrials_burst(lfp);   
+    errorTime_pBurst_lfp(lfpIdx,1) = errorBeta_late.timing.noncanc.pTrials_burst(lfp);   
+end
+
+depthTable_pBurst = table();
+
+% Collate the  data into a table
+depthTable_pBurst = table(fixTime_pBurst_lfp, stopTime_pBurst_lfp,...
+    cancelTime_pBurst_lfp, toneTime_pBurst_lfp, errorTime_pBurst_lfp);
+
+% And combine this with the cortical lfp map for future subsetting (i.e. by
+% monkey, laminar, depth, etc...)
+depthTable_pBurst = [corticalLFPmap(corticalLFPcontacts.subset.laminar.all,:), ...
+    depthTable_pBurst];
+
+% Then add an extra label which splits the depths into laminar compartments
+for contactIdx = 1:size(depthTable_pBurst,1)
+    % Find the depth and which layer it corresponds to in
+    % laminarAlignment.list
+    find_laminar = cellfun(@(c) find(c == depthTable_pBurst.depth(contactIdx)), laminarAlignment.list, 'uniform', false);
+    find_laminar = find(~cellfun(@isempty,find_laminar));
+    % Create a new column with the corresponding laminar compartment label.
+    depthTable_pBurst.laminar(contactIdx,1) = laminarAlignment.labels(find_laminar);
+    
+    if find_laminar < 3
+        depthTable_pBurst.upper_lower(contactIdx,1) = {'Upper'};
+    else
+        depthTable_pBurst.upper_lower(contactIdx,1) = {'Lower'};
+    end
+    
+end
+
+
+writetable(depthTable_pBurst,'D:\projectCode\project_stoppingLFP\data\exportJASP\depth_pBurst_epoch.csv','WriteRowNames',true)
 
 
 %% Clean up extracted data
@@ -85,6 +139,8 @@ for periodIdx = 1:length(periodName)
     end
     
 end
+
+table(depthLabel,periodLabel,depthBurst)
 
 %% Create Figure
 clear betaburst_depth_figure

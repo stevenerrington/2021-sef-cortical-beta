@@ -2,7 +2,7 @@
 % Set up parameters
 eventAlignments = {'target','saccade','stopSignal','tone'};
 eventWindows = {[-800 200],[-200 800],[-200 800],[-800 200]};
-eventBin = {1,1,1,1,1};
+eventBin = {1,1,1,1};
 saveDir = 'D:\projectCode\project_stoppingLFP\data\eeg_lfp\';
 
 % Initialise arrays
@@ -61,7 +61,7 @@ for sessionIdx = 1:29
         
         % Save this for EEG, split by the aligment event, and the session
         burstCounts_EEG{1,1} = {};
-        burstCounts_EEG{1,1} = spikeCounts(eegBurstTimes, window, binSize);
+        burstCounts_EEG{1,1} = double(spikeCounts(eegBurstTimes, window, binSize) > 0);
         
         
         %% Get LFP bursts %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -102,7 +102,7 @@ for sessionIdx = 1:29
             alignedBurstData_LFP = alignTimeStamps(lfpMatrix, zeros(length(lfpMatrix),1));
             lfpBurstTimes = trimTimeStamps(alignedBurstData_LFP, window);
             % Save this for LFP channel
-            burstCounts_LFPall(:,:,lfpidx) = spikeCounts(lfpBurstTimes, window, binSize);
+            burstCounts_LFPall(:,:,lfpidx) = double(spikeCounts(lfpBurstTimes, window, binSize) > 0);
         end
                 
         % After looping through all the channels, save the nBursts sorted

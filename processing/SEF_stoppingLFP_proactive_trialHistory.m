@@ -1,74 +1,93 @@
+% Define data directory
 dataDir = 'D:\projectCode\project_stoppingLFP\data\monkeyLFP\';
 
+% Clear the main variable
 clear proactiveBeta
 
-%% Get beta-burst timings
-
+% Find the no-stop trials after no-stop, canceled, and non-canceled trials
+% by session.
 for ii = 1:29
+    % No-stop after non-canceled
     ttx.GO_after_NC{ii} = executiveBeh.Trials.all{ii}.t_GO_after_NC;
+    % No-stop after canceled
     ttx.GO_after_C{ii} = executiveBeh.Trials.all{ii}.t_GO_after_C;
+    % No-stop after no-stop
     ttx.GO_after_GO{ii} = executiveBeh.Trials.all{ii}.t_GO_after_GO;
 end
 
+%% Get beta-burst timings
 % Extracted by:
 proactiveBeta.timing.bl_canceled = SEF_stoppingLFP_getAverageBurstTimeTarget...
-    (corticalLFPcontacts.all, ttx.GO_after_C, bayesianSSRT, sessionLFPmap);
+    (corticalLFPcontacts.all, ttx.GO_after_C, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
 proactiveBeta.timing.bl_noncanceled = SEF_stoppingLFP_getAverageBurstTimeTarget...
-    (corticalLFPcontacts.all,ttx.GO_after_NC, bayesianSSRT, sessionLFPmap);
+    (corticalLFPcontacts.all,ttx.GO_after_NC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
 proactiveBeta.timing.bl_nostop = SEF_stoppingLFP_getAverageBurstTimeTarget...
-    (corticalLFPcontacts.all,ttx.GO_after_GO, bayesianSSRT, sessionLFPmap);
+    (corticalLFPcontacts.all,ttx.GO_after_GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
 
-%% Get average by session
+%% Average beta-properties by session
+% Define trial types
 trlList = {'nostop','canceled','noncanceled'};
+% Define variables to average
 varList = {'mean_burstTime','std_burstTime','mean_burstOnset','mean_burstOffset',...
     'mean_burstDuration','mean_burstVolume','mean_burstFreq',...
     'modal_burstFreq','pTrials_burst','triggerFailures','mean_ssrt','std_ssrt'};
  
+% For each session
 for session = 1:29
+    % Find contacts in the given session
     sessionLFPidx = find(sessionLFPmap.session(corticalLFPcontacts.all) == session);
     
+    % For each trial type
     for trlIdx = 1:3
         trialType = trlList{trlIdx};
+        
+        % ...and each variable of interest
         for varIdx = 1:length(varList)
             varType = varList{varIdx};
             
-            proactiveBeta.sessionTiming.(trialType).(varType)(session,1) = nanmean(proactiveBeta.timing.(['bl_' trialType]).(varType)(sessionLFPidx)); 
+            % Average, and save in a new structure (sessionTiming)
+            proactiveBeta.sessionTiming.(trialType).(varType)(session,1) =...
+                nanmean(proactiveBeta.timing.(['bl_' trialType]).(varType)(sessionLFPidx)); 
         end
     end
 end
     
+% Convert the structure into a table
 proactiveBeta.sessionTiming.canceled = struct2table(proactiveBeta.sessionTiming.canceled);
 proactiveBeta.sessionTiming.noncanceled = struct2table(proactiveBeta.sessionTiming.noncanceled);
 proactiveBeta.sessionTiming.nostop = struct2table(proactiveBeta.sessionTiming.nostop);
 
+
+
+
 %% Find out beta-burst parameters/functional properties and export to JASP
+% Post-canceled trials
+canceledpBurst = proactiveBeta.timing.bl_canceled.pTrials_burst;
+canceledBurstTime = proactiveBeta.timing.bl_canceled.mean_burstTime;
+canceledBurstFreq = proactiveBeta.timing.bl_canceled.mean_burstFreq;
+canceledBurstOnset = proactiveBeta.timing.bl_canceled.mean_burstOnset;
+canceledBurstOffset = proactiveBeta.timing.bl_canceled.mean_burstOffset;
+canceledBurstDuration = proactiveBeta.timing.bl_canceled.mean_burstDuration;
+canceledBurstVolume = proactiveBeta.timing.bl_canceled.mean_burstVolume;
+% Post-non-canceled trials
+noncanceledpBurst = proactiveBeta.timing.bl_noncanceled.pTrials_burst;
+noncanceledBurstTime = proactiveBeta.timing.bl_noncanceled.mean_burstTime;
+noncanceledBurstFreq = proactiveBeta.timing.bl_noncanceled.mean_burstFreq;
+noncanceledBurstOnset = proactiveBeta.timing.bl_noncanceled.mean_burstOnset;
+noncanceledBurstOffset = proactiveBeta.timing.bl_noncanceled.mean_burstOffset;
+noncanceledBurstDuration = proactiveBeta.timing.bl_noncanceled.mean_burstDuration;
+noncanceledBurstVolume = proactiveBeta.timing.bl_noncanceled.mean_burstVolume;
+% Post-no-stop trials
+nostoppBurst = proactiveBeta.timing.bl_nostop.pTrials_burst;
+nostopBurstTime = proactiveBeta.timing.bl_nostop.mean_burstTime;
+nostopBurstFreq = proactiveBeta.timing.bl_nostop.mean_burstFreq;
+nostopBurstOnset = proactiveBeta.timing.bl_nostop.mean_burstOnset;
+nostopBurstOffset = proactiveBeta.timing.bl_nostop.mean_burstOffset;
+nostopBurstDuration = proactiveBeta.timing.bl_nostop.mean_burstDuration;
+nostopBurstVolume = proactiveBeta.timing.bl_nostop.mean_burstVolume;
 
-canceledpBurst = proactiveBeta.sessionTiming.canceled.pTrials_burst;
-canceledBurstTime = proactiveBeta.sessionTiming.canceled.mean_burstTime;
-canceledBurstFreq = proactiveBeta.sessionTiming.canceled.mean_burstFreq;
-canceledBurstOnset = proactiveBeta.sessionTiming.canceled.mean_burstOnset;
-canceledBurstOffset = proactiveBeta.sessionTiming.canceled.mean_burstOffset;
-canceledBurstDuration = proactiveBeta.sessionTiming.canceled.mean_burstDuration;
-canceledBurstVolume = proactiveBeta.sessionTiming.canceled.mean_burstVolume;
-
-noncanceledpBurst = proactiveBeta.sessionTiming.noncanceled.pTrials_burst;
-noncanceledBurstTime = proactiveBeta.sessionTiming.noncanceled.mean_burstTime;
-noncanceledBurstFreq = proactiveBeta.sessionTiming.noncanceled.mean_burstFreq;
-noncanceledBurstOnset = proactiveBeta.sessionTiming.noncanceled.mean_burstOnset;
-noncanceledBurstOffset = proactiveBeta.sessionTiming.noncanceled.mean_burstOffset;
-noncanceledBurstDuration = proactiveBeta.sessionTiming.noncanceled.mean_burstDuration;
-noncanceledBurstVolume = proactiveBeta.sessionTiming.noncanceled.mean_burstVolume;
-
-nostoppBurst = proactiveBeta.sessionTiming.nostop.pTrials_burst;
-nostopBurstTime = proactiveBeta.sessionTiming.nostop.mean_burstTime;
-nostopBurstFreq = proactiveBeta.sessionTiming.nostop.mean_burstFreq;
-nostopBurstOnset = proactiveBeta.sessionTiming.nostop.mean_burstOnset;
-nostopBurstOffset = proactiveBeta.sessionTiming.nostop.mean_burstOffset;
-nostopBurstDuration = proactiveBeta.sessionTiming.nostop.mean_burstDuration;
-nostopBurstVolume = proactiveBeta.sessionTiming.nostop.mean_burstVolume;
-
-monkeyLabel = executiveBeh.nhpSessions.monkeyNameLabel;
-
+% Compose variables into a table
+monkeyLabel = corticalLFPmap.monkeyName;
 meanBurstTimeTable = table(canceledBurstTime, noncanceledBurstTime, nostopBurstTime,...
     canceledBurstOnset,noncanceledBurstOnset,nostopBurstOnset,...
     canceledBurstOffset, noncanceledBurstOffset, nostopBurstOffset,...
@@ -77,12 +96,16 @@ meanBurstTimeTable = table(canceledBurstTime, noncanceledBurstTime, nostopBurstT
     canceledBurstFreq, noncanceledBurstFreq, nostopBurstFreq,...
     canceledpBurst, noncanceledpBurst, nostoppBurst, monkeyLabel);
 
+% Export table for use in JASP
 writetable(meanBurstTimeTable,...
     'D:\projectCode\project_stoppingLFP\data\exportJASP\LFP_ProactiveMeanburstTime.csv','WriteRowNames',true)
 
-%% Produce figure
-clear g
-inContacts = 1:509;
+%% Figure 1: Boxplot p(Burst) by trial history
+
+clear proactiveBurst_figure % Clear figure
+inContacts = 1:509; % Define contacts to use (all = 1:509)
+
+% Input figure data to gramm
 proactiveBurst_figure(1,1)=gramm('x',[repmat({'Canceled'},length(inContacts),1);
     repmat({'Non-canceled'},length(inContacts),1);...
     repmat({'No-stop'},length(inContacts),1)],...
@@ -93,11 +116,13 @@ proactiveBurst_figure(1,1)=gramm('x',[repmat({'Canceled'},length(inContacts),1);
     repmat({'Non-canceled'},length(inContacts),1);...
     repmat({'No-stop'},length(inContacts),1)]);
 
+% Setup figure: boxplot with points
 proactiveBurst_figure(1,1).stat_boxplot();
 proactiveBurst_figure(1,1).geom_point('alpha',0.1);
 proactiveBurst_figure(1,1).no_legend();
 proactiveBurst_figure.set_color_options('map',[colors.canceled;colors.nostop;colors.noncanc]);
 
+% Generate figure
 figure('Renderer', 'painters', 'Position', [100 100 300 300]);
 proactiveBurst_figure.draw();
 
@@ -152,14 +177,3 @@ figure('Position',[100 100 400 200]);
 a.draw();
 
 a(1, 2).results.stat_glm.model.Rsquared.Ordinary  
-
-
-%% CUTTINGS
-
-% % load([outputDir 'stoppingBeta.mat']);
-% proactiveBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTime...
-%     (corticalLFPcontacts.all, ttx.GO_after_C, bayesianSSRT, sessionLFPmap);
-% proactiveBeta.timing.noncanceled = SEF_stoppingLFP_getAverageBurstTime...
-%     (corticalLFPcontacts.all,ttx.GO_after_NC, bayesianSSRT, sessionLFPmap);
-% proactiveBeta.timing.nostop = SEF_stoppingLFP_getAverageBurstTime...
-%     (corticalLFPcontacts.all,ttx.GO_after_GO, bayesianSSRT, sessionLFPmap);

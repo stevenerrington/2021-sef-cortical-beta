@@ -2,7 +2,7 @@
 % Set up parameters
 eventAlignments = {'target','saccade','stopSignal','tone'};
 eventWindows = {[-800 200],[-200 800],[-200 800],[-800 200]};
-analysisWindows = {[-400:-200],[400:600],[400:600],[-400:-200]};
+analysisWindows = {[-400:-200],[400:600],[0:200],[-400:-200]};
 eventBin = {1,1,1,1,1};
 loadDir = 'D:\projectCode\project_stoppingLFP\data\eeg_lfp\';
 printFigFlag = 0;
@@ -21,9 +21,9 @@ for sessionIdx = 14:29
         
         % Get trials of interest
         if alignmentIdx == 2
-            trials = executiveBeh.ttm_c.NC{session,executiveBeh.midSSDindex(session)}.all;
+            trials = executiveBeh.ttx.sNC{session};
         else
-            trials = executiveBeh.ttm_CGO{session,executiveBeh.midSSDindex(session)}.C_matched;
+            trials = executiveBeh.ttx_canc{session};
         end
         
         % Save output for each alignment on each session
@@ -97,6 +97,11 @@ for sessionIdx = 14:29
         pBurst_L3.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l3),2) > 0 );
         pBurst_L5.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l5),2) > 0 );
         pBurst_L6.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l6),2) > 0 );
+
+        pBurst_L2_all.(alignmentEvent)(sessionIdx-13,1) = mean(mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,laminarAlignment.l2),2) > 0 ));
+        pBurst_L3_all.(alignmentEvent)(sessionIdx-13,1) = mean(mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,laminarAlignment.l3),2) > 0 ));
+        pBurst_L5_all.(alignmentEvent)(sessionIdx-13,1) = mean(mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,laminarAlignment.l5),2) > 0 ));
+        pBurst_L6_all.(alignmentEvent)(sessionIdx-13,1) = mean(mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,13:end),2) > 0 ));    
     end
     
     
@@ -152,18 +157,18 @@ for alignmentIdx = 1:4
     % Collapse data across EEG/Layers into one array and combine with those
     % in other alignments during the loop
     pBurst_combined = [pBurst_combined; ...
-        pBurst_EEG.(alignmentEvent); pBurst_L2.(alignmentEvent);...
-        pBurst_L3.(alignmentEvent); pBurst_L5.(alignmentEvent); ...
-        pBurst_L6.(alignmentEvent)];
+        pBurst_EEG.(alignmentEvent); pBurst_L2_all.(alignmentEvent);...
+        pBurst_L3_all.(alignmentEvent); pBurst_L5_all.(alignmentEvent); ...
+        pBurst_L6_all.(alignmentEvent)];
     
     % Apply the relevant EEG/depth labels
     pBurst_combined_labels =...
         [pBurst_combined_labels;...
         repmat({'EEG'},length(pBurst_EEG.(alignmentEvent)),1);...
-        repmat({'L2'},length(pBurst_L2.(alignmentEvent)),1);...
-        repmat({'L3'},length(pBurst_L3.(alignmentEvent)),1);...
-        repmat({'L5'},length(pBurst_L5.(alignmentEvent)),1);...
-        repmat({'L6'},length(pBurst_L6.(alignmentEvent)),1)];
+        repmat({'L2'},length(pBurst_L2_all.(alignmentEvent)),1);...
+        repmat({'L3'},length(pBurst_L3_all.(alignmentEvent)),1);...
+        repmat({'L5'},length(pBurst_L5_all.(alignmentEvent)),1);...
+        repmat({'L6'},length(pBurst_L6_all.(alignmentEvent)),1)];
     
     % and get the epoch label
     pBurst_combined_epoch =...
@@ -172,6 +177,32 @@ for alignmentIdx = 1:4
         
 end
 
+%% Export data for JASP analysis
+
+laminarJASPdata = struct();
+
+% Apply the relevant EEG/depth labels
+laminarJASPdata.label = [repmat({'EEG'},length(pBurst_EEG.(alignmentEvent)),1);...
+    repmat({'L2'},length(pBurst_L2_all.(alignmentEvent)),1);...
+    repmat({'L3'},length(pBurst_L3_all.(alignmentEvent)),1);...
+    repmat({'L5'},length(pBurst_L5_all.(alignmentEvent)),1);...
+    repmat({'L6'},length(pBurst_L6_all.(alignmentEvent)),1)];
+
+laminarJASPdata.monkey = repmat(executiveBeh.nhpSessions.monkeyNameLabel(14:29),5,1);
+
+for alignmentIdx = 1:4
+    % Get the event label
+    alignmentEvent = eventAlignments{alignmentIdx};
+
+    laminarJASPdata.(alignmentEvent) =...
+        [pBurst_EEG.(alignmentEvent); pBurst_L2_all.(alignmentEvent);...
+        pBurst_L3_all.(alignmentEvent); pBurst_L5_all.(alignmentEvent);...
+        pBurst_L6_all.(alignmentEvent)];
+end
+
+laminarJASPdata = struct2table(laminarJASPdata);
+writetable(laminarJASPdata,'D:\projectCode\project_stoppingLFP\data\exportJASP\laminarJASPdata.csv','WriteRowNames',true)
+%% Figure 1: p(burst) across epochs and layers
 % Setup the figure in gramm
 clear eeg_lfp_burst_epoch % Clear the figure from matlabs memory as we're writing it new
 
@@ -180,7 +211,7 @@ eeg_lfp_burst_epoch(1,1)= gramm('x',pBurst_combined_epoch,'y',pBurst_combined,'c
 % Set the figure up as a point/line figure with 95% CI error bar:
 eeg_lfp_burst_epoch(1,1).stat_summary('geom',{'point','line','errorbar'});
 % Set figure parameters:
-eeg_lfp_burst_epoch(1,1).axe_property('YLim',[0.0 0.75]);
+eeg_lfp_burst_epoch(1,1).axe_property('YLim',[0.0 0.50]);
 %... and print it!
 figure('Renderer', 'painters', 'Position', [100 100 400 300]);
 eeg_lfp_burst_epoch.draw();

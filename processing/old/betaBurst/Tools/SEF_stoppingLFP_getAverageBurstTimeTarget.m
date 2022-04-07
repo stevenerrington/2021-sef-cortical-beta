@@ -1,7 +1,6 @@
 function burstTiming = SEF_stoppingLFP_getAverageBurstTimeTarget(lfpList,...
     trialList, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold)
 
-getAnalysisParameters
 dataDir = 'D:\projectCode\project_stoppingLFP\data\monkeyLFP\';
 warning off
 event = 'target';
@@ -11,7 +10,7 @@ parfor lfpIdx = 1:length(lfpList)
     
     lfp = lfpList(lfpIdx);
     session = sessionLFPmap.session(lfp);
-    timeThreshold = [-200-bayesianSSRT.ssrt_mean(session) -200];
+    timeThreshold = [-400 -200];
     
     %     clear betaOutput trial_betaBurst_timing burstTimes trialBurstFlag trlBurstTimes
   

@@ -22,13 +22,13 @@ parfor sessionIdx = 14:29
     eegBetaBurst_target = parload([eegDir eeg_target]);
     eegBetaBurst_stopSignal = parload([eegDir eeg_stopSignal]);
     eegBetaBurst_saccade = parload([eegDir eeg_saccade]);
-	eegBetaBurst_tone = parload([eegDir eeg_tone]);
-
+    eegBetaBurst_tone = parload([eegDir eeg_tone]);
+    
     %   Threshold bursts at 6 x median LFP power for each epoch
     [eegBetaBurst_target] = thresholdBursts_EEG(eegBetaBurst_target.betaOutput, eegBetaBurst_target.betaOutput.medianLFPpower*6);
     [eegBetaBurst_stopSignal] = thresholdBursts_EEG(eegBetaBurst_stopSignal.betaOutput, eegBetaBurst_stopSignal.betaOutput.medianLFPpower*6);
     [eegBetaBurst_saccade] = thresholdBursts_EEG(eegBetaBurst_saccade.betaOutput, eegBetaBurst_saccade.betaOutput.medianLFPpower*6);
-	[eegBetaBurst_tone] = thresholdBursts_EEG(eegBetaBurst_tone.betaOutput, eegBetaBurst_tone.betaOutput.medianLFPpower*6);
+    [eegBetaBurst_tone] = thresholdBursts_EEG(eegBetaBurst_tone.betaOutput, eegBetaBurst_tone.betaOutput.medianLFPpower*6);
     
     %   Convolve these extracted beta bursts for each epoch to get a beta
     %   burst density function (BBDF)
@@ -42,10 +42,15 @@ parfor sessionIdx = 14:29
     c_temp_ssd = []; ns_temp_ssd = []; % for ssd
     c_temp_tone = []; ns_temp_tone = []; % for tone
     nc_temp_saccade = []; ns_temp_saccade = []; % and for saccade (error)
+    c_shuffle_fix = []; ns_shuffle_fix = [];
+    c_shuffle_ssd = []; ns_shuffle_ssd = [];
+    c_shuffle_tone = []; ns_shuffle_tone = [];
+    nc_shuffle_saccade = []; ns_shuffle_saccade = [];
     
     %   To latency match, we take the activity aligned on the event for
     %   each SSD and save it temporarily
     for ii = 1:length(executiveBeh.inh_SSD{session})
+        % Regular
         c_temp_fix(ii,:) = nanmean(EEG_SessionBDF_target(executiveBeh.ttm_CGO{session,ii}.C_matched, :));
         ns_temp_fix(ii,:) = nanmean(EEG_SessionBDF_target(executiveBeh.ttm_CGO{session,ii}.GO_matched, :));
         
@@ -57,21 +62,57 @@ parfor sessionIdx = 14:29
         
         nc_temp_saccade(ii,:) = nanmean(EEG_SessionBDF_tone(executiveBeh.ttm_c.NC{session,ii}.all, :));
         ns_temp_saccade(ii,:) = nanmean(EEG_SessionBDF_tone(executiveBeh.ttm_c.GO_NC{session,ii}.all, :));
+        
+        % Shuffle
+        shuffled_c_trials = executiveBeh.ttm_CGO{session,ii}.C_matched(randperm(numel(executiveBeh.ttm_CGO{session,ii}.C_matched)))
+        shuffled_cgo_trials = executiveBeh.ttm_CGO{session,ii}.GO_matched(randperm(numel(executiveBeh.ttm_CGO{session,ii}.GO_matched)))
+        shuffled_ncgo_trials = executiveBeh.ttm_c.GO_NC{session,ii}.all(randperm(numel(executiveBeh.ttm_c.GO_NC{session,ii}.all)))
+        shuffled_nc_trials = executiveBeh.ttm_c.NC{session,ii}.all(randperm(numel(executiveBeh.ttm_c.NC{session,ii}.all)))
+        
+        c_shuffle_fix(ii,:) = nanmean(EEG_SessionBDF_target(shuffled_c_trials, :));
+        ns_shuffle_fix(ii,:) = nanmean(EEG_SessionBDF_target(shuffled_cgo_trials, :));
+        
+        c_shuffle_ssd(ii,:) = nanmean(EEG_SessionBDF_stopSignal(shuffled_c_trials, :));
+        ns_shuffle_ssd(ii,:) = nanmean(EEG_SessionBDF_stopSignal(shuffled_cgo_trials, :));
+        
+        c_shuffle_tone(ii,:) = nanmean(EEG_SessionBDF_saccade(shuffled_c_trials, :));
+        ns_shuffle_tone(ii,:) = nanmean(EEG_SessionBDF_saccade(shuffled_cgo_trials, :));
+        
+        nc_shuffle_saccade(ii,:) = nanmean(EEG_SessionBDF_tone(shuffled_nc_trials, :));
+        ns_shuffle_saccade(ii,:) = nanmean(EEG_SessionBDF_tone(shuffled_ncgo_trials, :));
+        
     end
-
+    
     %   We then average across all these SSD's for:
     %   Fixation:
     EEGbbdf_canceled_fix{sessionIdx,1} = nanmean(c_temp_fix);
-    EEGbbdf_nostop_fix{sessionIdx,1} = nanmean(ns_temp_fix);       
+    EEGbbdf_nostop_fix{sessionIdx,1} = nanmean(ns_temp_fix);
     %   SSD:
     EEGbbdf_canceled_ssd{sessionIdx,1} = nanmean(c_temp_ssd);
-    EEGbbdf_nostop_ssd{sessionIdx,1} = nanmean(ns_temp_ssd);   
+    EEGbbdf_nostop_ssd{sessionIdx,1} = nanmean(ns_temp_ssd);
     %   Tone:
     EEGbbdf_canceled_tone{sessionIdx,1} = nanmean(c_temp_tone);
-    EEGbbdf_nostop_tone{sessionIdx,1} = nanmean(ns_temp_tone); 
+    EEGbbdf_nostop_tone{sessionIdx,1} = nanmean(ns_temp_tone);
     %   Saccade:
     EEGbbdf_noncanceled_saccade{sessionIdx,1} = nanmean(nc_temp_saccade);
-    EEGbbdf_nostop_saccade{sessionIdx,1} = nanmean(ns_temp_saccade);       
+    EEGbbdf_nostop_saccade{sessionIdx,1} = nanmean(ns_temp_saccade);
+    
+    
+    %   We then repeat this for shuffled condition:
+    %   Fixation
+    shuffledEEGbbdf_canceled_fix{sessionIdx,1} = nanmean(c_shuffle_fix);
+    shuffledEEGbbdf_nostop_fix{sessionIdx,1} = nanmean(ns_shuffle_fix);
+    %   SSD:
+    shuffledEEGbbdf_canceled_ssd{sessionIdx,1} = nanmean(c_shuffle_ssd);
+    shuffledEEGbbdf_nostop_ssd{sessionIdx,1} = nanmean(ns_shuffle_ssd);
+    %   Tone:
+    shuffledEEGbbdf_canceled_tone{sessionIdx,1} = nanmean(c_shuffle_tone);
+    shuffledEEGbbdf_nostop_tone{sessionIdx,1} = nanmean(ns_shuffle_tone);
+    %   Saccade:
+    shuffledEEGbbdf_noncanceled_saccade{sessionIdx,1} = nanmean(nc_shuffle_saccade);
+    shuffledEEGbbdf_nostop_saccade{sessionIdx,1} = nanmean(ns_shuffle_saccade);
+    
+    
 end
 
 
@@ -96,35 +137,75 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     c_temp_tone = []; ns_temp_tone = [];% for tone
     nc_temp_saccade = []; ns_temp_saccade = []; % and for saccade
     
+    c_shuffle_fix = []; ns_shuffle_fix = [];
+    c_shuffle_ssd = []; ns_shuffle_ssd = [];
+    c_shuffle_tone = []; ns_shuffle_tone = [];
+    nc_shuffle_saccade = []; ns_shuffle_saccade = [];
+        
     %   To latency match, we take the activity aligned on the event for
     %   each SSD and save it temporarily
     for ii = 1:length(executiveBeh.inh_SSD{session})
-        c_temp_fix(ii,:) = nanmean(bbdf.bbdf.ssd(executiveBeh.ttm_CGO{session,ii}.C_matched, :));
-        ns_temp_fix(ii,:) = nanmean(bbdf.bbdf.ssd(executiveBeh.ttm_CGO{session,ii}.GO_matched, :));
+        c_temp_fix(ii,:) = nanmean(bbdf.bbdf.fixate(executiveBeh.ttm_CGO{session,ii}.C_matched, :));
+        ns_temp_fix(ii,:) = nanmean(bbdf.bbdf.fixate(executiveBeh.ttm_CGO{session,ii}.GO_matched, :));
         
         c_temp_ssd(ii,:) = nanmean(bbdf.bbdf.ssd(executiveBeh.ttm_CGO{session,ii}.C_matched, :));
         ns_temp_ssd(ii,:) = nanmean(bbdf.bbdf.ssd(executiveBeh.ttm_CGO{session,ii}.GO_matched, :));
         
-        c_temp_tone(ii,:) = nanmean(bbdf.bbdf.ssd(executiveBeh.ttm_CGO{session,ii}.C_matched, :));
-        ns_temp_tone(ii,:) = nanmean(bbdf.bbdf.ssd(executiveBeh.ttm_CGO{session,ii}.GO_matched, :));
+        c_temp_tone(ii,:) = nanmean(bbdf.bbdf.tone(executiveBeh.ttm_CGO{session,ii}.C_matched, :));
+        ns_temp_tone(ii,:) = nanmean(bbdf.bbdf.tone(executiveBeh.ttm_CGO{session,ii}.GO_matched, :));
         
-        nc_temp_saccade(ii,:) = nanmean(bbdf.bbdf.ssd(executiveBeh.ttm_c.NC{session,ii}.all, :));
-        ns_temp_saccade(ii,:) = nanmean(bbdf.bbdf.ssd(executiveBeh.ttm_c.GO_NC{session,ii}.all, :));
+        nc_temp_saccade(ii,:) = nanmean(bbdf.bbdf.saccade(executiveBeh.ttm_c.NC{session,ii}.all, :));
+        ns_temp_saccade(ii,:) = nanmean(bbdf.bbdf.saccade(executiveBeh.ttm_c.GO_NC{session,ii}.all, :));
+        
+        % Shuffle
+        shuffled_nc_trials = []; shuffled_c_trials = []; shuffled_cgo_trials = []; shuffled_ncgo_trials = []
+        shuffled_c_trials = executiveBeh.ttm_CGO{session,ii}.C_matched(randperm(numel(executiveBeh.ttm_CGO{session,ii}.C_matched)))
+        shuffled_cgo_trials = executiveBeh.ttm_CGO{session,ii}.GO_matched(randperm(numel(executiveBeh.ttm_CGO{session,ii}.GO_matched)))
+        shuffled_ncgo_trials = executiveBeh.ttm_c.GO_NC{session,ii}.all(randperm(numel(executiveBeh.ttm_c.GO_NC{session,ii}.all)))
+        shuffled_nc_trials = executiveBeh.ttm_c.NC{session,ii}.all(randperm(numel(executiveBeh.ttm_c.NC{session,ii}.all)))
+          
+        c_shuffle_fix(ii,:) = nanmean(bbdf.bbdf.fixate(shuffled_c_trials, :));
+        ns_shuffle_fix(ii,:) = nanmean(bbdf.bbdf.fixate(shuffled_cgo_trials, :));
+        
+        c_shuffle_ssd(ii,:) = nanmean(bbdf.bbdf.ssd(shuffled_c_trials, :));
+        ns_shuffle_ssd(ii,:) = nanmean(bbdf.bbdf.ssd(shuffled_cgo_trials, :));
+        
+        c_shuffle_tone(ii,:) = nanmean(bbdf.bbdf.tone(shuffled_c_trials, :));
+        ns_shuffle_tone(ii,:) = nanmean(bbdf.bbdf.tone(shuffled_cgo_trials, :));
+        
+        nc_shuffle_saccade(ii,:) = nanmean(bbdf.bbdf.saccade(shuffled_nc_trials, :));
+        ns_shuffle_saccade(ii,:) = nanmean(bbdf.bbdf.saccade(shuffled_ncgo_trials, :));
     end
     
     %   We then average across all these SSD's for;
     %   Fixation:
     LFPbbdf_canceled_fix{lfpIdx,1} = nanmean(c_temp_fix);
-    LFPbbdf_nostop_fix{lfpIdx,1} = nanmean(ns_temp_fix);       
+    LFPbbdf_nostop_fix{lfpIdx,1} = nanmean(ns_temp_fix);
     %   SSD:
     LFPbbdf_canceled_ssd{lfpIdx,1} = nanmean(c_temp_ssd);
-    LFPbbdf_nostop_ssd{lfpIdx,1} = nanmean(ns_temp_ssd);   
+    LFPbbdf_nostop_ssd{lfpIdx,1} = nanmean(ns_temp_ssd);
     %   Tone:
     LFPbbdf_canceled_tone{lfpIdx,1} = nanmean(c_temp_tone);
-    LFPbbdf_nostop_tone{lfpIdx,1} = nanmean(ns_temp_tone); 
+    LFPbbdf_nostop_tone{lfpIdx,1} = nanmean(ns_temp_tone);
     %   Saccade:
     LFPbbdf_noncanceled_saccade{lfpIdx,1} = nanmean(nc_temp_saccade);
-    LFPbbdf_nostop_saccade{lfpIdx,1} = nanmean(ns_temp_saccade);     
+    LFPbbdf_nostop_saccade{lfpIdx,1} = nanmean(ns_temp_saccade);
+    
+    
+    
+    %   Repeating for the shuffled condition;
+    %   Fixation:
+    shuffledLFPbbdf_canceled_fix{lfpIdx,1} = nanmean(c_shuffle_fix);
+    shuffledLFPbbdf_nostop_fix{lfpIdx,1} = nanmean(ns_shuffle_fix);
+    %   SSD:
+    shuffledLFPbbdf_canceled_ssd{lfpIdx,1} = nanmean(c_shuffle_ssd);
+    shuffledLFPbbdf_nostop_ssd{lfpIdx,1} = nanmean(ns_shuffle_ssd);
+    %   Tone:
+    shuffledLFPbbdf_canceled_tone{lfpIdx,1} = nanmean(c_shuffle_tone);
+    shuffledLFPbbdf_nostop_tone{lfpIdx,1} = nanmean(ns_shuffle_tone);
+    %   Saccade:
+    shuffledLFPbbdf_noncanceled_saccade{lfpIdx,1} = nanmean(nc_shuffle_saccade);
+    shuffledLFPbbdf_nostop_saccade{lfpIdx,1} = nanmean(ns_shuffle_saccade);
 end
 
 
@@ -167,7 +248,7 @@ for session = 14:29
     % ... and lower cortical layers, and concatenate them with the main
     % array. This allows for BBDF's to be collapsed across sessions
     lfp_lower_BBDF = [lfp_lower_BBDF; LFPbbdf_canceled_ssd(sessionLFPidx_lower)];
-
+    
     % And, just like we did with the EEG, we provide labels to help with
     % plotting later.
     lfp_upper_label = [lfp_upper_label; repmat({'2_Upper'},length(sessionLFPidx_upper),1)];
@@ -179,7 +260,7 @@ end
 %  figures
 
 % First, we start by making sure we have a clean space to work with
-clear inputData inputLabels eeg_lfp_BBDF 
+clear inputData inputLabels eeg_lfp_BBDF
 
 % Then, we take the concatenated EEG, upper, and lower BBDF data and
 % concatenate it into one array to feed into the function

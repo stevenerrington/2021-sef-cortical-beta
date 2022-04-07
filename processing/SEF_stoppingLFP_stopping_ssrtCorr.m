@@ -85,8 +85,8 @@ writetable(meanBurstTimeTable,...
 clear burstParameters_stoppingBeh sessions
 % close all
 % Get input data:
-sessions = 1:29;
-sessions = executiveBeh.nhpSessions.EuSessions;
+% sessions = 1:29;
+sessions = executiveBeh.nhpSessions.XSessions;
 
 %   Mean burst time and SSRT relationship
 burstParameters_stoppingBeh(1,1)=gramm('x',stoppingBeta.sessionTiming.nostop.mean_burstTime(sessions),'y',stoppingBeta.sessionTiming.nostop.mean_ssrt(sessions));

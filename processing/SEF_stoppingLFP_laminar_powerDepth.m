@@ -89,8 +89,14 @@ for contactIdx = 1:size(depthTable,1)
     find_laminar = find(~cellfun(@isempty,find_laminar));
     % Create a new column with the corresponding laminar compartment label.
     depthTable.laminar(contactIdx,1) = laminarAlignment.labels(find_laminar);
+    
+    if find_laminar < 3
+        depthTable.upper_lower(contactIdx,1) = {'Upper'};
+    else
+        depthTable.upper_lower(contactIdx,1) = {'Lower'};
+    end
+    
 end
-
 
 %% Normalise the power data for each contact
 %  so that it is proportional the maximal power
@@ -108,6 +114,13 @@ for sessionIdx = 14:29
     maxPower_session_ssrt = ...
         max([depthTable.ssrt_power_canceled(sessionContacts); depthTable.ssrt_power_nostop(sessionContacts)]);
     
+    
+    depths = [];
+    depth_session = depthTable.depth(sessionContacts)
+    maxpower_depth(sessionIdx-13,1) = depth_session(find(depthTable.stopSignal_power_canceled(sessionContacts)...
+        == max(depthTable.stopSignal_power_canceled(sessionContacts))));
+    
+    
     % Adjust the values in the table to normalise against the maximal power
     depthTable.fixation_power_nostop(sessionContacts) = depthTable.fixation_power_nostop(sessionContacts);%./maxPower_session_fixation;
     depthTable.fixation_power_canceled(sessionContacts) = depthTable.fixation_power_canceled(sessionContacts);%./maxPower_session_fixation;
@@ -117,6 +130,12 @@ for sessionIdx = 14:29
     depthTable.ssrt_power_nostop(sessionContacts) = depthTable.ssrt_power_nostop(sessionContacts);%./maxPower_session_ssrt;
 end
 
+%% Output data for JASP
+writetable(depthTable,'D:\projectCode\project_stoppingLFP\data\exportJASP\depth_power_epoch.csv','WriteRowNames',true)
+
+% Run a quick one-way t-test to find out if the contact with the maximal
+% beta power was significantly far enough from the L3/5 border.
+[h, p, ~, stats] = ttest((maxpower_depth - 8) * 150);
 
 %% Generate figure
 %  Here we are plotting a point and 95% CI plot for each layer. We then
