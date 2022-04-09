@@ -10,9 +10,6 @@ printFigFlag = 0;
 %% 
 eegxlfp_cooccur.(alignmentEvent).preBurst = NaN(length(14:29),17);
 eegxlfp_cooccur.(alignmentEvent).postBurst = NaN(length(14:29),17);
-eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled = NaN(length(14:29),17);
-eegxlfp_cooccur.(alignmentEvent).postBurst_shuffled = NaN(length(14:29),17);
-
 windowSize = 50;
 %% Extract data from files
 % For each session
@@ -44,8 +41,8 @@ for sessionIdx = 14:29
         alignmentZero = abs(eeg_lfp_burst.eventWindows{alignmentIdx}(1));
         
         % Initialise arrays/clear each loop
-        preburst_lfp = []; postburst_lfp = [];
-        preburst_lfp_shuffled = []; postburst_lfp_shuffled = [];
+        preburst_lfp = [];
+        postburst_lfp = [];
         
         % Go through each trial
         count = 0;
@@ -118,16 +115,13 @@ for sessionIdx = 14:29
         alignmentLabel = eventAlignments(alignmentIdx);
         
         layerLabel = {'Upper','Lower','All'};
-        layerRef = {[1:8],[9:17],[1:17]};
-        
-        for layerIdx = 1:3
+ 
+        for layer = 1:3
             
-        regular_pre =  nanmean(eegxlfp_cooccur.(alignmentEvent).preBurst(sessionIdx-13,layerRef{layerIdx}),2);
-        regular_post =  nanmean(eegxlfp_cooccur.(alignmentEvent).postBurst(sessionIdx-13,layerRef{layerIdx}),2);
-        shuffled_pre =  nanmean(eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled(sessionIdx-13,layerRef{layerIdx}),2);
-        shuffled_post =  nanmean(eegxlfp_cooccur.(alignmentEvent).postBurst_shuffled(sessionIdx-13,layerRef{layerIdx}),2);
-                
-        table(session,monkey,alignmentLabel,regular_pre,regular_post,shuffled_pre,shuffled_post)
+        regular_pre =  nanmean(eegxlfp_cooccur.(alignmentEvent).preBurst(sessionIdx-13,:),2);
+        regular_post =  nanmean(eegxlfp_cooccur.(alignmentEvent).postBurst(sessionIdx-13,:),2);
+        
+        table(session,monkey,alignmentLabel,)
 
         end
         
