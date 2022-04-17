@@ -67,9 +67,14 @@ parfor lfpIdx = 1:length(laminarContacts)
     
     % Get the power of the (latency matched) beta-actvity within the stopping period
     % for each contact, for...
-    stopSignal_power_canceled(lfpIdx,1) = bandpower(nanmean(c_temp),1000,[14 29]);
-    stopSignal_power_noncanc(lfpIdx,1) = bandpower(nanmean(nc_temp),1000,[14 29]);
-    stopSignal_power_nostop(lfpIdx,1) = bandpower(nanmean(ns_temp),1000,[14 29]);
+    stopSignal_power_canceled_beta(lfpIdx,1) = bandpower(nanmean(c_temp),1000,[14 29]);
+    stopSignal_power_noncanc_beta(lfpIdx,1) = bandpower(nanmean(nc_temp),1000,[14 29]);
+    stopSignal_power_nostop_beta(lfpIdx,1) = bandpower(nanmean(ns_temp),1000,[14 29]);
+
+    
+    stopSignal_power_canceled_gamma(lfpIdx,1) = bandpower(nanmean(c_temp),1000,[80 160]);
+    stopSignal_power_noncanc_gamma(lfpIdx,1) = bandpower(nanmean(nc_temp),1000,[80 160]);
+    stopSignal_power_nostop_gamma(lfpIdx,1) = bandpower(nanmean(ns_temp),1000,[80 160]);
     
     % Also calculate power regardless of trial type
     stopSignal_power_allSSRT(lfpIdx,1) = bandpower(nanmean(lfpOutput.filteredLFP.beta(:, window)),1000,[14 29]);
@@ -197,7 +202,8 @@ end
 %% Compare power at depths
 
 % Initialise arrays
-stoppingPower = nan(length(1:17),3,length([14:29]));
+stoppingPower_beta = nan(length(1:17),3,length([14:29]));
+stoppingPower_gamma = nan(length(1:17),3,length([14:29]));
 stoppingPower_all = nan(length(1:17),1,length([14:29]));
 
 % For each contact in perpendcular penetrations
@@ -211,9 +217,13 @@ for lfpIdx = 1:length(laminarContacts)
     % Get the latency-matched band power for canceled (1), non-canceled
     % (2), and no-stop (3) trials. (num corresponds to column in
     % stoppingPower array).
-    stoppingPower(depth,1,session-13) = stopSignal_power_canceled(lfpIdx);
-    stoppingPower(depth,2,session-13) = stopSignal_power_noncanc(lfpIdx);
-    stoppingPower(depth,3,session-13) = stopSignal_power_nostop(lfpIdx);
+    stoppingPower_beta(depth,1,session-13) = stopSignal_power_canceled_beta(lfpIdx);
+    stoppingPower_beta(depth,2,session-13) = stopSignal_power_noncanc_beta(lfpIdx);
+    stoppingPower_beta(depth,3,session-13) = stopSignal_power_nostop_beta(lfpIdx);
+    
+    stoppingPower_gamma(depth,1,session-13) = stopSignal_power_canceled_gamma(lfpIdx);
+    stoppingPower_gamma(depth,2,session-13) = stopSignal_power_noncanc_gamma(lfpIdx);
+    stoppingPower_gamma(depth,3,session-13) = stopSignal_power_nostop_gamma(lfpIdx);
     
     stoppingPower_all(depth,1,session-13) = stopSignal_power_all(lfpIdx);    
 end
@@ -223,19 +233,25 @@ end
 for session = 1:16
     % In a given session, the depth with the maximum power will be valued
     % at 1, whilst the other values are proportional to this.
-    stoppingPower_norm(:,session) = stoppingPower_all(:,:,session)./...
-        nanmax(stoppingPower_all(:,:,session));
+    for trialTypeIdx = 1:3
+%     stoppingPower_norm(:,session) = stoppingPower_all(:,trialTypeIdx,session)./...
+%         nanmax(stoppingPower_all(:,trialTypeIdx,session));
     % Here, I am looking at the max across all trial types
-    stoppingPower_trlType_norm(:,:,session) = stoppingPower(:,:,session)...
-        /max(max(stoppingPower(:,:,session)));
-
+    stoppingPower_trlType_norm_beta(:,trialTypeIdx,session) = stoppingPower_beta(:,trialTypeIdx,session)...
+        /max(max(stoppingPower_beta(:,trialTypeIdx,session)));
+    stoppingPower_trlType_norm_gamma(:,trialTypeIdx,session) = stoppingPower_gamma(:,trialTypeIdx,session)...
+        /max(max(stoppingPower_gamma(:,trialTypeIdx,session)));
+    end
+    
 end
 
 % Here, I then split the power into separate arrays for each trial type.
 for session = 1:16
-    stoppingPower_cancNorm(:,session) = stoppingPower_trlType_norm(:,1,session);
-    stoppingPower_noncancNorm(:,session) = stoppingPower_trlType_norm(:,2,session);
-    stoppingPower_nostopNorm(:,session) = stoppingPower_trlType_norm(:,3,session);
+    stoppingPower_cancNorm_beta(:,session) = stoppingPower_trlType_norm_beta(:,1,session);
+    stoppingPower_noncancNorm_beta(:,session) = stoppingPower_trlType_norm_beta(:,2,session);
+    stoppingPower_nostopNorm_beta(:,session) = stoppingPower_trlType_norm_beta(:,3,session);
 
+    stoppingPower_cancNorm_gamma(:,session) = stoppingPower_trlType_norm_gamma(:,1,session);
+    stoppingPower_noncancNorm_gamma(:,session) = stoppingPower_trlType_norm_gamma(:,2,session);
+    stoppingPower_nostopNorm_gamma(:,session) = stoppingPower_trlType_norm_gamma(:,3,session);
 end
-

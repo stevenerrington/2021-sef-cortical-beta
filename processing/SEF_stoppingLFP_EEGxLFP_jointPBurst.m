@@ -7,7 +7,7 @@ eventBin = {1,1,1,1};
 loadDir = 'D:\projectCode\project_stoppingLFP\data\eeg_lfp\';
 printFigFlag = 0;
 
-%% 
+%%
 eegxlfp_cooccur.(alignmentEvent).preBurst = NaN(length(14:29),17);
 eegxlfp_cooccur.(alignmentEvent).postBurst = NaN(length(14:29),17);
 eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled = NaN(length(14:29),17);
@@ -81,11 +81,11 @@ for sessionIdx = 14:29
                         preburst_lfp(count,LFPidx) = sum(eeg_lfp_burst.LFP{1, 1}(trial_in,burst_preWindow,LFPidx)) > 0;
                         % or post-tone window:
                         postburst_lfp(count,LFPidx) = sum(eeg_lfp_burst.LFP{1, 1}(trial_in,burst_postWindow,LFPidx)) > 0;
-
+                        
                         
                         preburst_lfp_shuffled(count,LFPidx) = sum(eeg_lfp_burst.LFP{1, 1}(trial_in_shuffled,burst_preWindow,LFPidx)) > 0;
                         postburst_lfp_shuffled(count,LFPidx) = sum(eeg_lfp_burst.LFP{1, 1}(trial_in_shuffled,burst_postWindow,LFPidx)) > 0;
-
+                        
                         % This array will result in a nBurst in session x contact array,
                         % with a 1 indicating that a burst co-occured in EEG
                         % and the LFP contact in the window.
@@ -101,11 +101,12 @@ for sessionIdx = 14:29
         
         eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled(sessionIdx-13,1:size(eeg_lfp_burst.LFP{1, 1},3)) = nanmean(preburst_lfp_shuffled);
         eegxlfp_cooccur.(alignmentEvent).postBurst_shuffled(sessionIdx-13,1:size(eeg_lfp_burst.LFP{1, 1},3)) = nanmean(postburst_lfp_shuffled);
-                
+        
     end
     
 end
 
+count = 0;
 for sessionIdx = 14:29
     % Get the admin/details
     session = sessionIdx;
@@ -114,25 +115,29 @@ for sessionIdx = 14:29
     
     % ... and for each epoch of interest
     for alignmentIdx = 1:4
+        count = count + 1;
         alignmentEvent = eventAlignments{alignmentIdx};
         alignmentLabel = eventAlignments(alignmentIdx);
         
         layerLabel = {'Upper','Lower','All'};
         layerRef = {[1:8],[9:17],[1:17]};
         
-        for layerIdx = 1:3
-            
-        regular_pre =  nanmean(eegxlfp_cooccur.(alignmentEvent).preBurst(sessionIdx-13,layerRef{layerIdx}),2);
-        regular_post =  nanmean(eegxlfp_cooccur.(alignmentEvent).postBurst(sessionIdx-13,layerRef{layerIdx}),2);
-        shuffled_pre =  nanmean(eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled(sessionIdx-13,layerRef{layerIdx}),2);
-        shuffled_post =  nanmean(eegxlfp_cooccur.(alignmentEvent).postBurst_shuffled(sessionIdx-13,layerRef{layerIdx}),2);
-                
-        table(session,monkey,alignmentLabel,regular_pre,regular_post,shuffled_pre,shuffled_post)
+        upper_regular_pre =  nanmean(eegxlfp_cooccur.(alignmentEvent).preBurst(sessionIdx-13,layerRef{1}),2);
+        upper_regular_post =  nanmean(eegxlfp_cooccur.(alignmentEvent).postBurst(sessionIdx-13,layerRef{1}),2);
+        upper_shuffled_pre =  nanmean(eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled(sessionIdx-13,layerRef{1}),2);
+        upper_shuffled_post =  nanmean(eegxlfp_cooccur.(alignmentEvent).postBurst_shuffled(sessionIdx-13,layerRef{1}),2);
 
-        end
+        lower_regular_pre =  nanmean(eegxlfp_cooccur.(alignmentEvent).preBurst(sessionIdx-13,layerRef{2}),2);
+        lower_regular_post =  nanmean(eegxlfp_cooccur.(alignmentEvent).postBurst(sessionIdx-13,layerRef{2}),2);
+        lower_shuffled_pre =  nanmean(eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled(sessionIdx-13,layerRef{2}),2);
+        lower_shuffled_post =  nanmean(eegxlfp_cooccur.(alignmentEvent).postBurst_shuffled(sessionIdx-13,layerRef{2}),2);
         
+        
+        lfpxeeg_prepost_burst(count,:) = table(session,monkey,alignmentLabel,...
+            upper_regular_pre,upper_regular_post,upper_shuffled_pre,upper_shuffled_post,...
+            lower_regular_pre,lower_regular_post,lower_shuffled_pre,lower_shuffled_post);
         
     end
 end
 
-
+writetable(lfpxeeg_prepost_burst,'D:\projectCode\project_stoppingLFP\data\exportJASP\lfpxeeg_prepost_burst.csv','WriteRowNames',true)

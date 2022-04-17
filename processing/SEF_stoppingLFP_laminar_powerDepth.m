@@ -140,22 +140,11 @@ writetable(depthTable,'D:\projectCode\project_stoppingLFP\data\exportJASP\depth_
 %% Generate figure
 %  Here we are plotting a point and 95% CI plot for each layer. We then
 %  create 3 figures for each epoch.
-
-% ... Fixation beta-power on canceled/no-stop trials across layers
-fig_fixation_depth = [depthTable.laminar; depthTable.laminar];
-fig_fixation_label = [repmat({'Canceled'},249,1); repmat({'No-stop'},249,1)];
-fig_fixation_data = [fixation_power_canceled;fixation_power_nostop];
-fig_fixation_gramm(1,1) = gramm('x',fig_fixation_depth,'y',fig_fixation_data,'color',fig_fixation_label);
-fig_fixation_gramm(1,1).stat_summary('geom',{'point','errorbar'});
-fig_fixation_gramm(1,1).axe_property('YLim',[0 1]);
-fig_fixation_gramm(1,1).set_title('Fixation');
-figure('Position',[100 100 500 200]);
-fig_fixation_gramm.draw();
-
 % ... Stopping beta-power on canceled/no-stop trials across layers
+clear fig_stopping_depth
 fig_stopping_depth = [depthTable.laminar; depthTable.laminar];
 fig_stopping_label = [repmat({'Canceled'},249,1); repmat({'No-stop'},249,1)];
-fig_stopping_data = [stopSignal_power_canceled;stopSignal_power_nostop];
+fig_stopping_data = [depthTable.stopSignal_power_canceled;depthTable.stopSignal_power_nostop];
 fig_stopping_gramm(1,1) = gramm('x',fig_stopping_depth,'y',fig_stopping_data,'color',fig_stopping_label);
 fig_stopping_gramm(1,1).stat_summary('geom',{'point','errorbar'});
 fig_stopping_gramm(1,1).axe_property('YLim',[0 1]);
@@ -163,13 +152,53 @@ fig_stopping_gramm(1,1).set_title('Stopping');
 figure('Position',[100 100 500 200]);
 fig_stopping_gramm.draw();
 
-% ... SSRT beta-power on canceled/no-stop trials across layers
-fig_ssrt_depth = [depthTable.laminar; depthTable.laminar];
-fig_ssrt_label = [repmat({'Canceled'},249,1); repmat({'No-stop'},249,1)];
-fig_ssrt_data = [ssrt_power_canceled;ssrt_power_nostop];
-fig_ssrt_gramm(1,1) = gramm('x',fig_ssrt_depth,'y',fig_ssrt_data,'color',fig_ssrt_label);
-fig_ssrt_gramm(1,1).stat_summary('geom',{'point','errorbar'});
-fig_ssrt_gramm(1,1).axe_property('YLim',[0 1]);
-fig_ssrt_gramm(1,1).set_title('SSRT');
-figure('Position',[100 100 500 200]);
-fig_ssrt_gramm.draw();
+% ... Stopping beta-power on canceled/no-stop trials across layers
+ref_eu = find(strcmp(depthTable.monkeyName,'Euler') == 1);
+clear fig_stopping_gramm
+fig_stopping_depth = [depthTable.laminar(ref_eu); depthTable.laminar(ref_eu)];
+fig_stopping_label = [repmat({'Canceled'},length(ref_eu),1); repmat({'No-stop'},length(ref_eu),1)];
+fig_stopping_data = [depthTable.stopSignal_power_canceled(ref_eu);depthTable.stopSignal_power_nostop(ref_eu)];
+fig_stopping_gramm(1,1) = gramm('x',fig_stopping_depth,'y',fig_stopping_data,'color',fig_stopping_label);
+fig_stopping_gramm(1,1).stat_summary('geom',{'point','errorbar'});
+fig_stopping_gramm(1,1).axe_property('YLim',[0 1.1]);
+fig_stopping_gramm(1,1).set_title('Monkey Eu');
+% figure('Position',[100 100 500 200]);
+% fig_stopping_gramm.draw();
+
+% ... Stopping beta-power on canceled/no-stop trials across layers
+ref_x = find(strcmp(depthTable.monkeyName,'Xena') == 1);
+clear fig_stopping_depth
+fig_stopping_depth = [depthTable.laminar(ref_x); depthTable.laminar(ref_x)];
+fig_stopping_label = [repmat({'Canceled'},length(ref_x),1); repmat({'No-stop'},length(ref_x),1)];
+fig_stopping_data = [depthTable.stopSignal_power_canceled(ref_x);depthTable.stopSignal_power_nostop(ref_x)];
+fig_stopping_gramm(2,1) = gramm('x',fig_stopping_depth,'y',fig_stopping_data,'color',fig_stopping_label);
+fig_stopping_gramm(2,1).stat_summary('geom',{'point','errorbar'});
+fig_stopping_gramm(2,1).axe_property('YLim',[0 1.1]);
+fig_stopping_gramm(2,1).set_title('Monkey X');
+figure('Position',[100 100 500 600]);
+fig_stopping_gramm.draw();
+
+
+%% Archive
+% 
+% % ... Fixation beta-power on canceled/no-stop trials across layers
+% fig_fixation_depth = [depthTable.laminar; depthTable.laminar];
+% fig_fixation_label = [repmat({'Canceled'},249,1); repmat({'No-stop'},249,1)];
+% fig_fixation_data = [fixation_power_canceled;fixation_power_nostop];
+% fig_fixation_gramm(1,1) = gramm('x',fig_fixation_depth,'y',fig_fixation_data,'color',fig_fixation_label);
+% fig_fixation_gramm(1,1).stat_summary('geom',{'point','errorbar'});
+% fig_fixation_gramm(1,1).axe_property('YLim',[0 1]);
+% fig_fixation_gramm(1,1).set_title('Fixation');
+% figure('Position',[100 100 500 200]);
+% fig_fixation_gramm.draw();
+% 
+% % ... SSRT beta-power on canceled/no-stop trials across layers
+% fig_ssrt_depth = [depthTable.laminar; depthTable.laminar];
+% fig_ssrt_label = [repmat({'Canceled'},249,1); repmat({'No-stop'},249,1)];
+% fig_ssrt_data = [ssrt_power_canceled;ssrt_power_nostop];
+% fig_ssrt_gramm(1,1) = gramm('x',fig_ssrt_depth,'y',fig_ssrt_data,'color',fig_ssrt_label);
+% fig_ssrt_gramm(1,1).stat_summary('geom',{'point','errorbar'});
+% fig_ssrt_gramm(1,1).axe_property('YLim',[0 1]);
+% fig_ssrt_gramm(1,1).set_title('SSRT');
+% figure('Position',[100 100 500 200]);
+% fig_ssrt_gramm.draw();

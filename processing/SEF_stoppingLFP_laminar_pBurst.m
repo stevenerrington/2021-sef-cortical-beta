@@ -159,7 +159,7 @@ betaburst_depth_figure(1,3).stat_summary('geom',{'point','line','black_errorbar'
 
 % betaburst_depth_figure.coord_flip();
 
-% g(1,1).axe_property('YLim',[0.25 1]);
-% g(1,2).axe_property('YLim',[0.25 1]);
+betaburst_depth_figure(1,2).axe_property('YLim',[0.0 0.5]);
+betaburst_depth_figure(1,3).axe_property('YLim',[0.0 0.5]);
 figure('Renderer', 'painters', 'Position', [100 100 1200 250]);
 betaburst_depth_figure.draw();
