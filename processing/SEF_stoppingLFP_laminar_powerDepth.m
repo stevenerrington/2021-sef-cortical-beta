@@ -116,7 +116,7 @@ for sessionIdx = 14:29
     
     
     depths = [];
-    depth_session = depthTable.depth(sessionContacts)
+    depth_session = depthTable.depth(sessionContacts);
     maxpower_depth(sessionIdx-13,1) = depth_session(find(depthTable.stopSignal_power_canceled(sessionContacts)...
         == max(depthTable.stopSignal_power_canceled(sessionContacts))));
     
@@ -178,6 +178,45 @@ fig_stopping_gramm(2,1).set_title('Monkey X');
 figure('Position',[100 100 500 600]);
 fig_stopping_gramm.draw();
 
+%%
+
+for session = 1:16
+
+    betaIdx = []; gammaIdx = [];
+    betaIdx = find(f{session} > filterBands.alpha(1) & ...
+        f{session} < filterBands.beta(2));
+    
+    gammaIdx = find(f{session} > filterBands.allGamma(1) & ...
+        f{session} < filterBands.allGamma(2));
+    
+    nCh = size(PSDanalysis{session},1);
+    
+    beta_depth([1:nCh],session) = nanmean(PSDanalysis{session}(:,betaIdx),2);
+    gamma_depth([1:nCh],session) = nanmean(PSDanalysis{session}(:,gammaIdx),2);
+    
+end
+
+figure('Position',[100 100 600 250]);
+subplot(1,3,1)
+plot(nanmean(beta_depth(:,:),2),1:17); hold on
+plot(nanmean(gamma_depth(:,:),2),1:17)
+xlim([-50 50]); ylim([1 17])
+hline(8.5,'k--')
+set(gca,'YDir','Reverse')
+
+subplot(1,3,2)
+plot(nanmean(beta_depth(:,euPerpIdx),2),1:17); hold on
+plot(nanmean(gamma_depth(:,euPerpIdx),2),1:17)
+xlim([-50 50]); ylim([1 17])
+hline(8.5,'k--')
+set(gca,'YDir','Reverse')
+
+subplot(1,3,3)
+plot(nanmean(beta_depth(:,xenaPerpIdx),2),1:17); hold on
+plot(nanmean(gamma_depth(:,xenaPerpIdx),2),1:17)
+xlim([-50 50]); ylim([1 17])
+hline(8.5,'k--')
+set(gca,'YDir','Reverse')
 
 %% Archive
 % 

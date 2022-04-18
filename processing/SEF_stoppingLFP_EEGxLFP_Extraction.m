@@ -1,7 +1,7 @@
 %% Co-activation between SEF and MFC EEG
 % Set up parameters
 eventAlignments = {'target','saccade','stopSignal','tone'};
-eventWindows = {[-800 200],[-200 800],[-200 800],[-800 200]};
+eventWindows = {[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000]};
 eventBin = {1,1,1,1};
 saveDir = 'D:\projectCode\project_stoppingLFP\data\eeg_lfp\';
 

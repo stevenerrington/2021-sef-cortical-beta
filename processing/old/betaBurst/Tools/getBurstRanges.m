@@ -14,7 +14,6 @@ for peakIdx = 1:nBursts
     timeLFPpower = inputData(:,burstMaxTime);
         
     % Duration spread
-    % Find end of burst (sketchy code, but it works?
     burstStartTime = burstMaxTime; burstEndTime = burstMaxTime;
     
     startFlag = 1; endFlag = 1;

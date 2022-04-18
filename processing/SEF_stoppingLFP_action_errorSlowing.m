@@ -47,7 +47,7 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     
 end
 
-%% Model 1: Logisitc regression
+%% Model 1: Logistic regression
 %  Here, I looked at fitting a logistic regression see the association between a
 %  burst (0 or 1) in the error trial, and RT adaption in the following
 %  trial
