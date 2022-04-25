@@ -156,7 +156,7 @@ for sessionIdx = 1:length(sessionList)
     vline(0,'k');
     set(gca,'YDir','Reverse')
     set(gca,'CLim',clim_x)
-    colormap(parula)
+    colormap(viridis)
     
     % - Saccade aligned subplot
     subplot(1,4,2)
@@ -165,7 +165,7 @@ for sessionIdx = 1:length(sessionList)
     vline(0,'k');
     set(gca,'YDir','Reverse')
     set(gca,'CLim',clim_x)
-    colormap(parula)
+    colormap(viridis)
     
     % - SSD aligned subplot
     subplot(1,4,3)
@@ -174,7 +174,7 @@ for sessionIdx = 1:length(sessionList)
     vline(0,'k'); vline(mean(bayesianSSRT.ssrt_mean),'k--')
     set(gca,'YDir','Reverse')
     set(gca,'CLim',clim_x)
-    colormap(parula)
+    colormap(viridis)
     
     % - Tone aligned subplot
     subplot(1,4,4)
@@ -183,7 +183,7 @@ for sessionIdx = 1:length(sessionList)
     vline(0,'k');
     set(gca,'YDir','Reverse')
     set(gca,'CLim',clim_x)
-    colormap(parula)
+    colormap(viridis)
     
 end
 

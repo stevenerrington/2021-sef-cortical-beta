@@ -84,6 +84,9 @@ for sessionIdx = 14:29
         
     end
     
+    eeg_lfp_diffBurstTime.observed{session-13} = diff_burst_time;
+    eeg_lfp_diffBurstTime.shuffled{session-13} = diff_shuffledburst_time;
+    
     bincount_eeg_x_lfp = [];
     bincount_eeg_x_lfp_shuffled = [];
     
@@ -99,8 +102,8 @@ for sessionIdx = 14:29
     
 end
 
-pBurst_eeg_lfp_binned_array = nan(17,20,16);
-pBurst_eeg_lfp_binned_array_shuffled = nan(17,20,16);
+pBurst_eeg_lfp_binned_array = nan(17,size(windowBins,2)-1,16);
+pBurst_eeg_lfp_binned_array_shuffled = nan(17,size(windowBins,2)-1,16);
 
 for session = 1:16
     pBurst_eeg_lfp_binned_array...
@@ -112,3 +115,29 @@ for session = 1:16
         pBurst_eeg_lfp_binned_shuffled{session};
 end
 
+
+
+%%
+main_eegxlfp_average = nanmean(pBurst_eeg_lfp_binned_array(1:17,:,:),3);
+main_eegxlfp_shuffled = nanmean(pBurst_eeg_lfp_binned_array_shuffled(1:17,:,:),3);
+
+figure('Renderer', 'painters', 'Position', [100 100 1000 250]);
+subplot(1,3,1)
+imagesc('XData',windowBins,'YData',1:17,'CData',main_eegxlfp_average)
+set(gca,"YDir","Reverse","CLim",([min(min([main_eegxlfp_average; main_eegxlfp_shuffled]))...
+    max(max([main_eegxlfp_average; main_eegxlfp_shuffled]))]))
+ylim([1 17])
+colormap(viridis)
+
+subplot(1,3,2)
+imagesc('XData',windowBins,'YData',1:17,'CData',main_eegxlfp_shuffled)
+set(gca,"YDir","Reverse","CLim",([min(min([main_eegxlfp_average; main_eegxlfp_shuffled]))...
+    max(max([main_eegxlfp_average; main_eegxlfp_shuffled]))]))
+ylim([1 17])
+colormap(viridis)
+
+subplot(1,3,3)
+imagesc('XData',windowBins,'YData',1:17,'CData',main_eegxlfp_average-main_eegxlfp_shuffled)
+set(gca,"YDir","Reverse")
+ylim([1 17])
+colormap(viridis)

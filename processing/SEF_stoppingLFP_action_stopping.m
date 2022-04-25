@@ -91,6 +91,8 @@ burstDataCanc = [fixationBeta.timing.canceled.pTrials_burst;...
                    posttoneBeta.timing.canceled.pTrials_burst];
                
  
+
+               
 % Define data to use in the plot
 trialLabels = [groupLabels_nostop;groupLabels_canc];
 eventLabels = repmat([eventLabel_fixation;eventLabel_SSRT;eventLabel_preTone;eventLabel_postTone],2,1);
