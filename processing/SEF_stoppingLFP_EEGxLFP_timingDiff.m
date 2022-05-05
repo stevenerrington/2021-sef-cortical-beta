@@ -34,55 +34,30 @@ for session = 1:16
     end
 end
 
-
 %%
-layerLabel = [repmat({'L2'},length(eeg_lfp_diffBurstTime_layer.observed.l2),1);...
-    repmat({'L3'},length(eeg_lfp_diffBurstTime_layer.observed.l3),1);...
-    repmat({'L5'},length(eeg_lfp_diffBurstTime_layer.observed.l5),1);...
-    repmat({'L6'},length(eeg_lfp_diffBurstTime_layer.observed.l6),1)];
 
-eeg_lfp_diffDensity(1,1)=gramm('x',...
-    [eeg_lfp_diffBurstTime_layer.observed.l2'; eeg_lfp_diffBurstTime_layer.observed.l3';...
-    eeg_lfp_diffBurstTime_layer.observed.l5'; eeg_lfp_diffBurstTime_layer.observed.l6'],...
-    'color',layerLabel);
+displayWindow = [-500:10:500];
 
-eeg_lfp_diffDensity(1,2)=gramm('x',...
-    [eeg_lfp_diffBurstTime_layer.shuffled.l2'; eeg_lfp_diffBurstTime_layer.shuffled.l3';...
-    eeg_lfp_diffBurstTime_layer.shuffled.l5'; eeg_lfp_diffBurstTime_layer.shuffled.l6'],...
-    'color',layerLabel);
+figure('Renderer', 'painters', 'Position', [100 100 400 250]); hold on
+histogram(eeg_lfp_diffBurstTime_layer.observed.l2,displayWindow,'DisplayStyle','stairs','Normalization','probability');
+histogram(eeg_lfp_diffBurstTime_layer.observed.l3,displayWindow,'DisplayStyle','stairs','Normalization','probability');
+histogram(eeg_lfp_diffBurstTime_layer.observed.l5,displayWindow,'DisplayStyle','stairs','Normalization','probability');
+histogram(eeg_lfp_diffBurstTime_layer.observed.l6,displayWindow,'DisplayStyle','stairs','Normalization','probability');
 
-
-eeg_lfp_diffDensity(1,1).stat_bin('geom','line'); eeg_lfp_diffDensity(1,2).stat_bin('geom','line');
-eeg_lfp_diffDensity.axe_property('XLim',[-500 500]);
-figure('Renderer', 'painters', 'Position', [100 100 800 400]);
-eeg_lfp_diffDensity.draw();
-
-%% 
-
-displayWindow = [-250:10:250];
-
-figure('Renderer', 'painters', 'Position', [100 100 800 250]); 
-subplot(1,2,1); hold on;
-histogram(eeg_lfp_diffBurstTime_layer.observed.l2,displayWindow,'DisplayStyle','stairs','Normalization','Probability');
-histogram(eeg_lfp_diffBurstTime_layer.observed.l3,displayWindow,'DisplayStyle','stairs','Normalization','Probability');
-histogram(eeg_lfp_diffBurstTime_layer.observed.l5,displayWindow,'DisplayStyle','stairs','Normalization','Probability');
-histogram(eeg_lfp_diffBurstTime_layer.observed.l6,displayWindow,'DisplayStyle','stairs','Normalization','Probability');
-
+histogram(eeg_lfp_diffBurstTime_layer.shuffled.l2,displayWindow,'DisplayStyle','stairs','Normalization','probability');
+histogram(eeg_lfp_diffBurstTime_layer.shuffled.l3,displayWindow,'DisplayStyle','stairs','Normalization','probability');
+histogram(eeg_lfp_diffBurstTime_layer.shuffled.l5,displayWindow,'DisplayStyle','stairs','Normalization','probability');
+histogram(eeg_lfp_diffBurstTime_layer.shuffled.l6,displayWindow,'DisplayStyle','stairs','Normalization','probability');
 
 xlim([displayWindow(1) displayWindow(end)])
-ylim([0 0.02])
-
+% ylim([0 0.02])
+legend({'l2-obs','l3-obs','l5-obs','l6-obs','l2-shuf','l3-shuf','l5-shuf','l6-shuf'},'location','eastoutside')
 vline(mean(eeg_lfp_diffBurstTime_layer.observed.l2),'b--')
 vline(mean(eeg_lfp_diffBurstTime_layer.observed.l3),'o--')
 vline(mean(eeg_lfp_diffBurstTime_layer.observed.l5),'y--')
 vline(mean(eeg_lfp_diffBurstTime_layer.observed.l6),'r--')
 
-subplot(1,2,2); hold on;
-histogram(eeg_lfp_diffBurstTime_layer.shuffled.l2,displayWindow,'DisplayStyle','stairs','Normalization','Probability');
-histogram(eeg_lfp_diffBurstTime_layer.shuffled.l3,displayWindow,'DisplayStyle','stairs','Normalization','Probability');
-histogram(eeg_lfp_diffBurstTime_layer.shuffled.l5,displayWindow,'DisplayStyle','stairs','Normalization','Probability');
-histogram(eeg_lfp_diffBurstTime_layer.shuffled.l6,displayWindow,'DisplayStyle','stairs','Normalization','Probability');
-
+ylim([0.005 0.02])
 
 
 %%

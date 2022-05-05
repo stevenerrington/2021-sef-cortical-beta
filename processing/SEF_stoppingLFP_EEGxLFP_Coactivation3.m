@@ -137,16 +137,11 @@ end
 
 
 
-%% Figure 1: Heatmap p(LFP burst | EEG burst) x depth
-
-% Average across all sessions for the observed and shuffled data
+%%
 main_eegxlfp_average = nanmean(pBurst_eeg_lfp_binned_array(1:17,:,:),3);
 main_eegxlfp_shuffled = nanmean(pBurst_eeg_lfp_binned_array_shuffled(1:17,:,:),3);
 
-% Generate the figure
 figure('Renderer', 'painters', 'Position', [100 100 1000 250]);
-
-% Plot the observed data
 subplot(1,3,1)
 imagesc('XData',windowBins,'YData',1:17,'CData',main_eegxlfp_average)
 set(gca,"YDir","Reverse","CLim",([min(min([main_eegxlfp_average; main_eegxlfp_shuffled]))...
@@ -154,7 +149,6 @@ set(gca,"YDir","Reverse","CLim",([min(min([main_eegxlfp_average; main_eegxlfp_sh
 ylim([1 17])
 colormap(viridis)
 
-% Plot the shuffled data
 subplot(1,3,2)
 imagesc('XData',windowBins,'YData',1:17,'CData',main_eegxlfp_shuffled)
 set(gca,"YDir","Reverse","CLim",([min(min([main_eegxlfp_average; main_eegxlfp_shuffled]))...
@@ -162,7 +156,6 @@ set(gca,"YDir","Reverse","CLim",([min(min([main_eegxlfp_average; main_eegxlfp_sh
 ylim([1 17])
 colormap(viridis)
 
-% Plot the observed - shuffled data
 subplot(1,3,3)
 imagesc('XData',windowBins,'YData',1:17,'CData',main_eegxlfp_average-main_eegxlfp_shuffled)
 set(gca,"YDir","Reverse")
