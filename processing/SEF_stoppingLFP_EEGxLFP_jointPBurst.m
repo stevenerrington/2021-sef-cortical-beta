@@ -156,3 +156,40 @@ donut([nanmean(figureData.lower_regular_pre), 1-nanmean(figureData.lower_regular
 subplot(2,2,4)
 donut([nanmean(figureData.lower_regular_post), 1-nanmean(figureData.lower_regular_post)]);
 
+
+
+%%
+
+figureData_euler = lfpxeeg_prepost_burst(strcmp(lfpxeeg_prepost_burst.alignmentLabel,'target') &...
+    strcmp(lfpxeeg_prepost_burst.monkey,'Euler'),:);
+
+figureData_xena = lfpxeeg_prepost_burst(strcmp(lfpxeeg_prepost_burst.alignmentLabel,'target') &...
+    strcmp(lfpxeeg_prepost_burst.monkey,'Xena'),:);
+
+figure('Renderer', 'painters', 'Position', [100 100 450 400]);
+subplot(2,2,1)
+donut([nanmean(figureData_euler.upper_regular_pre), 1-nanmean(figureData_euler.upper_regular_pre)]);
+legend off
+subplot(2,2,2)
+donut([nanmean(figureData_euler.upper_regular_post), 1-nanmean(figureData_euler.upper_regular_post)]);
+legend off
+subplot(2,2,3)
+donut([nanmean(figureData_euler.lower_regular_pre), 1-nanmean(figureData_euler.lower_regular_pre)]);
+legend off
+subplot(2,2,4)
+donut([nanmean(figureData_euler.lower_regular_post), 1-nanmean(figureData_euler.lower_regular_post)]);
+legend off
+
+figure('Renderer', 'painters', 'Position', [100 100 450 400]);
+subplot(2,2,1)
+donut([nanmean(figureData_xena.upper_regular_pre), 1-nanmean(figureData_xena.upper_regular_pre)]);
+legend off
+subplot(2,2,2)
+donut([nanmean(figureData_xena.upper_regular_post), 1-nanmean(figureData_xena.upper_regular_post)]);
+legend off
+subplot(2,2,3)
+donut([nanmean(figureData_xena.lower_regular_pre), 1-nanmean(figureData_xena.lower_regular_pre)]);
+legend off
+subplot(2,2,4)
+donut([nanmean(figureData_xena.lower_regular_post), 1-nanmean(figureData_xena.lower_regular_post)]);
+legend off
