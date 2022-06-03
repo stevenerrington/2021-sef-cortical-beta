@@ -216,3 +216,19 @@ eeg_lfp_burst_epoch(1,1).axe_property('YLim',[0.0 0.50]);
 figure('Renderer', 'painters', 'Position', [100 100 400 300]);
 eeg_lfp_burst_epoch.draw();
 
+% Figure Supp 1: Split by monkey
+clear eeg_lfp_burst_epoch % Clear the figure from matlabs memory as we're writing it new
+monkeyLabels_all = repmat(laminarJASPdata.monkey,4,1);
+
+% Input data into the gramm library:
+eeg_lfp_burst_epoch(1,1)= gramm('x',pBurst_combined_epoch,'y',pBurst_combined,'color',pBurst_combined_labels,'subset',strcmp(monkeyLabels_all,'Euler'));
+eeg_lfp_burst_epoch(1,2)= gramm('x',pBurst_combined_epoch,'y',pBurst_combined,'color',pBurst_combined_labels,'subset',strcmp(monkeyLabels_all,'Xena'));
+% Set the figure up as a point/line figure with 95% CI error bar:
+eeg_lfp_burst_epoch(1,1).stat_summary('geom',{'point','line','errorbar'});
+eeg_lfp_burst_epoch(1,2).stat_summary('geom',{'point','line','errorbar'});
+% Set figure parameters:
+eeg_lfp_burst_epoch(1,1).axe_property('YLim',[0.0 0.50]);
+eeg_lfp_burst_epoch(1,2).axe_property('YLim',[0.0 0.50]);
+%... and print it!
+figure('Renderer', 'painters', 'Position', [100 100 800 300]);
+eeg_lfp_burst_epoch.draw();

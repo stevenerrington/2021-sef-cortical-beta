@@ -110,13 +110,13 @@ error_figure(3,2) = gramm('x',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(x
 
 % Setup figure type
 % Early period:
-error_figure(1,1).stat_boxplot(); error_figure(1,1).geom_jitter('alpha',0.1,'dodge',0.75);
-error_figure(2,1).stat_boxplot(); error_figure(2,1).geom_jitter('alpha',0.1,'dodge',0.75);
-error_figure(3,1).stat_boxplot(); error_figure(3,1).geom_jitter('alpha',0.1,'dodge',0.75);
+error_figure(1,1).stat_summary('geom',{'point','line','black_errorbar'}); 
+error_figure(2,1).stat_summary('geom',{'point','line','black_errorbar'}); 
+error_figure(3,1).stat_summary('geom',{'point','line','black_errorbar'});
 % Late period:
-error_figure(1,2).stat_boxplot(); error_figure(1,2).geom_jitter('alpha',0.1,'dodge',0.75);
-error_figure(2,2).stat_boxplot(); error_figure(2,2).geom_jitter('alpha',0.1,'dodge',0.75);
-error_figure(3,2).stat_boxplot(); error_figure(3,2).geom_jitter('alpha',0.1,'dodge',0.75);
+error_figure(1,2).stat_summary('geom',{'point','line','black_errorbar'});
+error_figure(2,2).stat_summary('geom',{'point','line','black_errorbar'});
+error_figure(3,2).stat_summary('geom',{'point','line','black_errorbar'});
 
 % Define figure parameters
 error_figure(1,1).axe_property('YLim',[0 1.0]); error_figure(2,1).axe_property('YLim',[0 1.0]); error_figure(3,1).axe_property('YLim',[0 1.0]); 
