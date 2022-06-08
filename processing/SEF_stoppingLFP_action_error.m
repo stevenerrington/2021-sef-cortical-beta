@@ -94,41 +94,41 @@ burstDataNonCanc_early = [errorBeta_early.timing.noncanc.pTrials_burst];
 burstDataNoStop_late = [errorBeta_late.timing.nostop.pTrials_burst];
 burstDataNonCanc_late = [errorBeta_late.timing.noncanc.pTrials_burst];
 
-% Input data into the gramm function.
-error_figure(1,1) = gramm('x',[groupLabelsNoStop(allChannels);groupLabelsNonCanc(allChannels)],...
-    'y',[burstDataNoStop_early(allChannels);burstDataNonCanc_early(allChannels)],'color',[groupLabelsNoStop(allChannels);groupLabelsNonCanc(allChannels)]);
-error_figure(2,1) = gramm('x',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(euChannels)],...
-    'y',[burstDataNoStop_early(euChannels);burstDataNonCanc_early(euChannels)],'color',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(euChannels)]);
-error_figure(3,1) = gramm('x',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)],...
-    'y',[burstDataNoStop_early(xChannels);burstDataNonCanc_early(xChannels)],'color',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)]);
-error_figure(1,2) = gramm('x',[groupLabelsNoStop(allChannels);groupLabelsNonCanc(allChannels)],...
-    'y',[burstDataNoStop_late(allChannels);burstDataNonCanc_late(allChannels)],'color',[groupLabelsNoStop(allChannels);groupLabelsNonCanc(allChannels)]);
-error_figure(2,2) = gramm('x',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(euChannels)],...
-    'y',[burstDataNoStop_late(euChannels);burstDataNonCanc_late(euChannels)],'color',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(euChannels)]);
-error_figure(3,2) = gramm('x',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)],...
-    'y',[burstDataNoStop_late(xChannels);burstDataNonCanc_late(xChannels)],'color',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)]);
+    % Input data into the gramm function.
+    error_figure(1,1) = gramm('x',[groupLabelsNoStop(allChannels);groupLabelsNonCanc(allChannels)],...
+        'y',[burstDataNoStop_early(allChannels);burstDataNonCanc_early(allChannels)],'color',[groupLabelsNoStop(allChannels);groupLabelsNonCanc(allChannels)]);
+    error_figure(2,1) = gramm('x',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(euChannels)],...
+        'y',[burstDataNoStop_early(euChannels);burstDataNonCanc_early(euChannels)],'color',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(euChannels)]);
+    error_figure(3,1) = gramm('x',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)],...
+        'y',[burstDataNoStop_early(xChannels);burstDataNonCanc_early(xChannels)],'color',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)]);
+    error_figure(1,2) = gramm('x',[groupLabelsNoStop(allChannels);groupLabelsNonCanc(allChannels)],...
+        'y',[burstDataNoStop_late(allChannels);burstDataNonCanc_late(allChannels)],'color',[groupLabelsNoStop(allChannels);groupLabelsNonCanc(allChannels)]);
+    error_figure(2,2) = gramm('x',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(euChannels)],...
+        'y',[burstDataNoStop_late(euChannels);burstDataNonCanc_late(euChannels)],'color',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(euChannels)]);
+    error_figure(3,2) = gramm('x',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)],...
+        'y',[burstDataNoStop_late(xChannels);burstDataNonCanc_late(xChannels)],'color',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)]);
 
-% Setup figure type
-% Early period:
-error_figure(1,1).stat_summary('geom',{'point','line','black_errorbar'}); 
-error_figure(2,1).stat_summary('geom',{'point','line','black_errorbar'}); 
-error_figure(3,1).stat_summary('geom',{'point','line','black_errorbar'});
-% Late period:
-error_figure(1,2).stat_summary('geom',{'point','line','black_errorbar'});
-error_figure(2,2).stat_summary('geom',{'point','line','black_errorbar'});
-error_figure(3,2).stat_summary('geom',{'point','line','black_errorbar'});
+    % Setup figure type
+    % Early period:
+    error_figure(1,1).stat_summary('geom',{'point','line','black_errorbar'}); 
+    error_figure(2,1).stat_summary('geom',{'point','line','black_errorbar'}); 
+    error_figure(3,1).stat_summary('geom',{'point','line','black_errorbar'});
+    % Late period:
+    error_figure(1,2).stat_summary('geom',{'point','line','black_errorbar'});
+    error_figure(2,2).stat_summary('geom',{'point','line','black_errorbar'});
+    error_figure(3,2).stat_summary('geom',{'point','line','black_errorbar'});
 
-% Define figure parameters
-error_figure(1,1).axe_property('YLim',[0 1.0]); error_figure(2,1).axe_property('YLim',[0 1.0]); error_figure(3,1).axe_property('YLim',[0 1.0]); 
-error_figure(1,2).axe_property('YLim',[0 1.0]); error_figure(2,2).axe_property('YLim',[0 1.0]); error_figure(3,2).axe_property('YLim',[0 1.0]); 
-error_figure(1,1).no_legend();error_figure(2,1).no_legend();error_figure(3,1).no_legend();
-error_figure(1,2).no_legend();error_figure(2,2).no_legend();error_figure(3,2).no_legend();
-error_figure.set_color_options('map',[colors.nostop;colors.noncanc]);
-error_figure.set_names('y','');
+    % Define figure parameters
+    error_figure(1,1).axe_property('YLim',[0.15 0.45]); error_figure(2,1).axe_property('YLim',[0.15 0.60]); error_figure(3,1).axe_property('YLim',[0.15 0.35]); 
+    error_figure(1,2).axe_property('YLim',[0.15 0.45]); error_figure(2,2).axe_property('YLim',[0.15 0.60]); error_figure(3,2).axe_property('YLim',[0.15 0.35]); 
+    error_figure(1,1).no_legend();error_figure(2,1).no_legend();error_figure(3,1).no_legend();
+    error_figure(1,2).no_legend();error_figure(2,2).no_legend();error_figure(3,2).no_legend();
+    error_figure.set_color_options('map',[colors.nostop;colors.noncanc]);
+    error_figure.set_names('y','');
 
-% Generate figure
-figure('Renderer', 'painters', 'Position', [100 100 400 700]);
-error_figure.draw();
+    % Generate figure
+    figure('Renderer', 'painters', 'Position', [100 100 400 700]);
+    error_figure.draw();
 
 
 

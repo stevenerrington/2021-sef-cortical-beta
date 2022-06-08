@@ -8,10 +8,10 @@ loadDir = 'D:\projectCode\project_stoppingLFP\data\eeg_lfp\';
 printFigFlag = 0;
 
 %%
-eegxlfp_cooccur.(alignmentEvent).preBurst = NaN(length(14:29),17);
-eegxlfp_cooccur.(alignmentEvent).postBurst = NaN(length(14:29),17);
-eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled = NaN(length(14:29),17);
-eegxlfp_cooccur.(alignmentEvent).postBurst_shuffled = NaN(length(14:29),17);
+eegxlfp_cooccur.(alignmentEvent).preBurst = {};
+eegxlfp_cooccur.(alignmentEvent).postBurst = {};
+eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled = {};
+eegxlfp_cooccur.(alignmentEvent).postBurst_shuffled = {};
 
 windowSize = 50;
 %% Extract data from files
@@ -94,17 +94,21 @@ for sessionIdx = 14:29
                     end
                 end
             end
-        end
+        end       
+                   
         
-        eegxlfp_cooccur.(alignmentEvent).preBurst(sessionIdx-13,1:size(eeg_lfp_burst.LFP{1, 1},3)) = nanmean(preburst_lfp);
-        eegxlfp_cooccur.(alignmentEvent).postBurst(sessionIdx-13,1:size(eeg_lfp_burst.LFP{1, 1},3)) = nanmean(postburst_lfp);
+        eegxlfp_cooccur.(alignmentEvent).preBurst{sessionIdx-13} = preburst_lfp;       
+        eegxlfp_cooccur.(alignmentEvent).postBurst{sessionIdx-13} = postburst_lfp;
         
-        eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled(sessionIdx-13,1:size(eeg_lfp_burst.LFP{1, 1},3)) = nanmean(preburst_lfp_shuffled);
-        eegxlfp_cooccur.(alignmentEvent).postBurst_shuffled(sessionIdx-13,1:size(eeg_lfp_burst.LFP{1, 1},3)) = nanmean(postburst_lfp_shuffled);
+        eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled{sessionIdx-13} = preburst_lfp_shuffled;
+        eegxlfp_cooccur.(alignmentEvent).postBurst_shuffled{sessionIdx-13} = postburst_lfp_shuffled;
         
     end
     
 end
+
+
+%%
 
 count = 0;
 for sessionIdx = 14:29
@@ -122,17 +126,17 @@ for sessionIdx = 14:29
         layerLabel = {'Upper','Lower','All'};
         layerRef = {[1:8],[9:17],[1:17]};
         
-        upper_regular_pre =  nanmean(eegxlfp_cooccur.(alignmentEvent).preBurst(sessionIdx-13,layerRef{1}),2);
-        upper_regular_post =  nanmean(eegxlfp_cooccur.(alignmentEvent).postBurst(sessionIdx-13,layerRef{1}),2);
-        upper_shuffled_pre =  nanmean(eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled(sessionIdx-13,layerRef{1}),2);
-        upper_shuffled_post =  nanmean(eegxlfp_cooccur.(alignmentEvent).postBurst_shuffled(sessionIdx-13,layerRef{1}),2);
+        upper_regular_pre =  mean((sum(eegxlfp_cooccur.(alignmentEvent).preBurst{sessionIdx-13}(:,1:8),2) > 0));
+        upper_regular_post =  mean((sum(eegxlfp_cooccur.(alignmentEvent).postBurst{sessionIdx-13}(:,1:8),2) > 0));
+        upper_shuffled_pre =  mean((sum(eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled{sessionIdx-13}(:,1:8),2) > 0));
+        upper_shuffled_post =  mean((sum(eegxlfp_cooccur.(alignmentEvent).postBurst_shuffled{sessionIdx-13}(:,1:8),2) > 0));
 
-        lower_regular_pre =  nanmean(eegxlfp_cooccur.(alignmentEvent).preBurst(sessionIdx-13,layerRef{2}),2);
-        lower_regular_post =  nanmean(eegxlfp_cooccur.(alignmentEvent).postBurst(sessionIdx-13,layerRef{2}),2);
-        lower_shuffled_pre =  nanmean(eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled(sessionIdx-13,layerRef{2}),2);
-        lower_shuffled_post =  nanmean(eegxlfp_cooccur.(alignmentEvent).postBurst_shuffled(sessionIdx-13,layerRef{2}),2);
+        lower_regular_pre = mean((sum(eegxlfp_cooccur.(alignmentEvent).preBurst{sessionIdx-13}(:,9:end),2) > 0));
+        lower_regular_post =  mean((sum(eegxlfp_cooccur.(alignmentEvent).postBurst{sessionIdx-13}(:,9:end),2) > 0));
+        lower_shuffled_pre =  mean((sum(eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled{sessionIdx-13}(:,9:end),2) > 0));
+        lower_shuffled_post =  mean((sum(eegxlfp_cooccur.(alignmentEvent).postBurst_shuffled{sessionIdx-13}(:,9:end),2) > 0));
         
-        
+
         lfpxeeg_prepost_burst(count,:) = table(session,monkey,alignmentLabel,...
             upper_regular_pre,upper_regular_post,upper_shuffled_pre,upper_shuffled_post,...
             lower_regular_pre,lower_regular_post,lower_shuffled_pre,lower_shuffled_post);
