@@ -12,7 +12,9 @@ sessionList = 1:16;
 
 % sessionList = euPerpIdx; % xenaPerpIdx
 
-
+% This code loops through all the LFPs in a given session, determines
+% whether it is an upper or lower layer contact, and then concatenates the
+% times into the relevant structure (upper or lower).
 for sessionIdx = 1:length(sessionList)
     session = sessionList(sessionIdx);
     fprintf('Analysing session %i of %i. \n',sessionIdx, length(sessionList))
@@ -45,23 +47,25 @@ end
 
 %%
 
-displayWindow = [-500:10:500];
+displayWindow = [-250:10:250];
 
 figure('Renderer', 'painters', 'Position', [100 100 400 250]); hold on
-histogram(eeg_lfp_diffBurstTime_layer.observed.upper,displayWindow,'DisplayStyle','stairs','Normalization','probability');
-histogram(eeg_lfp_diffBurstTime_layer.observed.lower,displayWindow,'DisplayStyle','stairs','Normalization','probability');
+histogram(eeg_lfp_diffBurstTime_layer.observed.upper,displayWindow,'DisplayStyle','stairs');
+histogram(eeg_lfp_diffBurstTime_layer.observed.lower,displayWindow,'DisplayStyle','stairs');
 
-histogram(eeg_lfp_diffBurstTime_layer.shuffled.upper,displayWindow,'DisplayStyle','stairs','Normalization','probability');
-histogram(eeg_lfp_diffBurstTime_layer.shuffled.lower,displayWindow,'DisplayStyle','stairs','Normalization','probability');
+histogram(eeg_lfp_diffBurstTime_layer.shuffled.upper,displayWindow,'DisplayStyle','stairs');
+histogram(eeg_lfp_diffBurstTime_layer.shuffled.lower,displayWindow,'DisplayStyle','stairs');
 
 xlim([displayWindow(1) displayWindow(end)])
 % ylim([0 0.02])
 legend({'upper-obs','lower-obs','upper-shuf','lower-shuf'},'location','eastoutside')
-vline(mean(eeg_lfp_diffBurstTime_layer.observed.upper),'b--')
-vline(mean(eeg_lfp_diffBurstTime_layer.observed.lower),'o--')
 
-ylim([0.005 0.020])
 
+% ylim([0.005 0.020])
 
 
 
+%% 
+
+nanmean(eeg_lfp_diffBurstTime_layer.observed.lower > -50 &...
+    eeg_lfp_diffBurstTime_layer.observed.lower < 0)

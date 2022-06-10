@@ -55,36 +55,36 @@ for sessionIdx = 14:29
             trial_in_shuffled = trials_shuffled(trialIdx);
             
             % Find bursts on the trial
-            burstPoints = [];
-            burstPoints = find(eeg_lfp_burst.EEG{1, 1}(trial_in,:) > 0);
+            eeg_burst_points = [];
+            eeg_burst_points = find(eeg_lfp_burst.EEG{1, 1}(trial_in,:) > 0)-alignmentZero;
             % and cut this down to those that just occur during the analysis
             % window/period of interest
-            burstPoints = burstPoints(ismember(burstPoints-alignmentZero,analysisWindows{alignmentIdx}));
+            eeg_burst_points = eeg_burst_points(ismember(eeg_burst_points,analysisWindows{alignmentIdx}));
             
             % If there is a burst
-            if ~isempty(burstPoints)
+            if ~isempty(eeg_burst_points)
                 % For each burst within the window
-                for burstIdx = 1:length(burstPoints)
+                for burstIdx = 1:length(eeg_burst_points)
                     
                     % Count the burst
                     count = count + 1;
                     
                     % Define a window:
                     % 50 ms prior to the burst
-                    burst_preWindow = [burstPoints(burstIdx)-windowSize:burstPoints(burstIdx)];
+                    burst_preWindow = [eeg_burst_points(burstIdx)-windowSize:eeg_burst_points(burstIdx)];
                     % 50 ms after the burst
-                    burst_postWindow = [burstPoints(burstIdx):burstPoints(burstIdx)+windowSize];
+                    burst_postWindow = [eeg_burst_points(burstIdx):eeg_burst_points(burstIdx)+windowSize];
                     
                     % Then for each electrode in the session
                     for LFPidx = 1:size(eeg_lfp_burst.LFP{1, 1},3)
                         % Find whether there was a burst in the pretone:
-                        preburst_lfp(count,LFPidx) = sum(eeg_lfp_burst.LFP{1, 1}(trial_in,burst_preWindow,LFPidx)) > 0;
+                        preburst_lfp(count,LFPidx) = sum(eeg_lfp_burst.LFP{1, 1}(trial_in,burst_preWindow+alignmentZero,LFPidx)) > 0;
                         % or post-tone window:
-                        postburst_lfp(count,LFPidx) = sum(eeg_lfp_burst.LFP{1, 1}(trial_in,burst_postWindow,LFPidx)) > 0;
+                        postburst_lfp(count,LFPidx) = sum(eeg_lfp_burst.LFP{1, 1}(trial_in,burst_postWindow+alignmentZero,LFPidx)) > 0;
                         
                         
-                        preburst_lfp_shuffled(count,LFPidx) = sum(eeg_lfp_burst.LFP{1, 1}(trial_in_shuffled,burst_preWindow,LFPidx)) > 0;
-                        postburst_lfp_shuffled(count,LFPidx) = sum(eeg_lfp_burst.LFP{1, 1}(trial_in_shuffled,burst_postWindow,LFPidx)) > 0;
+                        preburst_lfp_shuffled(count,LFPidx) = sum(eeg_lfp_burst.LFP{1, 1}(trial_in_shuffled,burst_preWindow+alignmentZero,LFPidx)) > 0;
+                        postburst_lfp_shuffled(count,LFPidx) = sum(eeg_lfp_burst.LFP{1, 1}(trial_in_shuffled,burst_postWindow+alignmentZero,LFPidx)) > 0;
                         
                         % This array will result in a nBurst in session x contact array,
                         % with a 1 indicating that a burst co-occured in EEG
@@ -93,6 +93,7 @@ for sessionIdx = 14:29
                         % with a burst in EEG and LFP
                     end
                 end
+               
             end
         end       
                    
@@ -125,6 +126,10 @@ for sessionIdx = 14:29
         
         layerLabel = {'Upper','Lower','All'};
         layerRef = {[1:8],[9:17],[1:17]};
+        
+        upper_regular_pre = []; upper_regular_post = []; upper_shuffled_pre = [];
+        upper_shuffled_post = []; lower_regular_pre = []; lower_regular_post = []; 
+        lower_shuffled_pre = []; lower_shuffled_post = [];
         
         upper_regular_pre =  mean((sum(eegxlfp_cooccur.(alignmentEvent).preBurst{sessionIdx-13}(:,1:8),2) > 0));
         upper_regular_post =  mean((sum(eegxlfp_cooccur.(alignmentEvent).postBurst{sessionIdx-13}(:,1:8),2) > 0));

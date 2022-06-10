@@ -39,12 +39,12 @@ for sessionIdx = 14:29
         
         % Find bursts on the trial
         eeg_burst_time = [];
-        eeg_burst_time = find(eeg_lfp_burst.EEG{1, 1}(trial_in,:) > 0);
+        eeg_burst_time = find(eeg_lfp_burst.EEG{1, 1}(trial_in,:) > 0)-alignmentZero;
         
         % Observed data: ###########################################
         for LFPidx = 1:size(eeg_lfp_burst.LFP{1, 1},3)
             lfp_burst_time = [];
-            lfp_burst_time = find(eeg_lfp_burst.LFP{1, 1}(trial_in,:,LFPidx));
+            lfp_burst_time = find(eeg_lfp_burst.LFP{1, 1}(trial_in,:,LFPidx))-alignmentZero;
             diff_burst_time{trialIdx,LFPidx} = [];
             
             % If there is a burst
@@ -58,7 +58,7 @@ for sessionIdx = 14:29
                 end
             else
                 % If no burst, then it's empty
-                diff_burst_time{trialIdx,LFPidx} = [];
+                diff_burst_time{trialIdx,LFPidx} = NaN;
             end
         end
         
@@ -80,7 +80,7 @@ for sessionIdx = 14:29
                 end
             else
                 % If no burst, then it's empty
-                diff_shuffledburst_time{trialIdx,LFPidx} = [];
+                diff_shuffledburst_time{trialIdx,LFPidx} = NaN;
             end
         end
         
