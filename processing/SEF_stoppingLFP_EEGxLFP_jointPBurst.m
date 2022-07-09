@@ -158,12 +158,16 @@ figureData = lfpxeeg_prepost_burst(strcmp(lfpxeeg_prepost_burst.alignmentLabel,'
 figure('Renderer', 'painters', 'Position', [100 100 450 400]);
 subplot(2,2,1)
 donut([nanmean(figureData.upper_regular_pre), 1-nanmean(figureData.upper_regular_pre)]);
+legend off
 subplot(2,2,2)
 donut([nanmean(figureData.upper_regular_post), 1-nanmean(figureData.upper_regular_post)]);
+legend off
 subplot(2,2,3)
 donut([nanmean(figureData.lower_regular_pre), 1-nanmean(figureData.lower_regular_pre)]);
+legend off
 subplot(2,2,4)
 donut([nanmean(figureData.lower_regular_post), 1-nanmean(figureData.lower_regular_post)]);
+legend off
 
 
 

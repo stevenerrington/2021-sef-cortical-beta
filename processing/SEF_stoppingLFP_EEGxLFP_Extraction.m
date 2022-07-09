@@ -24,7 +24,7 @@ for sessionIdx = 1:29
         % Get window sizes to oompare p(bursts)
         window = eventWindows{alignmentIdx};
         binSize = eventBin{alignmentIdx};
-        times = window(1)+(binSize/2):binSize:window(2)-(binSize/2);
+        times = window(1):binSize:window(2);
 
         %% Get EEG bursts %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % clear trials
@@ -113,7 +113,7 @@ for sessionIdx = 1:29
 
         % I'll then look to split these data by upper and lower layers
         % by first finding the layer in which channels were located
-        upperContacts = find(corticalLFPmap.depth(sessionLFP) < 9);
+        upperContacts = find(corticalLFPmap.depth(sessionLFP) <= 9);
         lowerContacts = find(corticalLFPmap.depth(sessionLFP) > 8); 
         
         % And splitting the output accordingly
@@ -126,7 +126,9 @@ for sessionIdx = 1:29
         % Collate information into one saveable structure
         eeg_lfp_burst = struct();
         eeg_lfp_burst.EEG = burstCounts_EEG;
-        eeg_lfp_burst.LFP = burstCounts_LFP_raw;
+        eeg_lfp_burst.LFP_raw = burstCounts_LFP_raw;
+        eeg_lfp_burst.LFP_upper = burstCounts_LFP_upper;
+        eeg_lfp_burst.LFP_lower = burstCounts_LFP_lower;
         eeg_lfp_burst.eventAlignments = eventAlignments;
         eeg_lfp_burst.eventWindows = eventWindows;
         eeg_lfp_burst.eventBins = eventBin;
