@@ -1,7 +1,7 @@
 %% Co-activation between SEF and MFC EEG
 % Set up parameters
 eventAlignments = {'target','saccade','stopSignal','tone'};
-eventWindows = {[-800 200],[-200 800],[-200 800],[-800 200]};
+eventWindows = {[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000]};
 analysisWindows = {[-400:-200],[400:600],[0:200],[-400:-200]};
 eventBin = {1,1,1,1,1};
 loadDir = 'D:\projectCode\project_stoppingLFP\data\eeg_lfp\';
@@ -20,11 +20,9 @@ for sessionIdx = 14:29
         alignmentEvent = eventAlignments{alignmentIdx};
         
         % Get trials of interest
-        if alignmentIdx == 2
-            trials = executiveBeh.ttx.sNC{session};
-        else
-            trials = executiveBeh.ttx_canc{session};
-        end
+        trials = [];
+        trials = 1:length(executiveBeh.TrialEventTimes_Overall{session});
+        trials_shuffled = trials(randperm(numel(trials)));
         
         % Save output for each alignment on each session
         loadfile_label = ['eeg_lfp_session' int2str(session) '_' alignmentEvent '.mat'];

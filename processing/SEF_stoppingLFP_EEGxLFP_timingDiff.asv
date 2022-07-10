@@ -69,16 +69,12 @@ for session_i = 14:29
                 lfp_burst_times = lfp_burst_times - alignmentZero;
                 lfp_burst_times_shuffled = lfp_burst_times_shuffled - alignmentZero;
                 
-                % If there are bursts identified within the LFP
+                
                 if ~isempty(lfp_burst_times)
-                    % Then added them to the relevant structure for future
-                    % analysis
                     diff_burst_time.obs.(laminarAlignment.compart_label{find_laminar}){session_i - 13} =...
                         [diff_burst_time.obs.(laminarAlignment.compart_label{find_laminar}){session_i - 13},...
                         lfp_burst_times-eeg_burst_x];
                 end
-                
-                % ...same for the shuffled condition
                 if ~isempty(lfp_burst_times_shuffled)
                     diff_burst_time.shuf.(laminarAlignment.compart_label{find_laminar}){session_i - 13} =...
                         [diff_burst_time.shuf.(laminarAlignment.compart_label{find_laminar}){session_i - 13},...
@@ -93,7 +89,7 @@ for session_i = 14:29
 end
 
 
-%% IN PROGRESS
+%%
 
 
 exitflag = 0; stepSize = 10;

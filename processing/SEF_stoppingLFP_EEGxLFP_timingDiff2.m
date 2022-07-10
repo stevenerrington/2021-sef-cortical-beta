@@ -8,7 +8,7 @@ eeg_lfp_diffBurstTime_layer.labels = {};
 
 layerLabel = laminarAlignment.compart_label;
 
-sessionList = 1:16;
+sessionList = 14:29;
 
 % sessionList = euPerpIdx; % xenaPerpIdx
 

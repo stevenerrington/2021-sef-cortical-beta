@@ -1,7 +1,7 @@
 %% Co-activation between SEF and MFC EEG
 % Set up parameters
 eventAlignments = {'target','saccade','stopSignal','tone'};
-eventWindows = {[-800 200],[-200 800],[-200 800],[-800 200]};
+eventWindows = {[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000]};
 analysisWindows = {[-400:-200],[400:600],[0:200],[-400:-200]};
 eventBin = {1,1,1,1};
 loadDir = 'D:\projectCode\project_stoppingLFP\data\eeg_lfp\';
@@ -28,13 +28,9 @@ for sessionIdx = 14:29
         
         % Get trials of interest
         trials = [];
-        if alignmentIdx == 2
-            trials = executiveBeh.ttx.sNC{session};
-            trials_shuffled = executiveBeh.ttx.sNC{session}(randperm(numel(executiveBeh.ttx.sNC{session})));
-        else
-            trials = executiveBeh.ttx_canc{session};
-            trials_shuffled = executiveBeh.ttx_canc{session}(randperm(numel(executiveBeh.ttx_canc{session})));
-        end
+        trials = 1:length(executiveBeh.TrialEventTimes_Overall{session});
+        trials_shuffled = trials(randperm(numel(trials)));
+        
         
         % Save output for each alignment on each session
         loadfile_label = ['eeg_lfp_session' int2str(session) '_' alignmentEvent '.mat'];
@@ -49,6 +45,7 @@ for sessionIdx = 14:29
         
         % Go through each trial
         count = 0;
+        
         for trialIdx = 1:length(trials)
             % Get the actual trial index
             trial_in = trials(trialIdx);
@@ -57,10 +54,10 @@ for sessionIdx = 14:29
             % Find bursts on the trial
             eeg_burst_points = [];
             eeg_burst_points = find(eeg_lfp_burst.EEG{1, 1}(trial_in,:) > 0)-alignmentZero;
-            % and cut this down to those that just occur during the analysis
-            % window/period of interest
-            eeg_burst_points = eeg_burst_points(ismember(eeg_burst_points,analysisWindows{alignmentIdx}));
-            
+%             % and cut this down to those that just occur during the analysis
+%             % window/period of interest
+%             eeg_burst_points = eeg_burst_points(ismember(eeg_burst_points,analysisWindows{alignmentIdx}));
+%             
             % If there is a burst
             if ~isempty(eeg_burst_points)
                 % For each burst within the window
@@ -76,15 +73,15 @@ for sessionIdx = 14:29
                     burst_postWindow = [eeg_burst_points(burstIdx):eeg_burst_points(burstIdx)+windowSize];
                     
                     % Then for each electrode in the session
-                    for LFPidx = 1:size(eeg_lfp_burst.LFP{1, 1},3)
+                    for LFPidx = 1:size(eeg_lfp_burst.LFP_raw{1, 1},3)
                         % Find whether there was a burst in the pretone:
-                        preburst_lfp(count,LFPidx) = sum(eeg_lfp_burst.LFP{1, 1}(trial_in,burst_preWindow+alignmentZero,LFPidx)) > 0;
+                        preburst_lfp(count,LFPidx) = sum(eeg_lfp_burst.LFP_raw{1, 1}(trial_in,burst_preWindow+alignmentZero,LFPidx)) > 0;
                         % or post-tone window:
-                        postburst_lfp(count,LFPidx) = sum(eeg_lfp_burst.LFP{1, 1}(trial_in,burst_postWindow+alignmentZero,LFPidx)) > 0;
+                        postburst_lfp(count,LFPidx) = sum(eeg_lfp_burst.LFP_raw{1, 1}(trial_in,burst_postWindow+alignmentZero,LFPidx)) > 0;
                         
                         
-                        preburst_lfp_shuffled(count,LFPidx) = sum(eeg_lfp_burst.LFP{1, 1}(trial_in_shuffled,burst_preWindow+alignmentZero,LFPidx)) > 0;
-                        postburst_lfp_shuffled(count,LFPidx) = sum(eeg_lfp_burst.LFP{1, 1}(trial_in_shuffled,burst_postWindow+alignmentZero,LFPidx)) > 0;
+                        preburst_lfp_shuffled(count,LFPidx) = sum(eeg_lfp_burst.LFP_raw{1, 1}(trial_in_shuffled,burst_preWindow+alignmentZero,LFPidx)) > 0;
+                        postburst_lfp_shuffled(count,LFPidx) = sum(eeg_lfp_burst.LFP_raw{1, 1}(trial_in_shuffled,burst_postWindow+alignmentZero,LFPidx)) > 0;
                         
                         % This array will result in a nBurst in session x contact array,
                         % with a 1 indicating that a burst co-occured in EEG
@@ -93,12 +90,12 @@ for sessionIdx = 14:29
                         % with a burst in EEG and LFP
                     end
                 end
-               
+                
             end
-        end       
-                   
+        end
         
-        eegxlfp_cooccur.(alignmentEvent).preBurst{sessionIdx-13} = preburst_lfp;       
+        
+        eegxlfp_cooccur.(alignmentEvent).preBurst{sessionIdx-13} = preburst_lfp;
         eegxlfp_cooccur.(alignmentEvent).postBurst{sessionIdx-13} = postburst_lfp;
         
         eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled{sessionIdx-13} = preburst_lfp_shuffled;
@@ -128,20 +125,20 @@ for sessionIdx = 14:29
         layerRef = {[1:8],[9:17],[1:17]};
         
         upper_regular_pre = []; upper_regular_post = []; upper_shuffled_pre = [];
-        upper_shuffled_post = []; lower_regular_pre = []; lower_regular_post = []; 
+        upper_shuffled_post = []; lower_regular_pre = []; lower_regular_post = [];
         lower_shuffled_pre = []; lower_shuffled_post = [];
         
         upper_regular_pre =  mean((sum(eegxlfp_cooccur.(alignmentEvent).preBurst{sessionIdx-13}(:,1:8),2) > 0));
         upper_regular_post =  mean((sum(eegxlfp_cooccur.(alignmentEvent).postBurst{sessionIdx-13}(:,1:8),2) > 0));
         upper_shuffled_pre =  mean((sum(eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled{sessionIdx-13}(:,1:8),2) > 0));
         upper_shuffled_post =  mean((sum(eegxlfp_cooccur.(alignmentEvent).postBurst_shuffled{sessionIdx-13}(:,1:8),2) > 0));
-
+        
         lower_regular_pre = mean((sum(eegxlfp_cooccur.(alignmentEvent).preBurst{sessionIdx-13}(:,9:end),2) > 0));
         lower_regular_post =  mean((sum(eegxlfp_cooccur.(alignmentEvent).postBurst{sessionIdx-13}(:,9:end),2) > 0));
         lower_shuffled_pre =  mean((sum(eegxlfp_cooccur.(alignmentEvent).preBurst_shuffled{sessionIdx-13}(:,9:end),2) > 0));
         lower_shuffled_post =  mean((sum(eegxlfp_cooccur.(alignmentEvent).postBurst_shuffled{sessionIdx-13}(:,9:end),2) > 0));
         
-
+        
         lfpxeeg_prepost_burst(count,:) = table(session,monkey,alignmentLabel,...
             upper_regular_pre,upper_regular_post,upper_shuffled_pre,upper_shuffled_post,...
             lower_regular_pre,lower_regular_post,lower_shuffled_pre,lower_shuffled_post);
