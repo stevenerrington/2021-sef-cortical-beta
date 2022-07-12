@@ -1,15 +1,13 @@
 %% Co-activation between SEF and MFC EEG
 % Set up parameters
 eventAlignments = {'target','saccade','stopSignal','tone'};
-eventWindows = {[-800 200],[-200 800],[-200 800],[-800 200]};
-analysisWindows = {[-400:-200],[400:600],[0:200],[-400:-200]};
-eventBin = {1,1,1,1};
 loadDir = 'D:\projectCode\project_stoppingLFP\data\eeg_lfp\';
-printFigFlag = 0;
 
-
+% Initialize arrays
+%    for observed data in upper/lower layers
 diff_burst_time.obs.upper = cell(1,length(14:29));
 diff_burst_time.obs.lower = cell(1,length(14:29));
+%    for shuffled data in upper/lower layers
 diff_burst_time.shuf.upper = cell(1,length(14:29));
 diff_burst_time.shuf.lower = cell(1,length(14:29));
 
@@ -22,7 +20,7 @@ for session_i = 14:29
     fprintf('Analysing session %i of %i. \n',session, 29)
     
     % ... and for each epoch of interest
-    alignment_i = 1; % # FOR LOOP
+    alignment_i = 1;
     % Get the desired alignment
     alignmentEvent = eventAlignments{alignment_i};
     
@@ -52,15 +50,16 @@ for session_i = 14:29
         
         % Step 2: for each EEG burst, look find the time at which a LFP burst
         % occured %%%%%%%%%%%%%%%%%%%%%%%%%%%
-        for trl_burst_i = 1:length(eeg_burst_times)
+        for eeg_burst_i = 1:length(eeg_burst_times)
             %   Get the burst time in EEG
-            eeg_burst_x = eeg_burst_times(trl_burst_i);
-            %   For each LFP channel
+            eeg_burst_x = eeg_burst_times(eeg_burst_i);
+            
+            %   For each LFP channel within the session
             for lfp_i = 1:size(data_in.eeg_lfp_burst.LFP_raw{1,1},3)
                 % Assign LFP channel to upper or lower layers
                 find_laminar = cellfun(@(c) find(c == lfp_i), laminarAlignment.compart, 'uniform', false);
                 find_laminar = find(~cellfun(@isempty,find_laminar));
-                
+                laminar_compart = laminarAlignment.compart_label{find_laminar};
                 % Find the time of a burst on the same trial
                 lfp_burst_times = [];
                 lfp_burst_times = find(data_in.eeg_lfp_burst.LFP_raw{1, 1}(trial_x,:,lfp_i) > 0);
@@ -73,15 +72,15 @@ for session_i = 14:29
                 if ~isempty(lfp_burst_times)
                     % Then added them to the relevant structure for future
                     % analysis
-                    diff_burst_time.obs.(laminarAlignment.compart_label{find_laminar}){session_i - 13} =...
-                        [diff_burst_time.obs.(laminarAlignment.compart_label{find_laminar}){session_i - 13},...
+                    diff_burst_time.obs.(laminar_compart){session_i - 13} =...
+                        [diff_burst_time.obs.(laminar_compart){session_i - 13},...
                         lfp_burst_times-eeg_burst_x];
                 end
                 
                 % ...same for the shuffled condition
                 if ~isempty(lfp_burst_times_shuffled)
-                    diff_burst_time.shuf.(laminarAlignment.compart_label{find_laminar}){session_i - 13} =...
-                        [diff_burst_time.shuf.(laminarAlignment.compart_label{find_laminar}){session_i - 13},...
+                    diff_burst_time.shuf.(laminar_compart){session_i - 13} =...
+                        [diff_burst_time.shuf.(laminar_compart){session_i - 13},...
                         lfp_burst_times_shuffled-eeg_burst_x];
                 end
                 
@@ -94,8 +93,6 @@ end
 
 
 %% IN PROGRESS
-
-
 exitflag = 0; stepSize = 10;
 curr_time = 0; count = 0;
 clear test
@@ -111,26 +108,35 @@ while exitflag ~= 1
 for session_i = 14:29
     input_diff_times = [];
     input_diff_times = diff_burst_time.obs.(laminarAlignment.compart_label{find_laminar}){session_i - 13};
+    input_diff_times_shuffled = diff_burst_time.shuf.(laminarAlignment.compart_label{find_laminar}){session_i - 13};
     
     nBurst_total = length(input_diff_times);
+    nBurst_total_shuf = length(input_diff_times_shuffled);
     nBurst_preWindow = length(find(input_diff_times > preWindow(1) & input_diff_times < preWindow(2)));
     nBurst_postWindow = length(find(input_diff_times > postWindow(1) & input_diff_times < postWindow(2)));
+
+    
+    nBurst_preWindow_shuf = length(find(input_diff_times > preWindow(1) & input_diff_times < preWindow(2)));
+    nBurst_postWindow_shuf = length(find(input_diff_times > postWindow(1) & input_diff_times < postWindow(2)));
+    
     
     pBurst_pre(session_i-13) = (nBurst_preWindow/nBurst_total);
     pBurst_post(session_i-13) = (nBurst_postWindow/nBurst_total);
     
+    pBurst_pre_shuf(session_i-13) = (nBurst_preWindow_shuf/nBurst_total_shuf);
+    pBurst_post_shuf(session_i-13) = (nBurst_postWindow_shuf/nBurst_total_shuf);    
 end
 
 test(count,:) = [curr_time, mean(pBurst_pre), mean(pBurst_post)];
+test_shuf(count,:) = [curr_time, mean(pBurst_pre_shuf), mean(pBurst_post_shuf)];
 
-if any(pBurst_pre > 0.9); exitflag = 1; end
-if any(pBurst_post > 0.9); exitflag = 1; end
+if any(pBurst_pre > 0.35); exitflag = 1; end
+if any(pBurst_post > 0.35); exitflag = 1; end
 end
 
 figure;
 plot(test(:,1),test(:,2));
+hold on
+plot(test_shuf(:,1),test_shuf(:,2));
 
 
-
-
-diff_burst_time.obs.(laminarAlignment.compart_label{find_laminar}){session_i - 13}
