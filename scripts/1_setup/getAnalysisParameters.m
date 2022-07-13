@@ -24,7 +24,7 @@ eventNames = {'fixate','target','stopSignal','saccade','sacc_end','tone','reward
 
 mapLFPtoChannel
 
-load(fullfile(matDir,'baselineLFPpower.mat'));
+load(fullfile(dataDir,'baselineLFPpower.mat'));
 
 for session = 1:29
     sessionBLpower(session) = ...

@@ -3,7 +3,7 @@
 eventAlignments = {'target','saccade','stopSignal','tone'};
 eventWindows = {[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000]};
 eventBin = {1,1,1,1};
-saveDir = fullfile(matDir,'eeg_lfp');
+saveDir = fullfile(dataDir,'eeg_lfp');
 
 % Initialise arrays
 burstCounts_LFP_raw = {}; burstCounts_LFP_all = {};

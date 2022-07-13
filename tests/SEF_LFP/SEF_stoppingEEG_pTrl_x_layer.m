@@ -1,5 +1,5 @@
 %% Get beta burst information
-dataDir = [matDir 'monkeyLFP\SEF\'];
+dataDir = [dataDir 'monkeyLFP\SEF\'];
 clear burstTiming 
 
 % For each session

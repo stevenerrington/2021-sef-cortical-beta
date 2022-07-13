@@ -132,5 +132,5 @@ for ii = 1:509
     end
 end
 
-writetable(stoppingMonitoring,fullfile(matDir,'exportJASP','canc_nostop_epochComp.csv'),'WriteRowNames',true)
+writetable(stoppingMonitoring,fullfile(rootDir,'results','jasp_tables','canc_nostop_epochComp.csv'),'WriteRowNames',true)
 

@@ -1,6 +1,6 @@
-matDir = 'C:\Users\Steven\Desktop\tempTEBA\matlabRepo\project_stoppingEEG\data\behavior\';
+dataDir = 'C:\Users\Steven\Desktop\tempTEBA\matlabRepo\project_stoppingEEG\data\behavior\';
 dataDir = 'C:\Users\Steven\Desktop\tempTEBA\matlabRepo\project_stoppingEEG\data\monkeyLFP\SEF\';
-load([matDir 'bayesianSSRT']); load([matDir 'executiveBeh']); load([matDir 'FileNames'])
+load([dataDir 'bayesianSSRT']); load([dataDir 'executiveBeh']); load([dataDir 'FileNames'])
 
 %% Calculate proportion of trials with burst
 count = 0;

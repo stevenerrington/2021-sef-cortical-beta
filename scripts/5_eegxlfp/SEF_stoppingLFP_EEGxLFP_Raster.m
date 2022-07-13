@@ -4,7 +4,7 @@ eventAlignments = {'target','saccade','stopSignal','tone'};
 eventWindows = {[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000]};
 analysisWindows = {[-400:-200],[400:600],[0:200],[-400:-200]};
 eventBin = {1,1,1,1,1};
-loadDir = fullfile(matDir,'eeg_lfp');
+loadDir = fullfile(dataDir,'eeg_lfp');
 printFigFlag = 0;
 
 %% Extract data from files
@@ -199,7 +199,7 @@ for alignmentIdx = 1:4
 end
 
 laminarJASPdata = struct2table(laminarJASPdata);
-writetable(laminarJASPdata,fullfile(matDir,'exportJASP','laminarJASPdata.csv'),'WriteRowNames',true)
+writetable(laminarJASPdata,fullfile(rootDir,'results','jasp_tables','laminarJASPdata.csv'),'WriteRowNames',true)
 %% Figure 1: p(burst) across epochs and layers
 % Setup the figure in gramm
 clear eeg_lfp_burst_epoch % Clear the figure from matlabs memory as we're writing it new

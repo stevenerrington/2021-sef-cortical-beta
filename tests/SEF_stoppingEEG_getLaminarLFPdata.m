@@ -55,7 +55,7 @@ for session = 14:29
                 [morletLFP] = convMorletWaveform(filteredLFP,morletParameters);
                 
                 % Save the output and clear for the next session
-                outputDir = [matDir 'monkeyLFP\SEF\'];
+                outputDir = [dataDir 'monkeyLFP\SEF\'];
                 out_lfpFilename = ['SEF_' filter 'LFP' int2str(ii) '_session' int2str(session) '_' eventLabel];
                 out_powerFilename = ['SEF_' filter 'LFP' int2str(ii) '_session' int2str(session) '_' eventLabel '_morlet'];
                 
@@ -108,7 +108,7 @@ end
 
 
 %% Get beta burst information
-dataDir = [matDir 'monkeyLFP\SEF\'];
+dataDir = [dataDir 'monkeyLFP\SEF\'];
 
 % For each session
 for session = 14:29

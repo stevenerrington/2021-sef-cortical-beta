@@ -33,5 +33,5 @@ for session = 14:29
     
 end
 
-outputDir = [matDir 'monkeyLFP\SEF\'];
+outputDir = [dataDir 'monkeyLFP\SEF\'];
 save([outputDir 'channelDepthMap'],'channelDepthMap','-v7.3')

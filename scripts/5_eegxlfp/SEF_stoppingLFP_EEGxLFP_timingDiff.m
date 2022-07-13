@@ -1,7 +1,7 @@
 %% Co-activation between SEF and MFC EEG
 % Set up parameters
 eventAlignments = {'target','saccade','stopSignal','tone'};
-loadDir = fullfile(matDir,'eeg_lfp');
+loadDir = fullfile(dataDir,'eeg_lfp');
 
 % Initialize arrays
 %    for observed data in upper/lower layers

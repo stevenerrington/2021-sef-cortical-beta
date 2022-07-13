@@ -91,7 +91,7 @@ for contactIdx = 1:size(depthTable_pBurst,1)
 end
 
 
-writetable(depthTable_pBurst,fullfile(matDir,'exportJASP','depth_pBurst_epoch.csv'),'WriteRowNames',true)
+writetable(depthTable_pBurst,fullfile(rootDir,'results','jasp_tables','depth_pBurst_epoch.csv'),'WriteRowNames',true)
 
 
 %% Clean up extracted data

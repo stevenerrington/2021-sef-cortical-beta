@@ -95,7 +95,7 @@ meanBurstTimeTable = table(canceledBurstTime, noncanceledBurstTime, nostopBurstT
 
 % Export table for use in JASP
 writetable(meanBurstTimeTable,...
-   fullfile(matDir,'exportJASP','LFP_ProactiveMeanburstTime.csv'),'WriteRowNames',true)
+   fullfile(rootDir,'results','jasp_tables','LFP_ProactiveMeanburstTime.csv'),'WriteRowNames',true)
 
 %% Figure 1: Boxplot p(Burst) by trial history
 

@@ -69,7 +69,7 @@ error_pBurst_earlylate = table(monkeyLabel,noncanceled_pBurst_early,nostop_pBurs
     noncanceled_pBurst_late,nostop_pBurst_late);
 
 writetable(error_pBurst_earlylate,...
-    fullfile(matDir,'exportJASP','error_pBurst_earlylate.csv'),'WriteRowNames',true)
+    fullfile(rootDir,'results','jasp_tables','error_pBurst_earlylate.csv'),'WriteRowNames',true)
 
 
 

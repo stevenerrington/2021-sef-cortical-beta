@@ -5,10 +5,10 @@ clear all; clc
 % pre-processed/pre-extracted behavioral information.
 
 % Load relevant behavioral data
-matDir = 'D:\projectCode\project_stoppingLFP\data\';
+dataDir = 'D:\projectCode\project_stoppingLFP\data\';
 outputDir = 'D:\projectCode\project_stoppingLFP\data\monkeyLFP\';
 
-load([matDir 'behavior\bayesianSSRT']); load([matDir 'behavior\executiveBeh']); load([matDir 'behavior\FileNames'])
+load([dataDir 'behavior\bayesianSSRT']); load([dataDir 'behavior\executiveBeh']); load([dataDir 'behavior\FileNames'])
 
 % Run parameter scripts
 getColors; getAnalysisParameters; mapLFPtoChannel

@@ -131,7 +131,7 @@ for sessionIdx = 14:29
 end
 
 %% Output data for JASP
-writetable(depthTable,fullfile(matDir,'exportJASP','depth_power_epoch.csv'),'WriteRowNames',true)
+writetable(depthTable,fullfile(rootDir,'results','jasp_tables','depth_power_epoch.csv'),'WriteRowNames',true)
 
 % Run a quick one-way t-test to find out if the contact with the maximal
 % beta power was significantly far enough from the L3/5 border.
