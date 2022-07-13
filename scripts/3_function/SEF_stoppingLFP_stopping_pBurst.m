@@ -9,8 +9,8 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     fprintf('Analysing LFP number %i of %i. \n',lfpIdx,length(corticalLFPcontacts.all));
     
     % Load in beta output data for session
-    loadname_stopSignal = ['betaBurst\stopSignal\lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_stopSignal'];
-    betaOutput_stopSignal = parload([outputDir loadname_stopSignal])
+    loadname_stopSignal = fullfile('betaBurst','stopSignal',['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_stopSignal']);
+    betaOutput_stopSignal = parload(fullfile(outputDir, loadname_stopSignal));
     
     % Get behavioral information
     ssrt = bayesianSSRT.ssrt_mean(session);
@@ -69,4 +69,4 @@ betaBurstTable = table(session, monkey,...
     ssd_canceled, ssd_noncanc, ssd_nostop);
 
 writetable(betaBurstTable,...
-    'D:\projectCode\project_stoppingLFP\data\exportJASP\LFP_pBurst_trial.csv','WriteRowNames',true)
+   fullfile(matDir,'exportJASP','LFP_pBurst_trial.csv'),'WriteRowNames',true)

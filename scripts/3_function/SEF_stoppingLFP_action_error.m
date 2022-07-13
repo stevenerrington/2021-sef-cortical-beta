@@ -8,8 +8,8 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     fprintf('Analysing LFP number %i of %i. \n',lfpIdx,length(corticalLFPcontacts.all));
     
     % Load in beta output data for session
-    loadname = ['betaBurst\saccade\lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_saccade'];
-    betaOutput = parload([outputDir loadname])
+    loadname = fullfile('betaBurst','saccade',['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_saccade']);
+    betaOutput = parload(fullfile(outputDir, loadname));
     
     % Get behavioral information
     ssrt = bayesianSSRT.ssrt_mean(session);
@@ -41,19 +41,19 @@ end
 %% Get key beta-burst information for...
 % Non-canceled trials in the early period (0 to 300 ms)
 errorBeta_early.timing.noncanc = SEF_stoppingLFP_getAverageBurstTimeError...
-    (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [0 300]);
+    (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [0 300],outputDir);
 
 % No-stop trials in the early period (0 to 300 ms)
 errorBeta_early.timing.nostop = SEF_stoppingLFP_getAverageBurstTimeError...
-    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [0 300]);
+    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [0 300],outputDir);
 
 % Non-canceled trials in the late period (300 to 600 ms)
 errorBeta_late.timing.noncanc = SEF_stoppingLFP_getAverageBurstTimeError...
-    (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [300 600]);
+    (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [300 600],outputDir);
 
 % No-stop trials in the late period (300 to 600 ms)
 errorBeta_late.timing.nostop = SEF_stoppingLFP_getAverageBurstTimeError...
-    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [300 600]);
+    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [300 600],outputDir);
 
 %% Export burst information for use in JASP
 % Early period (0 to 300 ms post-saccade) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -69,7 +69,7 @@ error_pBurst_earlylate = table(monkeyLabel,noncanceled_pBurst_early,nostop_pBurs
     noncanceled_pBurst_late,nostop_pBurst_late);
 
 writetable(error_pBurst_earlylate,...
-    'D:\projectCode\project_stoppingLFP\data\exportJASP\error_pBurst_earlylate.csv','WriteRowNames',true)
+    fullfile(matDir,'exportJASP','error_pBurst_earlylate.csv'),'WriteRowNames',true)
 
 
 

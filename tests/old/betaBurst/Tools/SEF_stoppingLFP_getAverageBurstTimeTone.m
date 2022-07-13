@@ -1,7 +1,6 @@
 function burstTiming = SEF_stoppingLFP_getAverageBurstTimeTone(lfpList,...
-    trialList, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, timeThreshold_input)
+    trialList, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, timeThreshold_input,dataDir)
 
-dataDir = 'D:\projectCode\project_stoppingLFP\data\monkeyLFP\';
 warning off
 event = 'tone';
 burstTiming = table();

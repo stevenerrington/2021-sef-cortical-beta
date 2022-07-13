@@ -1,7 +1,6 @@
 function burstTiming = SEF_stoppingLFP_getAverageBurstTime(lfpList,...
-    trialList, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold)
+    trialList, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,dataDir)
 
-dataDir = 'D:\projectCode\project_stoppingLFP\data\monkeyLFP\';
 warning off
 event = 'stopSignal';
 burstTiming = table();
@@ -19,8 +18,8 @@ parfor lfpIdx = 1:length(lfpList)
     fprintf('Analysing LFP number %i of %i. \n',lfpIdx,length(lfpList));
     
     % Save output
-    loadFile = ['betaBurst\' event '\lfp_session' int2str(session) '_' lfpName '_betaOutput_' event];
-    betaOutputRaw = parload([dataDir loadFile]);
+    loadFile = fullfile('betaBurst', event, ['lfp_session' int2str(session) '_' lfpName '_betaOutput_' event]);
+    betaOutputRaw = parload(fullfile(dataDir, loadFile));
     [betaOutput] = thresholdBursts(betaOutputRaw.betaOutput, sessionBLpower(session)*burstThreshold);
     
     trial_betaBurst_timing = []; trial_betaBurst_freq = [];

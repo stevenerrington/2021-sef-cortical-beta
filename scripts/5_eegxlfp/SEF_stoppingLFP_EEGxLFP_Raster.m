@@ -4,7 +4,7 @@ eventAlignments = {'target','saccade','stopSignal','tone'};
 eventWindows = {[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000]};
 analysisWindows = {[-400:-200],[400:600],[0:200],[-400:-200]};
 eventBin = {1,1,1,1,1};
-loadDir = 'D:\projectCode\project_stoppingLFP\data\eeg_lfp\';
+loadDir = fullfile(matDir,'eeg_lfp');
 printFigFlag = 0;
 
 %% Extract data from files
@@ -26,7 +26,7 @@ for sessionIdx = 14:29
         
         % Save output for each alignment on each session
         loadfile_label = ['eeg_lfp_session' int2str(session) '_' alignmentEvent '.mat'];
-        load([loadDir loadfile_label]);
+        load(fullfile(loadDir, loadfile_label));
         
         % Get zero point
         alignmentZero = abs(eeg_lfp_burst.eventWindows{alignmentIdx}(1));
@@ -52,16 +52,16 @@ for sessionIdx = 14:29
                 find(eeg_lfp_burst.EEG{1, 1}(trials(ii),:)) - alignmentZero;
             %      L2:
             rasterplot.data.(alignmentEvent).lfp_L2{ii,1} =...
-                find(eeg_lfp_burst.LFP{1, 1}(trials(ii),:,ch_l2)) - alignmentZero;
+                find(eeg_lfp_burst.LFP_raw{1, 1}(trials(ii),:,ch_l2)) - alignmentZero;
             %      L3:
             rasterplot.data.(alignmentEvent).lfp_L3{ii,1} =...
-                find(eeg_lfp_burst.LFP{1, 1}(trials(ii),:,ch_l3)) - alignmentZero;
+                find(eeg_lfp_burst.LFP_raw{1, 1}(trials(ii),:,ch_l3)) - alignmentZero;
             %      L5:
             rasterplot.data.(alignmentEvent).lfp_L5{ii,1} =...
-                find(eeg_lfp_burst.LFP{1, 1}(trials(ii),:,ch_l5)) - alignmentZero;
+                find(eeg_lfp_burst.LFP_raw{1, 1}(trials(ii),:,ch_l5)) - alignmentZero;
             %      L6:
             rasterplot.data.(alignmentEvent).lfp_L6{ii,1} =...
-                find(eeg_lfp_burst.LFP{1, 1}(trials(ii),:,ch_l6)) - alignmentZero;
+                find(eeg_lfp_burst.LFP_raw{1, 1}(trials(ii),:,ch_l6)) - alignmentZero;
         end
         
         % We are going to print for each session, so for this, we can just
@@ -91,15 +91,15 @@ for sessionIdx = 14:29
         % trials in which a burst was observed
         
         pBurst_EEG.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.EEG{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero),2) > 0 );
-        pBurst_L2.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l2),2) > 0 );
-        pBurst_L3.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l3),2) > 0 );
-        pBurst_L5.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l5),2) > 0 );
-        pBurst_L6.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l6),2) > 0 );
+        pBurst_L2.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP_raw{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l2),2) > 0 );
+        pBurst_L3.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP_raw{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l3),2) > 0 );
+        pBurst_L5.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP_raw{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l5),2) > 0 );
+        pBurst_L6.(alignmentEvent)(sessionIdx-13,1) = mean(sum(eeg_lfp_burst.LFP_raw{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,ch_l6),2) > 0 );
 
-        pBurst_L2_all.(alignmentEvent)(sessionIdx-13,1) = mean(mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,laminarAlignment.l2),2) > 0 ));
-        pBurst_L3_all.(alignmentEvent)(sessionIdx-13,1) = mean(mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,laminarAlignment.l3),2) > 0 ));
-        pBurst_L5_all.(alignmentEvent)(sessionIdx-13,1) = mean(mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,laminarAlignment.l5),2) > 0 ));
-        pBurst_L6_all.(alignmentEvent)(sessionIdx-13,1) = mean(mean(sum(eeg_lfp_burst.LFP{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,13:end),2) > 0 ));    
+        pBurst_L2_all.(alignmentEvent)(sessionIdx-13,1) = mean(mean(sum(eeg_lfp_burst.LFP_raw{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,laminarAlignment.l2),2) > 0 ));
+        pBurst_L3_all.(alignmentEvent)(sessionIdx-13,1) = mean(mean(sum(eeg_lfp_burst.LFP_raw{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,laminarAlignment.l3),2) > 0 ));
+        pBurst_L5_all.(alignmentEvent)(sessionIdx-13,1) = mean(mean(sum(eeg_lfp_burst.LFP_raw{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,laminarAlignment.l5),2) > 0 ));
+        pBurst_L6_all.(alignmentEvent)(sessionIdx-13,1) = mean(mean(sum(eeg_lfp_burst.LFP_raw{1, 1}(trials,analysisWindows{alignmentIdx}+alignmentZero,13:end),2) > 0 ));    
     end
     
     
@@ -199,7 +199,7 @@ for alignmentIdx = 1:4
 end
 
 laminarJASPdata = struct2table(laminarJASPdata);
-writetable(laminarJASPdata,'D:\projectCode\project_stoppingLFP\data\exportJASP\laminarJASPdata.csv','WriteRowNames',true)
+writetable(laminarJASPdata,fullfile(matDir,'exportJASP','laminarJASPdata.csv'),'WriteRowNames',true)
 %% Figure 1: p(burst) across epochs and layers
 % Setup the figure in gramm
 clear eeg_lfp_burst_epoch % Clear the figure from matlabs memory as we're writing it new

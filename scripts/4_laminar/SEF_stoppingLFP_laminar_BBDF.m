@@ -18,8 +18,8 @@ for ii = 1:length(laminarContacts.all)
     fprintf('Analysing LFP number %i of %i. \n',ii,length(laminarContacts.all));
     
     % Load the previously extracted BBDF
-    bbdfData = load(['D:\projectCode\project_stoppingLFP\data\bbdf\bbdf_' int2str(lfp)]);
-    
+    bbdfData = load(fullfile(matDir,'bbdf',['bbdf_' int2str(lfp)]));
+        
     % Latency-match BBDF
     %  Initialise loops to be used in array
     c_temp_fix = []; ns_temp_fix = [];

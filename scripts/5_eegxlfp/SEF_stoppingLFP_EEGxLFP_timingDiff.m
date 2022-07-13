@@ -1,7 +1,7 @@
 %% Co-activation between SEF and MFC EEG
 % Set up parameters
 eventAlignments = {'target','saccade','stopSignal','tone'};
-loadDir = 'D:\projectCode\project_stoppingLFP\data\eeg_lfp\';
+loadDir = fullfile(matDir,'eeg_lfp');
 
 % Initialize arrays
 %    for observed data in upper/lower layers
@@ -31,7 +31,7 @@ for session_i = 14:29
     
     % Save output for each alignment on each session
     loadfile_label = ['eeg_lfp_session' int2str(session) '_' alignmentEvent '.mat'];
-    data_in = load([loadDir loadfile_label]);
+    data_in = load(fullfile(loadDir, loadfile_label));
     
     % Get zero point
     alignmentZero = abs(data_in.eeg_lfp_burst.eventWindows{alignment_i}(1));

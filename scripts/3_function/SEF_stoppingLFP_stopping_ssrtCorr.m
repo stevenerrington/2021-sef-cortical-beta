@@ -1,4 +1,4 @@
-dataDir = 'D:\projectCode\project_stoppingLFP\data\monkeyLFP\';
+dataDir = outputDir;
 
 clear stoppingBeta
 
@@ -7,11 +7,11 @@ clear stoppingBeta
 % load([outputDir 'stoppingBeta.mat']);
 % Extracted by:
 stoppingBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTime...
-    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
+    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,dataDir);
 stoppingBeta.timing.noncanceled = SEF_stoppingLFP_getAverageBurstTime...
-    (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
+    (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,dataDir);
 stoppingBeta.timing.nostop = SEF_stoppingLFP_getAverageBurstTime...
-    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
+    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,dataDir);
 
 
 %% Get average by session
@@ -131,8 +131,8 @@ burstParameters_stoppingBeh.draw();
 %%
 for trlIdx = 1:3
     for metricIdx = 1:3
-        a_R(metricIdx,trlIdx) = burstParameters_stoppingBeh(metricIdx, trlIdx).results.stat_glm.model.Rsquared.Ordinary  
-        a_P(metricIdx,trlIdx) = burstParameters_stoppingBeh(metricIdx, trlIdx).results.stat_glm.model.Coefficients.pValue(2)  
+        a_R(metricIdx,trlIdx) = burstParameters_stoppingBeh(metricIdx, trlIdx).results.stat_glm.model.Rsquared.Ordinary;
+        a_P(metricIdx,trlIdx) = burstParameters_stoppingBeh(metricIdx, trlIdx).results.stat_glm.model.Coefficients.pValue(2);
         
     end
 end

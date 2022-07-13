@@ -1,7 +1,6 @@
 function burstTiming = SEF_stoppingLFP_getAverageBurstTimeSSRT(lfpList,...
-    trialList, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold)
+    trialList, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, dataDir)
 
-dataDir = 'D:\projectCode\project_stoppingLFP\data\monkeyLFP\';
 warning off
 event = 'stopSignal';
 burstTiming = table();

@@ -1,4 +1,3 @@
-outputDir = 'D:\projectCode\project_stoppingLFP\data\monkeyLFP\';
 % Load parameters for analysis
 getAnalysisParameters; % Separate script holding all key parameters.
    

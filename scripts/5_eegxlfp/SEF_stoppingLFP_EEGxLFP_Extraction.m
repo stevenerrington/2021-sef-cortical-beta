@@ -3,7 +3,7 @@
 eventAlignments = {'target','saccade','stopSignal','tone'};
 eventWindows = {[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000]};
 eventBin = {1,1,1,1};
-saveDir = 'D:\projectCode\project_stoppingLFP\data\eeg_lfp\';
+saveDir = fullfile(matDir,'eeg_lfp');
 
 % Initialise arrays
 burstCounts_LFP_raw = {}; burstCounts_LFP_all = {};
@@ -32,9 +32,9 @@ for sessionIdx = 1:29
         trials = 1:length(executiveBeh.TrialEventTimes_Overall{session}(:,1));
         
         % Load in EEG data from directory & threshold bursts
-        eegDir = 'D:\projectCode\project_stoppingEEG\data\monkeyEEG\';
-        eegName = ['betaBurst\eeg_session' int2str(session) '_' FileNames{session} '_betaOutput_' alignmentEvent];
-        eegBetaBurst = parload([eegDir eegName]);
+        eegDir = fullfile(driveDir,'projectCode','project_stoppingEEG','data','monkeyEEG');
+        eegName = fullfile('betaBurst',['eeg_session' int2str(session) '_' FileNames{session} '_betaOutput_' alignmentEvent]);
+        eegBetaBurst = parload(fullfile(eegDir,eegName));
         [eegBetaBurst] = thresholdBursts_EEG(eegBetaBurst.betaOutput, eegBetaBurst.betaOutput.medianLFPpower*6);
         
         % Find the maximum number of bursts that occured in a trial and
@@ -76,8 +76,8 @@ for sessionIdx = 1:29
         parfor lfpidx = 1:nLFPs
             % Load in the relevant data and threshold bursts
             lfp = sessionLFP(lfpidx);
-            lfpName = ['betaBurst\' alignmentEvent '\lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_' alignmentEvent];
-            lfpBetaBurst = parload([outputDir lfpName]);
+            lfpName = fullfile('betaBurst', alignmentEvent, ['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_' alignmentEvent]);
+            lfpBetaBurst = parload(fullfile(outputDir, lfpName));
             [lfpBetaBurst] = thresholdBursts(lfpBetaBurst.betaOutput, lfpBetaBurst.betaOutput.medianLFPpower*6);
             
             % Find the maximum number of bursts that occured in a trial and
@@ -134,7 +134,7 @@ for sessionIdx = 1:29
         eeg_lfp_burst.eventBins = eventBin;
         
         % Save output for each alignment on each session
-        save([saveDir savefile_label],'eeg_lfp_burst','-v7.3')
+        save(fullfile(saveDir, savefile_label),'eeg_lfp_burst','-v7.3')
         % This can be loaded in to future analyses.
     end
 end

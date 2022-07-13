@@ -1,6 +1,3 @@
-% Define data directory
-dataDir = 'D:\projectCode\project_stoppingLFP\data\monkeyLFP\';
-
 % Clear the main variable
 clear proactiveBeta
 
@@ -18,11 +15,11 @@ end
 %% Get beta-burst timings
 % Extracted by:
 proactiveBeta.timing.bl_canceled = SEF_stoppingLFP_getAverageBurstTimeTarget...
-    (corticalLFPcontacts.all, ttx.GO_after_C, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
+    (corticalLFPcontacts.all, ttx.GO_after_C, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, dataDir);
 proactiveBeta.timing.bl_noncanceled = SEF_stoppingLFP_getAverageBurstTimeTarget...
-    (corticalLFPcontacts.all,ttx.GO_after_NC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
+    (corticalLFPcontacts.all,ttx.GO_after_NC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, dataDir);
 proactiveBeta.timing.bl_nostop = SEF_stoppingLFP_getAverageBurstTimeTarget...
-    (corticalLFPcontacts.all,ttx.GO_after_GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
+    (corticalLFPcontacts.all,ttx.GO_after_GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, dataDir);
 
 %% Average beta-properties by session
 % Define trial types
@@ -98,7 +95,7 @@ meanBurstTimeTable = table(canceledBurstTime, noncanceledBurstTime, nostopBurstT
 
 % Export table for use in JASP
 writetable(meanBurstTimeTable,...
-    'D:\projectCode\project_stoppingLFP\data\exportJASP\LFP_ProactiveMeanburstTime.csv','WriteRowNames',true)
+   fullfile(matDir,'exportJASP','LFP_ProactiveMeanburstTime.csv'),'WriteRowNames',true)
 
 %% Figure 1: Boxplot p(Burst) by trial history
 

@@ -13,8 +13,8 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     fprintf('Analysing LFP number %i of 509. \n',lfpIdx);
     
     % Load in beta output data for session
-    loadname = ['betaBurst\target\lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_target'];
-    betaOutput = parload([outputDir loadname]);
+    loadname = fullfile('betaBurst','target',['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_target']);
+    betaOutput = parload(fullfile(outputDir, loadname));
     [betaOutput] = thresholdBursts(betaOutput.betaOutput, betaOutput.betaOutput.medianLFPpower*6);
     
     % Get GO trials \

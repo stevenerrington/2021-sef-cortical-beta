@@ -1,22 +1,22 @@
 %% Load dependencies
-load('D:\projectCode\project_stoppingLFP\processing\procData\stoppingBeta.mat')
+load(fullfile(dataDir,'stoppingBeta.mat'));
 pBurst_depth = nan(19, 15);
 
 %% Run extraction function to get beta-burst properties across all contacts for canceled trials...
 % ... following successful stopping (target-400:target-200)
 fixBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeTarget...
-    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
+    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,dataDir);
 % ... following successful stopping (ssrt+200:ssrt+400)
 ssrtBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeSSRT...
-    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
+    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,dataDir);
 % ... and prior to the tone (-200:tone; when inhibition needed to be held
 %     until)
 toneBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeTone...
-    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [-200 0]);
+    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [-200 0],dataDir);
 
 % ... we're also going to take a look at error beta here too.
 errorBeta_late.timing.noncanc = SEF_stoppingLFP_getAverageBurstTimeError...
-    (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [300 600]);
+    (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [300 600],dataDir);
 
 %% Extract and align pBurst by cortical depth
 perpSessions = 14:29; % This limits to the sessions in which we believe are perpendicular
@@ -91,7 +91,7 @@ for contactIdx = 1:size(depthTable_pBurst,1)
 end
 
 
-writetable(depthTable_pBurst,'D:\projectCode\project_stoppingLFP\data\exportJASP\depth_pBurst_epoch.csv','WriteRowNames',true)
+writetable(depthTable_pBurst,fullfile(matDir,'exportJASP','depth_pBurst_epoch.csv'),'WriteRowNames',true)
 
 
 %% Clean up extracted data

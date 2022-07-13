@@ -13,8 +13,8 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     fprintf('Analysing LFP number %i of %i. \n',lfpIdx,length(corticalLFPcontacts.all));
     
     % Load in beta output data for session
-    loadname = ['betaBurst\target\lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_target'];
-    betaOutput = parload([outputDir loadname]);
+    loadname = fullfile('betaBurst','target',['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_target']);
+    betaOutput = parload(fullfile(outputDir, loadname));
     
     [betaOutput] = thresholdBursts(betaOutput.betaOutput, sessionThreshold(session));
     
@@ -37,8 +37,6 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
 end
 
 
-
-
 %% EEG
 % Extract data from files
 % For each session
@@ -48,8 +46,8 @@ for sessionIdx = 1:29
     fprintf('Analysing session %i of %i. \n',session, 29)
     
     % Load in EEG data from directory & threshold bursts
-    eegDir = 'D:\projectCode\project_stoppingEEG\data\monkeyEEG\';
-    eegName = ['betaBurst\eeg_session' int2str(session) '_' FileNames{session} '_betaOutput_target'];
+    eegDir = fullfile(driveDir,'project_stoppingEEG','data','monkeyEEG');
+    eegName = fullfile('betaBurst',['eeg_session' int2str(session) '_' FileNames{session} '_betaOutput_target']);
     eegBetaBurst = parload([eegDir eegName]);
     [eegBetaBurst] = thresholdBursts_EEG(eegBetaBurst.betaOutput, eegBetaBurst.betaOutput.medianLFPpower*6);
     

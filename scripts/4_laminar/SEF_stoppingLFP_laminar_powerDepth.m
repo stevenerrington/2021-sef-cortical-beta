@@ -13,11 +13,11 @@ parfor lfpIdx = 1:length(laminarContacts)
     
     % Load in beta output data for session
     % ... for fixation
-    lfp_loadname_fixation = ['LFP\target\lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_target']; 
-    lfpOutput_fixation = parload([outputDir lfp_loadname_fixation]);
+    lfp_loadname_fixation = fullfile('LFP','target',['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_target']);
+    lfpOutput_fixation = parload(fullfile(outputDir, lfp_loadname_fixation));
     % ... for stopping and post-ssrt
-    lfp_loadname_stopping = ['LFP\stopSignal\lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_stopSignal'];
-    lfpOutput_stopping = parload([outputDir lfp_loadname_stopping]);
+    lfp_loadname_stopping = fullfile('LFP','stopSignal',['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_stopSignal']);
+    lfpOutput_stopping = parload(fullfile(outputDir, lfp_loadname_stopping));
     
     % Get behavioral information
     ssrt = round(bayesianSSRT.ssrt_mean(session));
@@ -131,7 +131,7 @@ for sessionIdx = 14:29
 end
 
 %% Output data for JASP
-writetable(depthTable,'D:\projectCode\project_stoppingLFP\data\exportJASP\depth_power_epoch.csv','WriteRowNames',true)
+writetable(depthTable,fullfile(matDir,'exportJASP','depth_power_epoch.csv'),'WriteRowNames',true)
 
 % Run a quick one-way t-test to find out if the contact with the maximal
 % beta power was significantly far enough from the L3/5 border.

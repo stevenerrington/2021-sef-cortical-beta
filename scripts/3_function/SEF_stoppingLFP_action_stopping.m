@@ -2,27 +2,27 @@
 %% Get main information tables
 % Fixation: -400 to 200 ms pre-target
 fixationBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeTarget...
-    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
+    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,outDir);
 fixationBeta.timing.nostop = SEF_stoppingLFP_getAverageBurstTimeTarget...
-    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
+    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,outDir);
 
 % Post SSRT: 200 to 400 ms
 ssrtBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeSSRT...
-    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
+    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,outDir);
 ssrtBeta.timing.nostop = SEF_stoppingLFP_getAverageBurstTimeSSRT...
-    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold);
+    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,outDir);
 
 % Pre tone: -400 to -200 ms
 pretoneBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeTone...
-    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [-400 -200]);
+    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [-400 -200],outDir);
 pretoneBeta.timing.nostop = SEF_stoppingLFP_getAverageBurstTimeTone...
-    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [-400 -200]);
+    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [-400 -200],outDir);
 
 % Post tone: 100 to 300 ms
 posttoneBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeTone...
-    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [100 300]);
+    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [100 300],outDir);
 posttoneBeta.timing.nostop = SEF_stoppingLFP_getAverageBurstTimeTone...
-    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [100 300]);
+    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [100 300],outDir);
 
 
 %% Figure 1: Boxplot p(Burst) at post-SSRT
@@ -132,5 +132,5 @@ for ii = 1:509
     end
 end
 
-writetable(stoppingMonitoring,'D:\projectCode\project_stoppingLFP\data\exportJASP\canc_nostop_epochComp.csv','WriteRowNames',true)
+writetable(stoppingMonitoring,fullfile(matDir,'exportJASP','canc_nostop_epochComp.csv'),'WriteRowNames',true)
 
