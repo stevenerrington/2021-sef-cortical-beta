@@ -1,21 +1,4 @@
-dataDir = outputDir;
-
-clear stoppingBeta
-
-%% Get beta-burst timings
-
-% load([outputDir 'stoppingBeta.mat']);
-% Extracted by:
-stoppingBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTime...
-    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,dataDir);
-stoppingBeta.timing.noncanceled = SEF_stoppingLFP_getAverageBurstTime...
-    (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,dataDir);
-stoppingBeta.timing.nostop = SEF_stoppingLFP_getAverageBurstTime...
-    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,dataDir);
-
-
 %% Get average by session
-
 trlList = {'nostop','canceled','noncanceled'};
 varList = {'mean_burstTime','std_burstTime','mean_burstOnset','mean_burstOffset',...
     'mean_burstDuration','mean_burstVolume','mean_burstFreq',...
@@ -78,7 +61,7 @@ meanBurstTimeTable = ...
     table(repmat(monkeyLabel, 3, 1),'VariableName',{'Monkey'})];
 
 writetable(meanBurstTimeTable,...
-    'D:\projectCode\project_stoppingLFP\data\exportJASP\LFP_meanburstTime.csv','WriteRowNames',true)
+    fullfile(rootDir,'results','jasp_tables','LFP_meanburstTime.csv'),'WriteRowNames',true)
 
 
 %% Set up figure

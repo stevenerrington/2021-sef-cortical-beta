@@ -15,7 +15,7 @@ parfor lfpIdx = 1:length(laminarContacts)
     
     % Load in beta output data for session %%%%%%%%%%%%%%%%%%%%%%%%%%%
     lfp_loadname = fullfile('LFP','stopSignal',['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_stopSignal']);
-    lfpOutput = parload(fullfile(outputDir, lfp_loadname));
+    lfpOutput = parload(fullfile(fullfile(dataDir,'lfp'), lfp_loadname));
     LFP_all{lfpIdx} = lfpOutput.filteredLFP.all;
     
     % Get behavioral information %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

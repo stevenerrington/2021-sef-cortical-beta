@@ -14,7 +14,7 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     
     % Load in beta output data for session
     loadname = fullfile('betaBurst','saccade',['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_saccade']);
-    betaOutput = parload(fullfile(outputDir, loadname));
+    betaOutput = parload(fullfile(fullfile(dataDir,'lfp'), loadname));
     [betaOutput] = thresholdBursts(betaOutput.betaOutput, sessionBLpower(session)*burstThreshold);
     
     % Get GO trials following NC, and the preceding NC trial (these are

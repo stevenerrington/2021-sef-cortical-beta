@@ -62,7 +62,7 @@ for eventType = [1,2,3,4,6]
                 [betaOutput] = betaBurstCount_LFP(morletLFP, morletParameters);
                 savename_betaBurst = ['betaBurst\' eventLabel '\lfp_session' int2str(session) '_' lfpChannels{k} '_betaOutput_' eventLabel];
                 
-                parsave_betaburst([outputDir savename_betaBurst], betaOutput)          
+                parsave_betaburst([fullfile(dataDir,'lfp') savename_betaBurst], betaOutput)          
                 
             end
         end
@@ -120,7 +120,7 @@ for eventType = [2 3 6]
 
                 savename_LFP = ['LFP\' eventLabel '\lfp_session' int2str(session) '_' lfpChannels{k} '_betaOutput_' eventLabel];
                 
-                parsave_filtered([outputDir savename_LFP], filteredLFP)          
+                parsave_filtered([fullfile(dataDir,'lfp') savename_LFP], filteredLFP)          
                 
             end
         end

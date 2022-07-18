@@ -9,7 +9,7 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     
     % Load in beta output data for session
     loadname = fullfile('betaBurst','saccade',['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_saccade']);
-    betaOutput = parload(fullfile(outputDir, loadname));
+    betaOutput = parload(fullfile(fullfile(dataDir,'lfp'), loadname));
     
     % Get behavioral information
     ssrt = bayesianSSRT.ssrt_mean(session);
@@ -37,23 +37,6 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     saccade_bbdf_noncanceled{lfpIdx,1} = nanmean(nc_sacc_temp);
     saccade_bbdf_nostop{lfpIdx,1} = nanmean(ns_sacc_temp);
 end
-
-%% Get key beta-burst information for...
-% Non-canceled trials in the early period (0 to 300 ms)
-errorBeta_early.timing.noncanc = SEF_stoppingLFP_getAverageBurstTimeError...
-    (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [0 300],outputDir);
-
-% No-stop trials in the early period (0 to 300 ms)
-errorBeta_early.timing.nostop = SEF_stoppingLFP_getAverageBurstTimeError...
-    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [0 300],outputDir);
-
-% Non-canceled trials in the late period (300 to 600 ms)
-errorBeta_late.timing.noncanc = SEF_stoppingLFP_getAverageBurstTimeError...
-    (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [300 600],outputDir);
-
-% No-stop trials in the late period (300 to 600 ms)
-errorBeta_late.timing.nostop = SEF_stoppingLFP_getAverageBurstTimeError...
-    (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [300 600],outputDir);
 
 %% Export burst information for use in JASP
 % Early period (0 to 300 ms post-saccade) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -168,9 +151,7 @@ burstDataNonCanc_late = [errorBeta_late.timing.noncanc.pTrials_burst];
 %     noncanceledBurstVolume, nostopBurstVolume,...
 %     noncanceledBurstFreq, nostopBurstFreq, monkeyLabel);
 % 
-% writetable(meanBurstTimeTable_early,...
-%     'D:\projectCode\project_stoppingLFP\data\exportJASP\LFP_errorBurstProperties_0_300.csv','WriteRowNames',true)
-% 
+
 % % Late period (300 to 600 ms post-saccade) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % clear noncanceled* nostop* meanBurstTimeTable*
 % 

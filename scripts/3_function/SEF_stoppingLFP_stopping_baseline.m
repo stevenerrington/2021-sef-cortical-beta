@@ -14,7 +14,7 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     
     % Load in beta output data for session
     loadname = fullfile('betaBurst','target',['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_target']);
-    betaOutput = parload(fullfile(outputDir, loadname));
+    betaOutput = parload(fullfile(fullfile(dataDir,'lfp'), loadname));
     
     [betaOutput] = thresholdBursts(betaOutput.betaOutput, sessionThreshold(session));
     

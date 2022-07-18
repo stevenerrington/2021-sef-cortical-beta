@@ -11,7 +11,7 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     
     % Load in beta output data for session
     loadname = fullfile('betaBurst','stopSignal',['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_stopSignal']);
-    tempIn = parload(fullfile(outputDir, loadname));
+    tempIn = parload(fullfile(fullfile(dataDir,'lfp'), loadname));
     
     % Get behavioral information
     ssrt = bayesianSSRT.ssrt_mean(session);

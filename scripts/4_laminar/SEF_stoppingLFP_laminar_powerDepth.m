@@ -14,10 +14,10 @@ parfor lfpIdx = 1:length(laminarContacts)
     % Load in beta output data for session
     % ... for fixation
     lfp_loadname_fixation = fullfile('LFP','target',['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_target']);
-    lfpOutput_fixation = parload(fullfile(outputDir, lfp_loadname_fixation));
+    lfpOutput_fixation = parload(fullfile(fullfile(dataDir,'lfp'), lfp_loadname_fixation));
     % ... for stopping and post-ssrt
     lfp_loadname_stopping = fullfile('LFP','stopSignal',['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_stopSignal']);
-    lfpOutput_stopping = parload(fullfile(outputDir, lfp_loadname_stopping));
+    lfpOutput_stopping = parload(fullfile(fullfile(dataDir,'lfp'), lfp_loadname_stopping));
     
     % Get behavioral information
     ssrt = round(bayesianSSRT.ssrt_mean(session));

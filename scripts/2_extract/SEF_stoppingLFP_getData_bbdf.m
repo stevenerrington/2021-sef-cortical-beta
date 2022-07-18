@@ -15,11 +15,11 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     loadname_saccade = ['betaBurst\saccade\lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_saccade'];
     loadname_ssd = ['betaBurst\stopSignal\lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_stopSignal'];
     loadname_tone = ['betaBurst\tone\lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_tone'];
-    betaOutput_fixate = parload([outputDir loadname_fixate]);
-    betaOutput_target = parload([outputDir loadname_target]);
-    betaOutput_saccade = parload([outputDir loadname_saccade]);
-    betaOutput_ssd = parload([outputDir loadname_ssd]);
-    betaOutput_tone = parload([outputDir loadname_tone]);
+    betaOutput_fixate = parload([fullfile(dataDir,'lfp') loadname_fixate]);
+    betaOutput_target = parload([fullfile(dataDir,'lfp') loadname_target]);
+    betaOutput_saccade = parload([fullfile(dataDir,'lfp') loadname_saccade]);
+    betaOutput_ssd = parload([fullfile(dataDir,'lfp') loadname_ssd]);
+    betaOutput_tone = parload([fullfile(dataDir,'lfp') loadname_tone]);
         
     % Extract Beta-Bursts at given threshold
     [betaOutput_fixate] = thresholdBursts(betaOutput_fixate.betaOutput, sessionThreshold(session));

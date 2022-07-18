@@ -77,7 +77,7 @@ for sessionIdx = 1:29
             % Load in the relevant data and threshold bursts
             lfp = sessionLFP(lfpidx);
             lfpName = fullfile('betaBurst', alignmentEvent, ['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_' alignmentEvent]);
-            lfpBetaBurst = parload(fullfile(outputDir, lfpName));
+            lfpBetaBurst = parload(fullfile(fullfile(dataDir,'lfp'), lfpName));
             [lfpBetaBurst] = thresholdBursts(lfpBetaBurst.betaOutput, lfpBetaBurst.betaOutput.medianLFPpower*6);
             
             % Find the maximum number of bursts that occured in a trial and
