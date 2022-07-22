@@ -2,7 +2,7 @@
 clc;
 
 % If the data is already extracted, then load it in.
-if exist('burstData_stopping.mat','file') == 2
+if exist(fullfile(dataDir,'burst', 'burstData_stopping.mat'),'file') == 2
     loadBurstData
 else % Otherwise, extract the data
     %% For baseline/fixation period (-400 to -200 ms, pre-target) %%%%%%%%%%%%%
