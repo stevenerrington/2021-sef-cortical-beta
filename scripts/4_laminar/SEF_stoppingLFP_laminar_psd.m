@@ -110,12 +110,12 @@ parfor session = 1:16
     % Set baseline window for CSD
     baselineWin = [0:100]+1000; % This is 0 to 100 ms after the stop-signal
     
-    % Run current source density analysis (0.4 conductance, 150 um spacing
-    % on electrode)...
-    CSDanalysis{session} = D_CSD_BASIC(LFP_aligned{session}, 'cndt', 0.4, 'spc', 150);
-    % ..and baseline correct
-    CSDanalysis{session} = CSD_blCorr(CSDanalysis{session}, baselineWin)  
-    
+%     % Run current source density analysis (0.4 conductance, 150 um spacing
+%     % on electrode)...
+%     CSDanalysis{session} = D_CSD_BASIC(LFP_aligned{session}, 'cndt', 0.4, 'spc', 150);
+%     % ..and baseline correct
+%     CSDanalysis{session} = CSD_blCorr(CSDanalysis{session}, baselineWin)  
+%     
     % Run power spectral density analysis
     [~, PSDanalysis{session}, f{session}] = D_PSD_BASIC(LFP_aligned{session});
     [o_out{session}, p_out{session}] = D_CSDBAND_BASIC(LFP_aligned{session}, 1000, 0.15, [15 29]);
@@ -127,10 +127,10 @@ end
 clear CSD_sessionMean PSD_sessionMean osc_sessionMean pow_sessionMean
 
 % Intialise arrays
-%    ... for CSD
-CSD_sessionMean.canceled = nan(17,3000,length([1:16]));
-CSD_sessionMean.noncanceled = nan(17,3000,length([1:16]));
-CSD_sessionMean.nostop = nan(17,3000,length([1:16]));
+% %    ... for CSD
+% CSD_sessionMean.canceled = nan(17,3000,length([1:16]));
+% CSD_sessionMean.noncanceled = nan(17,3000,length([1:16]));
+% CSD_sessionMean.nostop = nan(17,3000,length([1:16]));
 %    ... for OSC and power
 osc_sessionMean.canceled = nan(17,3000,length([1:16])); 
 osc_sessionMean.nostop = nan(17,3000,length([1:16]));
@@ -154,12 +154,12 @@ for session = 1:16
     for ii = 1:length(executiveBeh.inh_SSD{session})
         % If there are enough canceled or latency-matched no-stop trials
         if ~isempty(executiveBeh.ttm_c.C{session+13,ii}) || ~isempty(executiveBeh.ttm_c.GO_C{session+13,ii})
-            
-            % Get the mean CSD for the given session for canceled (c) and
-            % no-stop (ns) at the given SSD
-            c_temp(:,:,ii) = nanmean(CSDanalysis{session}(:,:, executiveBeh.ttm_c.C{session+13,ii}.all),3);
-            ns_temp(:,:,ii) = nanmean(CSDanalysis{session}(:,:, executiveBeh.ttm_c.GO_C{session+13,ii}.all),3);
-            
+%             
+%             % Get the mean CSD for the given session for canceled (c) and
+%             % no-stop (ns) at the given SSD
+%             c_temp(:,:,ii) = nanmean(CSDanalysis{session}(:,:, executiveBeh.ttm_c.C{session+13,ii}.all),3);
+%             ns_temp(:,:,ii) = nanmean(CSDanalysis{session}(:,:, executiveBeh.ttm_c.GO_C{session+13,ii}.all),3);
+%             
             % Get the mean OSC for the given session for canceled (c) and
             % no-stop (ns) at the given SSD
             osc_c_temp(:,:,ii) = nanmean(o_out{session}(:,:, executiveBeh.ttm_c.C{session+13,ii}.all),3);
@@ -176,11 +176,11 @@ for session = 1:16
     end
     
     % Average across all SSD's in order to latency match.
-    
-    CSD_sessionMean.canceled(1:size(CSDanalysis{session},1),:,session) =...
-        nanmean(c_temp,3);
-    CSD_sessionMean.nostop(1:size(CSDanalysis{session},1),:,session) =...
-        nanmean(ns_temp,3);
+%     
+%     CSD_sessionMean.canceled(1:size(CSDanalysis{session},1),:,session) =...
+%         nanmean(c_temp,3);
+%     CSD_sessionMean.nostop(1:size(CSDanalysis{session},1),:,session) =...
+%         nanmean(ns_temp,3);
     
     osc_sessionMean.canceled(1:size(o_out{session},1),:,session) =...
         nanmean(osc_c_temp,3);
@@ -193,7 +193,7 @@ for session = 1:16
         nanmean(pow_ns_temp,3);       
     
     % As PSD is across trials, we can just take the mean of all trials.
-    PSD_sessionMean.all(1:size(CSDanalysis{session},1),:,session) =...
+    PSD_sessionMean.all(1:size(PSDanalysis{session},1),:,session) =...
         nanmean(PSDanalysis{session},3);    
     
 end

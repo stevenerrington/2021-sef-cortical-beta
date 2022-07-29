@@ -1,22 +1,6 @@
 %% Load dependencies
-load(fullfile(dataDir,'stoppingBeta.mat'));
+load(fullfile(dataDir,'lfp','stoppingBeta.mat'));
 pBurst_depth = nan(19, 15);
-
-%% Run extraction function to get beta-burst properties across all contacts for canceled trials...
-% ... following successful stopping (target-400:target-200)
-fixBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeTarget...
-    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,dataDir);
-% ... following successful stopping (ssrt+200:ssrt+400)
-ssrtBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeSSRT...
-    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,dataDir);
-% ... and prior to the tone (-200:tone; when inhibition needed to be held
-%     until)
-toneBeta.timing.canceled = SEF_stoppingLFP_getAverageBurstTimeTone...
-    (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [-200 0],dataDir);
-
-% ... we're also going to take a look at error beta here too.
-errorBeta_late.timing.noncanc = SEF_stoppingLFP_getAverageBurstTimeError...
-    (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, [300 600],dataDir);
 
 %% Extract and align pBurst by cortical depth
 perpSessions = 14:29; % This limits to the sessions in which we believe are perpendicular
@@ -36,7 +20,7 @@ for sessionIdx = 1:length(perpSessions)
         
         % Extract the proportion of beta-bursts observed during SSRT, post-SSRT and pre-tone
         % for that contact.
-        fixTime_pBurst_depth(depth,sessionIdx) = fixBeta.timing.canceled.pTrials_burst(lfp);
+        fixTime_pBurst_depth(depth,sessionIdx) = fixationBeta.timing.canceled.pTrials_burst(lfp);
         stopTime_pBurst_depth(depth,sessionIdx) = stoppingBeta.timing.canceled.pTrials_burst(lfp);
         cancelTime_pBurst_depth(depth,sessionIdx) = ssrtBeta.timing.canceled.pTrials_burst(lfp);
         toneTime_pBurst_depth(depth,sessionIdx) = toneBeta.timing.canceled.pTrials_burst(lfp);
@@ -55,7 +39,7 @@ for lfpIdx = 1:length(laminarContacts)
     session = sessionLFPmap.session(lfp);
     sessionName = FileNames{session};
     
-    fixTime_pBurst_lfp(lfpIdx,1) = fixBeta.timing.canceled.pTrials_burst(lfp);
+    fixTime_pBurst_lfp(lfpIdx,1) = fixationBeta.timing.canceled.pTrials_burst(lfp);
     stopTime_pBurst_lfp(lfpIdx,1) = stoppingBeta.timing.canceled.pTrials_burst(lfp);
     cancelTime_pBurst_lfp(lfpIdx,1) = ssrtBeta.timing.canceled.pTrials_burst(lfp);
     toneTime_pBurst_lfp(lfpIdx,1) = toneBeta.timing.canceled.pTrials_burst(lfp);   

@@ -18,7 +18,7 @@ parfor lfpIdx = 1:length(lfpList)
     %     fprintf('Analysing LFP number %i of %i. \n',lfpIdx,length(lfpList));
     
     % Save output
-    loadFile = fullfile('betaBurst', event, ['lfp_session' int2str(session) '_' lfpName '_betaOutput_' event]);
+    loadFile = fullfile('lfp','betaBurst', event, ['lfp_session' int2str(session) '_' lfpName '_betaOutput_' event]);
     betaOutputRaw = parload(fullfile(dataDir, loadFile));
     [betaOutput] = thresholdBursts(betaOutputRaw.betaOutput, sessionBLpower(session)*burstThreshold);
     

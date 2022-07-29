@@ -32,7 +32,7 @@ for sessionIdx = 1:29
         trials = 1:length(executiveBeh.TrialEventTimes_Overall{session}(:,1));
         
         % Load in EEG data from directory & threshold bursts
-        eegDir = fullfile(driveDir,'projectCode','project_stoppingEEG','data','monkeyEEG');
+        eegDir = fullfile(dataDir,'eeg');
         eegName = fullfile('betaBurst',['eeg_session' int2str(session) '_' FileNames{session} '_betaOutput_' alignmentEvent]);
         eegBetaBurst = parload(fullfile(eegDir,eegName));
         [eegBetaBurst] = thresholdBursts_EEG(eegBetaBurst.betaOutput, eegBetaBurst.betaOutput.medianLFPpower*6);
@@ -62,7 +62,6 @@ for sessionIdx = 1:29
         % Save this for EEG, split by the aligment event, and the session
         burstCounts_EEG{1,1} = {};
         burstCounts_EEG{1,1} = double(spikeCounts(eegBurstTimes, window, binSize) > 0);
-        
         
         %% Get LFP bursts %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % For the session we've extracted the EEG from, find the cortical

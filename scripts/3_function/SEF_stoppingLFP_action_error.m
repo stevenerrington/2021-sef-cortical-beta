@@ -1,43 +1,3 @@
-parfor lfpIdx = 1:length(corticalLFPcontacts.all)
-    
-    lfp = corticalLFPcontacts.all(lfpIdx)
-    session = sessionLFPmap.session(lfp);
-    
-    % Get session name (to load in relevant file)
-    sessionName = FileNames{session};
-    fprintf('Analysing LFP number %i of %i. \n',lfpIdx,length(corticalLFPcontacts.all));
-    
-    % Load in beta output data for session
-    loadname = fullfile('betaBurst','saccade',['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_saccade']);
-    betaOutput = parload(fullfile(fullfile(dataDir,'lfp'), loadname));
-    
-    % Get behavioral information
-    ssrt = bayesianSSRT.ssrt_mean(session);
-    
-    % Get relevant trial information
-    trials = [];
-    trials.canceled = executiveBeh.ttx_canc{session};
-    trials.noncanceled = executiveBeh.ttx.sNC{session};
-    trials.nostop = executiveBeh.ttx.GO{session};
-    
-    % Calculate p(trials) with burst
-    [betaOutput] = thresholdBursts(betaOutput.betaOutput, sessionBLpower(session)*burstThreshold)
-    
-    % Convolve and get density function
-    SessionBDF = BetaBurstConvolver(betaOutput.burstData.burstTime);
-        
-     % Saccade (latency matched aligned)
-    nc_sacc_temp = []; ns_sacc_temp = [];
-    
-    for ii = 1:length(executiveBeh.inh_SSD{session})
-        nc_sacc_temp(ii,:) = nanmean(SessionBDF(executiveBeh.ttm_c.NC{session,ii}.all, :));
-        ns_sacc_temp(ii,:) = nanmean(SessionBDF(executiveBeh.ttm_c.GO_NC{session,ii}.all, :));
-    end
-
-    saccade_bbdf_noncanceled{lfpIdx,1} = nanmean(nc_sacc_temp);
-    saccade_bbdf_nostop{lfpIdx,1} = nanmean(ns_sacc_temp);
-end
-
 %% Export burst information for use in JASP
 % Early period (0 to 300 ms post-saccade) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
@@ -53,7 +13,6 @@ error_pBurst_earlylate = table(monkeyLabel,noncanceled_pBurst_early,nostop_pBurs
 
 writetable(error_pBurst_earlylate,...
     fullfile(rootDir,'results','jasp_tables','error_pBurst_earlylate.csv'),'WriteRowNames',true)
-
 
 
 %% Produce error-related activity figure
@@ -115,12 +74,48 @@ burstDataNonCanc_late = [errorBeta_late.timing.noncanc.pTrials_burst];
 
 
 
-
-
-
-
-
+%% %% BBDF
+% parfor lfpIdx = 1:length(corticalLFPcontacts.all)
+%     
+%     lfp = corticalLFPcontacts.all(lfpIdx)
+%     session = sessionLFPmap.session(lfp);
+%     
+%     % Get session name (to load in relevant file)
+%     sessionName = FileNames{session};
+%     fprintf('Analysing LFP number %i of %i. \n',lfpIdx,length(corticalLFPcontacts.all));
+%     
+%     % Load in beta output data for session
+%     loadname = fullfile('betaBurst','saccade',['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_saccade']);
+%     betaOutput = parload(fullfile(fullfile(dataDir,'lfp'), loadname));
+%     
+%     % Get behavioral information
+%     ssrt = bayesianSSRT.ssrt_mean(session);
+%     
+%     % Get relevant trial information
+%     trials = [];
+%     trials.canceled = executiveBeh.ttx_canc{session};
+%     trials.noncanceled = executiveBeh.ttx.sNC{session};
+%     trials.nostop = executiveBeh.ttx.GO{session};
+%     
+%     % Calculate p(trials) with burst
+%     [betaOutput] = thresholdBursts(betaOutput.betaOutput, sessionBLpower(session)*burstThreshold)
+%     
+%     % Convolve and get density function
+%     SessionBDF = BetaBurstConvolver(betaOutput.burstData.burstTime);
+%         
+%      % Saccade (latency matched aligned)
+%     nc_sacc_temp = []; ns_sacc_temp = [];
+%     
+%     for ii = 1:length(executiveBeh.inh_SSD{session})
+%         nc_sacc_temp(ii,:) = nanmean(SessionBDF(executiveBeh.ttm_c.NC{session,ii}.all, :));
+%         ns_sacc_temp(ii,:) = nanmean(SessionBDF(executiveBeh.ttm_c.GO_NC{session,ii}.all, :));
+%     end
 % 
+%     saccade_bbdf_noncanceled{lfpIdx,1} = nanmean(nc_sacc_temp);
+%     saccade_bbdf_nostop{lfpIdx,1} = nanmean(ns_sacc_temp);
+% end
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 % 
 % %% Archived
