@@ -1,11 +1,8 @@
 figure; hold on
 
-trialType_list = {'nostop','noncanceled','nostop'};
+trialType_list = {'nostop','noncanceled','canceled'};
 measure_list = {'burstOnset','burstTimes','burstOffset'};
 count = 0;
-
-
-
 
 for trialtype_i = 1:length(trialType_list)
     trialType = trialType_list{trialtype_i};
@@ -34,7 +31,7 @@ for trialtype_i = 1:length(trialType_list)
             end
         end
         
-        subplot(length(measure_list),length(trialType_list),count)
+        subplot(length(trialType_list),length(measure_list),count)
         histogram(ibi_array_all,1:1:100,'LineStyle','None')
         ylabel(trialType)
     end

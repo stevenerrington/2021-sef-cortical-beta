@@ -58,41 +58,72 @@ for session_i = 14:29
         
         % Step 2: for each EEG burst, look find the time at which a LFP burst
         % occured %%%%%%%%%%%%%%%%%%%%%%%%%%%
-        for eeg_burst_i = 1:length(eeg_burst_times)
-            %   Get the burst time in EEG
-            eeg_burst_x = eeg_burst_times(eeg_burst_i);
-          
+        if ~isempty(eeg_burst_times)
             
             %   For each LFP channel within the session
             for lfp_i = 1:size(data_in.eeg_lfp_burst.LFP_raw{1,1},3)
+                
                 % Assign LFP channel to upper or lower layers
                 find_laminar = cellfun(@(c) find(c == lfp_i), laminarAlignment.compart, 'uniform', false);
                 find_laminar = find(~cellfun(@isempty,find_laminar));
                 laminar_compart = laminarAlignment.compart_label{find_laminar};
+                
                 % Find the time of a burst on the same trial
                 lfp_burst_times = [];
                 lfp_burst_times = find(data_in.eeg_lfp_burst.LFP_raw{1, 1}(trial_x,:,lfp_i) > 0);
                 lfp_burst_times_shuffled = find(data_in.eeg_lfp_burst.LFP_raw{1, 1}(trial_x_shuf,:,lfp_i) > 0);
+                
                 % ... again adjusting for alignment times
                 lfp_burst_times = lfp_burst_times - alignmentZero;
                 lfp_burst_times_shuffled = lfp_burst_times_shuffled - alignmentZero;
- 
                 
-                % If there are bursts identified within the LFP
+                % If there are bursts identified within the LFP,
                 if ~isempty(lfp_burst_times)
+                    nearest_eeg_burst_i = [];
+                    lfp_diff_burst_time = [];
+                    shuf_lfp_burst_i = [];
+                    lfp_diff_burst_time_shuf = [];
+                    
+                    
+                    % Find EEG burst closest to LFP burst in time.
+                    for lfp_burst_i = 1:length(lfp_burst_times)
+                        [~,nearest_eeg_burst_i(lfp_burst_i)] =...
+                            min(abs(eeg_burst_times-lfp_burst_times(lfp_burst_i)));
+                        
+                        lfp_diff_burst_time(lfp_burst_i) =...
+                            eeg_burst_times(nearest_eeg_burst_i(lfp_burst_i)) -...
+                            lfp_burst_times(lfp_burst_i);
+                    end
+                    
                     % Then added them to the relevant structure for future
                     % analysis
                     diff_burst_time.obs.(laminar_compart){session_i - 13} =...
                         [diff_burst_time.obs.(laminar_compart){session_i - 13},...
-                        lfp_burst_times-eeg_burst_x];
+                        lfp_diff_burst_time];
+                    
                 end
                 
-                % ...same for the shuffled condition
+                % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                % If there are bursts identified within the shuffled LFP condition,
                 if ~isempty(lfp_burst_times_shuffled)
+                    
+                    % Find EEG burst closest to LFP burst in time.
+                    for shuf_lfp_burst_i = 1:length(lfp_burst_times_shuffled)
+                        [~,shuf_nearest_eeg_burst_i(shuf_lfp_burst_i)] =...
+                            min(abs(eeg_burst_times-lfp_burst_times_shuffled(shuf_lfp_burst_i)));
+                        
+                        lfp_diff_burst_time_shuf(shuf_lfp_burst_i) =...
+                            eeg_burst_times(shuf_nearest_eeg_burst_i(shuf_lfp_burst_i)) -...
+                            lfp_burst_times_shuffled(shuf_lfp_burst_i);
+                    end
+                    
+                    % Then added them to the relevant structure for future
+                    % analysis
                     diff_burst_time.shuf.(laminar_compart){session_i - 13} =...
                         [diff_burst_time.shuf.(laminar_compart){session_i - 13},...
-                        lfp_burst_times_shuffled-eeg_burst_x];
+                        lfp_diff_burst_time_shuf];
                 end
+                
                 
             end
             
@@ -103,76 +134,39 @@ end
 
 
 
+%% 
+eeg_x_lfp_delta.shuf.upper = []; eeg_x_lfp_delta.shuf.lower = [];
+eeg_x_lfp_delta.obs.upper = [];  eeg_x_lfp_delta.obs.lower = [];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-%% IN PROGRESS
-exitflag = 0; stepSize = 10;
-curr_time = 0; count = 0;
-clear test
-while exitflag ~= 1
+for session_i = 1:16
+    eeg_x_lfp_delta.shuf.upper = [eeg_x_lfp_delta.shuf.upper; ...
+        diff_burst_time.shuf.upper{session_i}'];
     
-    count = count + 1;
-    curr_time = curr_time+stepSize;
-    fprintf('Window size: %i ms \n',curr_time)
+    eeg_x_lfp_delta.shuf.lower = [eeg_x_lfp_delta.shuf.lower; ...
+        diff_burst_time.shuf.lower{session_i}'];    
+
+    eeg_x_lfp_delta.obs.upper = [eeg_x_lfp_delta.obs.upper; ...
+        diff_burst_time.obs.upper{session_i}'];
     
-    preWindow = [-(curr_time) -1];
-    postWindow = [1 curr_time];
-    
-    for session_i = 14:29
-        input_diff_times = [];
-        input_diff_times = diff_burst_time.obs.(laminarAlignment.compart_label{find_laminar}){session_i - 13};
-        input_diff_times_shuffled = diff_burst_time.shuf.(laminarAlignment.compart_label{find_laminar}){session_i - 13};
-        
-        nBurst_total = length(input_diff_times);
-        nBurst_total_shuf = length(input_diff_times_shuffled);
-        nBurst_preWindow = length(find(input_diff_times > preWindow(1) & input_diff_times < preWindow(2)));
-        nBurst_postWindow = length(find(input_diff_times > postWindow(1) & input_diff_times < postWindow(2)));
-        
-        
-        nBurst_preWindow_shuf = length(find(input_diff_times > preWindow(1) & input_diff_times < preWindow(2)));
-        nBurst_postWindow_shuf = length(find(input_diff_times > postWindow(1) & input_diff_times < postWindow(2)));
-        
-        
-        pBurst_pre(session_i-13) = (nBurst_preWindow/nBurst_total);
-        pBurst_post(session_i-13) = (nBurst_postWindow/nBurst_total);
-        
-        pBurst_pre_shuf(session_i-13) = (nBurst_preWindow_shuf/nBurst_total_shuf);
-        pBurst_post_shuf(session_i-13) = (nBurst_postWindow_shuf/nBurst_total_shuf);
-    end
-    
-    test(count,:) = [curr_time, mean(pBurst_pre), mean(pBurst_post)];
-    test_shuf(count,:) = [curr_time, mean(pBurst_pre_shuf), mean(pBurst_post_shuf)];
-    
-    if any(pBurst_pre > 0.35); exitflag = 1; end
-    if any(pBurst_post > 0.35); exitflag = 1; end
+    eeg_x_lfp_delta.obs.lower = [eeg_x_lfp_delta.obs.lower; ...
+        diff_burst_time.obs.lower{session_i}'];     
 end
 
-figure;
-plot(test(:,1),test(:,2));
-hold on
-plot(test_shuf(:,1),test_shuf(:,2));
+displayWindow = [-250:10:250];
+NM = 'probability';
+figure('Renderer', 'painters', 'Position', [100 100 400 250]); hold on
+histogram(eeg_x_lfp_delta.obs.upper,displayWindow,'DisplayStyle','stairs','Normalization',NM);
+histogram(eeg_x_lfp_delta.obs.lower,displayWindow,'DisplayStyle','stairs','Normalization',NM);
 
+histogram(eeg_x_lfp_delta.shuf.upper,displayWindow,'DisplayStyle','stairs','Normalization',NM);
+histogram(eeg_x_lfp_delta.shuf.lower,displayWindow,'DisplayStyle','stairs','Normalization',NM);
+
+xlim([displayWindow(1) displayWindow(end)])
+% ylim([0 0.02])
+legend({'upper-obs','lower-obs','upper-shuf','lower-shuf'},'location','eastoutside')
+
+
+% ylim([0.005 0.020])
+
+nanmean(eeg_x_lfp_delta.obs.upper > -50 & eeg_x_lfp_delta.obs.upper < 0)
 

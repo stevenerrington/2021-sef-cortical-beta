@@ -159,13 +159,13 @@ else
         for iT = (1 + delay):nTime
             VariableIDs = {1,1,iT;...
                 1,2,iT - delay};
-            [mutualInfo(iT),p(iT)] = instinfo(StatesRaster, Method, VariableIDs, 'MCOpt', MCOpt, 'MCpThresh', MCpThresh, 'MCnSamples', MCnSamples);
+            [mutualInfo(iT),p(iT)] = instinfo(StatesRaster, Method, VariableIDs, 'MCOpt', MCOpt);
         end
     else
         for iT = 1:(nTime + delay)
             VariableIDs = {1,1,iT;...
                 1,2,iT - delay};
-            [mutualInfo(iT),p(iT)] = instinfo(StatesRaster, Method, VariableIDs, 'MCOpt', MCOpt, 'MCpThresh', MCpThresh, 'MCnSamples', MCnSamples);
+            [mutualInfo(iT),p(iT)] = instinfo(StatesRaster, Method, VariableIDs, 'MCOpt', MCOpt);
         end
     end
     
