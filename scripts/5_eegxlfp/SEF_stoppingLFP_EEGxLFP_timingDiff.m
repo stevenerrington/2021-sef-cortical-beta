@@ -3,15 +3,6 @@
 eventAlignments = {'target','saccade','stopSignal','tone'};
 loadDir = fullfile(dataDir,'eeg_lfp');
 
-% Initialize arrays
-%    for observed data in upper/lower layers
-diff_burst_time.obs.upper = cell(1,length(14:29));
-diff_burst_time.obs.lower = cell(1,length(14:29));
-%    for shuffled data in upper/lower layers
-diff_burst_time.shuf.upper = cell(1,length(14:29));
-diff_burst_time.shuf.lower = cell(1,length(14:29));
-
-
 trl_burst_diff_lfp = {};
 trl_burst_diff_lfp_shuffled = {};
 
@@ -61,8 +52,6 @@ for session_i = 14:29
         %   Adjust time for alignment offset
         eeg_burst_times = eeg_burst_times - alignmentZero;
         
-        eeg_burst_times = eeg_burst_times(eeg_burst_times > filter_window(1) & eeg_burst_times < filter_window(2));
-        
         % Step 2: For each LFP channel in the session, find if a burst occured.
         for lfp_i = 1:size(data_in.eeg_lfp_burst.LFP_raw{1,1},3)
             
@@ -83,22 +72,29 @@ for session_i = 14:29
             % If there is: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % No beta-burst in EEG, then label trial as 'no eeg burst'
             if isempty(eeg_burst_times) && ~isempty(lfp_burst_times)
-                trl_burst_diff_lfp{session_i,lfp_i}{trl_i,1} = '-eeg, +lfp';
-                trl_burst_diff_lfp_shuffled{session_i,lfp_i}{trl_i,1} = '-eeg, +lfp';
+                trl_burst_diff_lfp{session_i,lfp_i}{trl_i,1} = NaN;
+                trl_burst_diff_lfp{session_i,lfp_i}{trl_i,2} = '-eeg, +lfp';
+                
+                trl_burst_diff_lfp_shuffled{session_i,lfp_i}{trl_i,1} = NaN;
+                trl_burst_diff_lfp_shuffled{session_i,lfp_i}{trl_i,2} = '-eeg, +lfp';
             end
             % No beta-burst in LFP, then label trial as 'no lfp burst'
             if ~isempty(eeg_burst_times) && isempty(lfp_burst_times)
-                trl_burst_diff_lfp{session_i,lfp_i}{trl_i,1} = '+eeg, -lfp';
+                trl_burst_diff_lfp{session_i,lfp_i}{trl_i,1} = NaN;
+                trl_burst_diff_lfp{session_i,lfp_i}{trl_i,2} = '+eeg, -lfp';
             end
             if ~isempty(eeg_burst_times) && isempty(lfp_burst_times_shuffled)
-                trl_burst_diff_lfp_shuffled{session_i,lfp_i}{trl_i,1} = '+eeg, -lfp';
+                trl_burst_diff_lfp_shuffled{session_i,lfp_i}{trl_i,1} = NaN;
+                trl_burst_diff_lfp_shuffled{session_i,lfp_i}{trl_i,2} = '+eeg, -lfp';
             end
             % No beta-burst in EEG or LFP, then label trial as 'no lfp or eeg burst'
             if isempty(eeg_burst_times) && isempty(lfp_burst_times)
-                trl_burst_diff_lfp{session_i,lfp_i}{trl_i,1} = '-eeg, -lfp';
+                trl_burst_diff_lfp{session_i,lfp_i}{trl_i,1} = NaN;
+                trl_burst_diff_lfp{session_i,lfp_i}{trl_i,2} = '-eeg, -lfp';
             end
             if isempty(eeg_burst_times) && isempty(lfp_burst_times_shuffled)
-                trl_burst_diff_lfp_shuffled{session_i,lfp_i}{trl_i,1} = '-eeg, -lfp';
+                trl_burst_diff_lfp_shuffled{session_i,lfp_i}{trl_i,1} = NaN;
+                trl_burst_diff_lfp_shuffled{session_i,lfp_i}{trl_i,2} = '-eeg, -lfp';
             end
             % Otherwise, find the difference between the burst times
             % for observed LFP bursts
@@ -114,13 +110,14 @@ for session_i = 14:29
                     lfp_diff_burst_time(lfp_burst_i) =...
                         eeg_burst_times(nearest_eeg_burst_i(lfp_burst_i)) -...
                         lfp_burst_times(lfp_burst_i);
-                end                        
+                end
                 
                 trl_burst_diff_lfp{session_i,lfp_i}{trl_i,1} = lfp_diff_burst_time;
+                trl_burst_diff_lfp{session_i,lfp_i}{trl_i,2} = '+eeg, +lfp';
             end
             
             % and for shuffled LFP bursts
-            if ~isempty(eeg_burst_times) & ~isempty(lfp_burst_times_shuffled)
+            if ~isempty(eeg_burst_times) && ~isempty(lfp_burst_times_shuffled)
                 % Find EEG burst closest to LFP burst in time.
                 for shuf_lfp_burst_i = 1:length(lfp_burst_times_shuffled)
                     [~,shuf_nearest_eeg_burst_i(shuf_lfp_burst_i)] =...
@@ -131,30 +128,127 @@ for session_i = 14:29
                         lfp_burst_times_shuffled(shuf_lfp_burst_i);
                 end
                 trl_burst_diff_lfp_shuffled{session_i,lfp_i}{trl_i,1} = lfp_diff_burst_time_shuf;
+                trl_burst_diff_lfp_shuffled{session_i,lfp_i}{trl_i,2} = '+eeg, +lfp';
             end
         end
     end
 end
 
+%% Analysis: get proportion of bursts that occur in EEG, LFP
+
+% Parameterize the window
+filter_window_pre = [-50 0];
+filter_window_post = [0 50];
+
+% Setup arrays
+p_eeg_lfp.obs.eeg_and_lfp_all = nan(length(1:17),length(14:29));
+p_eeg_lfp.obs.eeg_and_lfp_window_pre = nan(length(1:17),length(14:29));
+p_eeg_lfp.obs.eeg_and_lfp_window_post = nan(length(1:17),length(14:29));
+p_eeg_lfp.obs.eeg_and_nolfp = nan(length(1:17),length(14:29));
+p_eeg_lfp.obs.noeeg_and_lfp = nan(length(1:17),length(14:29));
+p_eeg_lfp.obs.noeeg_and_nolfp = nan(length(1:17),length(14:29));
+
+p_eeg_lfp.shuf.eeg_and_lfp_all = nan(length(1:17),length(14:29));
+p_eeg_lfp.shuf.eeg_and_lfp_window_pre = nan(length(1:17),length(14:29));
+p_eeg_lfp.shuf.eeg_and_lfp_window_post = nan(length(1:17),length(14:29));
+p_eeg_lfp.shuf.eeg_and_nolfp = nan(length(1:17),length(14:29));
+p_eeg_lfp.shuf.noeeg_and_lfp = nan(length(1:17),length(14:29));
+p_eeg_lfp.shuf.noeeg_and_nolfp = nan(length(1:17),length(14:29));
+
+% Define session and contact
+for session_i = 14:29
+    nLFP = max(find(cell2mat(cellfun(@(x) ~isempty(x),...
+        trl_burst_diff_lfp(session_i,:), 'UniformOutput', false))));
+    
+    for lfp_i = 1:nLFP
+                
+        % Find trials in which there was a co-occurance of an EEG and LFP
+        % beta-burst
+        clear input_window_pre input_window_post input_window_pre_shuf input_window_post_shuf
+        
+        % Observed:
+        input = []; input = trl_burst_diff_lfp{session_i, lfp_i};
+        input_window_pre = cellfun(@(x) x > filter_window_pre(1) & x < filter_window_pre(2), input(:,1), 'UniformOutput', false);
+        input_window_post = cellfun(@(x) x > filter_window_post(1) & x < filter_window_post(2), input(:,1), 'UniformOutput', false);
+        
+        % Find proportion of trials with burst in EEG, LFP, both, or
+        % none.
+        p_eeg_lfp.obs.eeg_and_lfp_all(lfp_i, session_i-13) = nanmean(cell2mat(cellfun(@(x) any(~isnan(x) == 1), input(:,1), 'UniformOutput', false)));
+        p_eeg_lfp.obs.eeg_and_lfp_window_pre(lfp_i, session_i-13) = nanmean(cell2mat(cellfun(@(x) any(x == 1), input_window_pre, 'UniformOutput', false)));
+        p_eeg_lfp.obs.eeg_and_lfp_window_post(lfp_i, session_i-13) = nanmean(cell2mat(cellfun(@(x) any(x == 1), input_window_post, 'UniformOutput', false)));
+        p_eeg_lfp.obs.eeg_and_nolfp(lfp_i, session_i-13) = nanmean(strcmp(input(:,2),'+eeg, -lfp')); % Obs EEG burst, no LFP burst;
+        p_eeg_lfp.obs.noeeg_and_lfp(lfp_i, session_i-13) = nanmean(strcmp(input(:,2),'-eeg, +lfp')); % No EEG burst, Obs LFP burst
+        p_eeg_lfp.obs.noeeg_and_nolfp(lfp_i, session_i-13) = nanmean(strcmp(input(:,2),'-eeg, -lfp')); % No EEG burst, Obs LFP burst
+        
+        % Shuffled:
+        input_shuffled = []; input_shuffled = trl_burst_diff_lfp_shuffled{session_i, lfp_i};
+        
+        input_window_pre_shuf = cellfun(@(x) x > filter_window_pre(1) & x < filter_window_pre(2), input_shuffled(:,1), 'UniformOutput', false);
+        input_window_post_shuf = cellfun(@(x) x > filter_window_post(1) & x < filter_window_post(2), input_shuffled(:,1), 'UniformOutput', false);
+        
+        % Find proportion of trials with burst in EEG, LFP, both, or
+        % none.
+        p_eeg_lfp.shuf.eeg_and_lfp_all(lfp_i, session_i-13) = nanmean(cell2mat(cellfun(@(x) any(~isnan(x) == 1), input_shuffled(:,1), 'UniformOutput', false)));
+        p_eeg_lfp.shuf.eeg_and_lfp_window_pre(lfp_i, session_i-13) = nanmean(cell2mat(cellfun(@(x) any(x == 1), input_window_pre_shuf, 'UniformOutput', false)));
+        p_eeg_lfp.shuf.eeg_and_lfp_window_post(lfp_i, session_i-13) = nanmean(cell2mat(cellfun(@(x) any(x == 1), input_window_post_shuf, 'UniformOutput', false)));
+        p_eeg_lfp.shuf.eeg_and_nolfp(lfp_i,session_i-13) = nanmean(strcmp(input_shuffled(:,2),'+eeg, -lfp')); % Obs EEG burst, no LFP burst;
+        p_eeg_lfp.shuf.noeeg_and_lfp(lfp_i,session_i-13) = nanmean(strcmp(input_shuffled(:,2),'-eeg, +lfp')); % No EEG burst, Obs LFP burst
+        p_eeg_lfp.shuf.noeeg_and_nolfp(lfp_i,session_i-13) = nanmean(strcmp(input_shuffled(:,2),'-eeg, -lfp')); % No EEG burst, Obs LFP burst
+        
+    end
+end
+
 %%
-filter_window = [-250 250];
+beta_burst_diffTimes.obs.upper = []; beta_burst_diffTimes.obs.lower = [];
+beta_burst_diffTimes.shuf.upper = []; beta_burst_diffTimes.shuf.lower = [];
+for session_i = 14:29
+    fprintf('Analysing session %i of %i. \n',session_i, 29)
+    
+    nLFP = max(find(cell2mat(cellfun(@(x) ~isempty(x),...
+        trl_burst_diff_lfp(session_i,:), 'UniformOutput', false))));
+    
+    for lfp_i = 1:nLFP
+        % Assign LFP channel to upper or lower layers
+        find_laminar = cellfun(@(c) find(c == lfp_i), laminarAlignment.compart, 'uniform', false);
+        find_laminar = find(~cellfun(@isempty,find_laminar));
+        laminar_compart = laminarAlignment.compart_label{find_laminar};
+        
+        for trl_i = 1:length(trl_burst_diff_lfp{session_i, lfp_i})
+            beta_burst_diffTimes.obs.(laminar_compart) =...
+                [beta_burst_diffTimes.obs.(laminar_compart), trl_burst_diff_lfp{session_i, lfp_i}{trl_i}];
+            
+            beta_burst_diffTimes.shuf.(laminar_compart) =...
+                [beta_burst_diffTimes.shuf.(laminar_compart), trl_burst_diff_lfp_shuffled{session_i, lfp_i}{trl_i}];
+        end
+    end
+end
 
-session_i = 14;
-lfp_i = 1;
 
-input = []; input = trl_burst_diff_lfp{session_i, lfp_i};
-co_lfp_eeg_trls = find(cell2mat(cellfun(@(x) isnumeric(x), input, 'UniformOutput', false)) == 1);
+%% 
 
-test = cellfun(@(x) x > filter_window(1) & x < filter_window(2), input(co_lfp_eeg_trls), 'UniformOutput', false);
-test2 = cell2mat(cellfun(@(x) isempty(find(x == 1)), test, 'UniformOutput', false));
+clear a b c test_a test_b
+laminar_compart = 'lower';
+bins = [-200:10:200];
+
+[a,b] = histcounts( beta_burst_diffTimes.obs.(laminar_compart), bins)
+[c,~] = histcounts( beta_burst_diffTimes.shuf.(laminar_compart), bins)
+
+nBursts = sum(~isnan(beta_burst_diffTimes.obs.(laminar_compart)))
+nBursts_shuffled = sum(~isnan(beta_burst_diffTimes.shuf.(laminar_compart)))
+
+a = (a/nBursts) * 100;
+b = b(2:end)-((bins(2)-bins(1))/2);
+c = (c/nBursts_shuffled) * 100;
+
+figure; hold on
+plot(b,a)
+plot(b,c)
+
+test_a = nanmean(nanmean(p_eeg_lfp.obs.eeg_and_lfp_window_pre(9:end,:),2))*100
+test_b = sum(a(find(b > filter_window_pre(1) & b < filter_window_pre(2))))
 
 
-p_eeg_lfp.eeg_and_lfp = nanmean(cell2mat(cellfun(@(x) isnumeric(x), input, 'UniformOutput', false)) == 1);
-p_eeg_lfp.eeg_and_lfp_window = nanmean(test2);
 
-p_eeg_lfp.eeg_and_nolfp = nanmean(strcmp(input,'+eeg, -lfp')); % Obs EEG burst, no LFP burst;
-p_eeg_lfp.noeeg_and_lfp = nanmean(strcmp(input,'-eeg, +lfp')); % No EEG burst, Obs LFP burst
-p_eeg_lfp.noeeg_and_nolfp = nanmean(strcmp(input,'-eeg, -lfp')); % No EEG burst, Obs LFP burst
 
 
 
