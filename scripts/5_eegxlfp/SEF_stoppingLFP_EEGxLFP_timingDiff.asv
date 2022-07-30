@@ -145,18 +145,13 @@ lfp_i = 1;
 input = []; input = trl_burst_diff_lfp{session_i, lfp_i};
 co_lfp_eeg_trls = find(cell2mat(cellfun(@(x) isnumeric(x), input, 'UniformOutput', false)) == 1);
 
-test = cellfun(@(x) x > filter_window(1) & x < filter_window(2), input(co_lfp_eeg_trls), 'UniformOutput', false);
-test2 = cell2mat(cellfun(@(x) isempty(find(x == 1)), test, 'UniformOutput', false));
-
-
 p_eeg_lfp.eeg_and_lfp = nanmean(cell2mat(cellfun(@(x) isnumeric(x), input, 'UniformOutput', false)) == 1);
-p_eeg_lfp.eeg_and_lfp_window = nanmean(test2);
-
 p_eeg_lfp.eeg_and_nolfp = nanmean(strcmp(input,'+eeg, -lfp')); % Obs EEG burst, no LFP burst;
 p_eeg_lfp.noeeg_and_lfp = nanmean(strcmp(input,'-eeg, +lfp')); % No EEG burst, Obs LFP burst
 p_eeg_lfp.noeeg_and_nolfp = nanmean(strcmp(input,'-eeg, -lfp')); % No EEG burst, Obs LFP burst
 
 
+test = cellfun(@(x) x > filter_window(1) & x < filter_window(2), input(eeg_lfp_cotrials), 'UniformOutput', false);
 
 
 %% Annex %%
