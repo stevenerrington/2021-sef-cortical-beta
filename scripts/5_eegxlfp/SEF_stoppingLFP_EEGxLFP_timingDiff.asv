@@ -194,8 +194,7 @@ plot(getMidBin(bin),nanmean(pBurst_LFPshuf_lower),'b--')
 
 
 
-% P(Bursts) in upper/lower layers in 0 to 50 ms period pre/post EEG burst,
-% for observed and shuffled conditions.
+
 
 sum(nanmean(pBurst_LFP_upper(:,find(getMidBin(bin) > -50 & getMidBin(bin) < 0))))
 sum(nanmean(pBurst_LFP_upper(:,find(getMidBin(bin) > 0 & getMidBin(bin) < 50))))
