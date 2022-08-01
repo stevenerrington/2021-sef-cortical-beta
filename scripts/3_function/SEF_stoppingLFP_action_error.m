@@ -1,6 +1,6 @@
 %% Export burst information for use in JASP
 % Early period (0 to 300 ms post-saccade) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 
+
 noncanceled_pBurst_early = errorBeta_early.timing.noncanc.pTrials_burst;
 nostop_pBurst_early = errorBeta_early.timing.nostop.pTrials_burst;
 noncanceled_pBurst_late = errorBeta_late.timing.noncanc.pTrials_burst;
@@ -36,88 +36,88 @@ burstDataNonCanc_early = [errorBeta_early.timing.noncanc.pTrials_burst];
 burstDataNoStop_late = [errorBeta_late.timing.nostop.pTrials_burst];
 burstDataNonCanc_late = [errorBeta_late.timing.noncanc.pTrials_burst];
 
-    % Input data into the gramm function.
-    error_figure(1,1) = gramm('x',[groupLabelsNoStop(allChannels);groupLabelsNonCanc(allChannels)],...
-        'y',[burstDataNoStop_early(allChannels);burstDataNonCanc_early(allChannels)],'color',[groupLabelsNoStop(allChannels);groupLabelsNonCanc(allChannels)]);
-    error_figure(2,1) = gramm('x',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(euChannels)],...
-        'y',[burstDataNoStop_early(euChannels);burstDataNonCanc_early(euChannels)],'color',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(euChannels)]);
-    error_figure(3,1) = gramm('x',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)],...
-        'y',[burstDataNoStop_early(xChannels);burstDataNonCanc_early(xChannels)],'color',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)]);
-    error_figure(1,2) = gramm('x',[groupLabelsNoStop(allChannels);groupLabelsNonCanc(allChannels)],...
-        'y',[burstDataNoStop_late(allChannels);burstDataNonCanc_late(allChannels)],'color',[groupLabelsNoStop(allChannels);groupLabelsNonCanc(allChannels)]);
-    error_figure(2,2) = gramm('x',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(euChannels)],...
-        'y',[burstDataNoStop_late(euChannels);burstDataNonCanc_late(euChannels)],'color',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(euChannels)]);
-    error_figure(3,2) = gramm('x',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)],...
-        'y',[burstDataNoStop_late(xChannels);burstDataNonCanc_late(xChannels)],'color',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)]);
+% Input data into the gramm function.
+error_figure(1,1) = gramm('x',[groupLabelsNoStop(allChannels);groupLabelsNonCanc(allChannels)],...
+    'y',[burstDataNoStop_early(allChannels);burstDataNonCanc_early(allChannels)],'color',[groupLabelsNoStop(allChannels);groupLabelsNonCanc(allChannels)]);
+error_figure(2,1) = gramm('x',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(euChannels)],...
+    'y',[burstDataNoStop_early(euChannels);burstDataNonCanc_early(euChannels)],'color',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(euChannels)]);
+error_figure(3,1) = gramm('x',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)],...
+    'y',[burstDataNoStop_early(xChannels);burstDataNonCanc_early(xChannels)],'color',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)]);
+error_figure(1,2) = gramm('x',[groupLabelsNoStop(allChannels);groupLabelsNonCanc(allChannels)],...
+    'y',[burstDataNoStop_late(allChannels);burstDataNonCanc_late(allChannels)],'color',[groupLabelsNoStop(allChannels);groupLabelsNonCanc(allChannels)]);
+error_figure(2,2) = gramm('x',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(euChannels)],...
+    'y',[burstDataNoStop_late(euChannels);burstDataNonCanc_late(euChannels)],'color',[groupLabelsNoStop(euChannels);groupLabelsNonCanc(euChannels)]);
+error_figure(3,2) = gramm('x',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)],...
+    'y',[burstDataNoStop_late(xChannels);burstDataNonCanc_late(xChannels)],'color',[groupLabelsNoStop(xChannels);groupLabelsNonCanc(xChannels)]);
 
-    % Setup figure type
-    % Early period:
-    error_figure(1,1).stat_summary('geom',{'point','line','black_errorbar'}); 
-    error_figure(2,1).stat_summary('geom',{'point','line','black_errorbar'}); 
-    error_figure(3,1).stat_summary('geom',{'point','line','black_errorbar'});
-    % Late period:
-    error_figure(1,2).stat_summary('geom',{'point','line','black_errorbar'});
-    error_figure(2,2).stat_summary('geom',{'point','line','black_errorbar'});
-    error_figure(3,2).stat_summary('geom',{'point','line','black_errorbar'});
+% Setup figure type
+% Early period:
+error_figure(1,1).stat_summary('geom',{'point','line','black_errorbar'});
+error_figure(2,1).stat_summary('geom',{'point','line','black_errorbar'});
+error_figure(3,1).stat_summary('geom',{'point','line','black_errorbar'});
+% Late period:
+error_figure(1,2).stat_summary('geom',{'point','line','black_errorbar'});
+error_figure(2,2).stat_summary('geom',{'point','line','black_errorbar'});
+error_figure(3,2).stat_summary('geom',{'point','line','black_errorbar'});
 
-    % Define figure parameters
-    error_figure(1,1).axe_property('YLim',[0.15 0.45]); error_figure(2,1).axe_property('YLim',[0.15 0.60]); error_figure(3,1).axe_property('YLim',[0.15 0.35]); 
-    error_figure(1,2).axe_property('YLim',[0.15 0.45]); error_figure(2,2).axe_property('YLim',[0.15 0.60]); error_figure(3,2).axe_property('YLim',[0.15 0.35]); 
-    error_figure(1,1).no_legend();error_figure(2,1).no_legend();error_figure(3,1).no_legend();
-    error_figure(1,2).no_legend();error_figure(2,2).no_legend();error_figure(3,2).no_legend();
-    error_figure.set_color_options('map',[colors.nostop;colors.noncanc]);
-    error_figure.set_names('y','');
+% Define figure parameters
+error_figure(1,1).axe_property('YLim',[0.15 0.45]); error_figure(2,1).axe_property('YLim',[0.15 0.60]); error_figure(3,1).axe_property('YLim',[0.15 0.35]);
+error_figure(1,2).axe_property('YLim',[0.15 0.45]); error_figure(2,2).axe_property('YLim',[0.15 0.60]); error_figure(3,2).axe_property('YLim',[0.15 0.35]);
+error_figure(1,1).no_legend();error_figure(2,1).no_legend();error_figure(3,1).no_legend();
+error_figure(1,2).no_legend();error_figure(2,2).no_legend();error_figure(3,2).no_legend();
+error_figure.set_color_options('map',[colors.nostop;colors.noncanc]);
+error_figure.set_names('y','');
 
-    % Generate figure
-    figure('Renderer', 'painters', 'Position', [100 100 400 700]);
-    error_figure.draw();
+% Generate figure
+figure('Renderer', 'painters', 'Position', [100 100 400 700]);
+error_figure.draw();
 
 
 
 %% %% BBDF
 % parfor lfpIdx = 1:length(corticalLFPcontacts.all)
-%     
+%
 %     lfp = corticalLFPcontacts.all(lfpIdx)
 %     session = sessionLFPmap.session(lfp);
-%     
+%
 %     % Get session name (to load in relevant file)
 %     sessionName = FileNames{session};
 %     fprintf('Analysing LFP number %i of %i. \n',lfpIdx,length(corticalLFPcontacts.all));
-%     
+%
 %     % Load in beta output data for session
 %     loadname = fullfile('betaBurst','saccade',['lfp_session' int2str(session) '_' sessionLFPmap.channelNames{lfp} '_betaOutput_saccade']);
 %     betaOutput = parload(fullfile(fullfile(dataDir,'lfp'), loadname));
-%     
+%
 %     % Get behavioral information
 %     ssrt = bayesianSSRT.ssrt_mean(session);
-%     
+%
 %     % Get relevant trial information
 %     trials = [];
 %     trials.canceled = executiveBeh.ttx_canc{session};
 %     trials.noncanceled = executiveBeh.ttx.sNC{session};
 %     trials.nostop = executiveBeh.ttx.GO{session};
-%     
+%
 %     % Calculate p(trials) with burst
 %     [betaOutput] = thresholdBursts(betaOutput.betaOutput, sessionBLpower(session)*burstThreshold)
-%     
+%
 %     % Convolve and get density function
 %     SessionBDF = BetaBurstConvolver(betaOutput.burstData.burstTime);
-%         
+%
 %      % Saccade (latency matched aligned)
 %     nc_sacc_temp = []; ns_sacc_temp = [];
-%     
+%
 %     for ii = 1:length(executiveBeh.inh_SSD{session})
 %         nc_sacc_temp(ii,:) = nanmean(SessionBDF(executiveBeh.ttm_c.NC{session,ii}.all, :));
 %         ns_sacc_temp(ii,:) = nanmean(SessionBDF(executiveBeh.ttm_c.GO_NC{session,ii}.all, :));
 %     end
-% 
+%
 %     saccade_bbdf_noncanceled{lfpIdx,1} = nanmean(nc_sacc_temp);
 %     saccade_bbdf_nostop{lfpIdx,1} = nanmean(ns_sacc_temp);
 % end
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
-% 
+%
+%
 % %% Archived
 % clear noncanceled* nostop* meanBurstTimeTable*
 % noncanceled_pBurst = errorBeta_early.timing.noncanc.pTrials_burst;
@@ -127,7 +127,7 @@ burstDataNonCanc_late = [errorBeta_late.timing.noncanc.pTrials_burst];
 % noncanceledBurstOffset = errorBeta_early.timing.noncanc.mean_burstOffset;
 % noncanceledBurstDuration = errorBeta_early.timing.noncanc.mean_burstDuration;
 % noncanceledBurstVolume = errorBeta_early.timing.noncanc.mean_burstVolume;
-% 
+%
 % nostop_pBurst = errorBeta_early.timing.nostop.pTrials_burst;
 % nostopBurstTime = errorBeta_early.timing.nostop.mean_burstTime;
 % nostopBurstFreq = errorBeta_early.timing.nostop.mean_burstFreq;
@@ -135,9 +135,9 @@ burstDataNonCanc_late = [errorBeta_late.timing.noncanc.pTrials_burst];
 % nostopBurstOffset = errorBeta_early.timing.nostop.mean_burstOffset;
 % nostopBurstDuration = errorBeta_early.timing.nostop.mean_burstDuration;
 % nostopBurstVolume = errorBeta_early.timing.nostop.mean_burstVolume;
-% 
+%
 % monkeyLabel = sessionLFPmap.monkeyName(corticalLFPcontacts.all);
-% 
+%
 % meanBurstTimeTable_early = table(noncanceled_pBurst, nostop_pBurst,...
 %     noncanceledBurstTime, nostopBurstTime,...
 %     noncanceledBurstOnset,nostopBurstOnset,...
@@ -145,11 +145,11 @@ burstDataNonCanc_late = [errorBeta_late.timing.noncanc.pTrials_burst];
 %     noncanceledBurstDuration, nostopBurstDuration,...
 %     noncanceledBurstVolume, nostopBurstVolume,...
 %     noncanceledBurstFreq, nostopBurstFreq, monkeyLabel);
-% 
+%
 
 % % Late period (300 to 600 ms post-saccade) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % clear noncanceled* nostop* meanBurstTimeTable*
-% 
+%
 % noncanceled_pBurst = errorBeta_late.timing.noncanc.pTrials_burst;
 % noncanceledBurstTime = errorBeta_late.timing.noncanc.mean_burstTime;
 % noncanceledBurstFreq = errorBeta_late.timing.noncanc.mean_burstFreq;
@@ -157,7 +157,7 @@ burstDataNonCanc_late = [errorBeta_late.timing.noncanc.pTrials_burst];
 % noncanceledBurstOffset = errorBeta_late.timing.noncanc.mean_burstOffset;
 % noncanceledBurstDuration = errorBeta_late.timing.noncanc.mean_burstDuration;
 % noncanceledBurstVolume = errorBeta_late.timing.noncanc.mean_burstVolume;
-% 
+%
 % nostop_pBurst = errorBeta_late.timing.nostop.pTrials_burst;
 % nostopBurstTime = errorBeta_late.timing.nostop.mean_burstTime;
 % nostopBurstFreq = errorBeta_late.timing.nostop.mean_burstFreq;
@@ -165,9 +165,9 @@ burstDataNonCanc_late = [errorBeta_late.timing.noncanc.pTrials_burst];
 % nostopBurstOffset = errorBeta_late.timing.nostop.mean_burstOffset;
 % nostopBurstDuration = errorBeta_late.timing.nostop.mean_burstDuration;
 % nostopBurstVolume = errorBeta_late.timing.nostop.mean_burstVolume;
-% 
+%
 % monkeyLabel = sessionLFPmap.monkeyName(corticalLFPcontacts.all);
-% 
+%
 % meanBurstTimeTable_late = table(noncanceled_pBurst, nostop_pBurst,...
 %     noncanceledBurstTime, nostopBurstTime,...
 %     noncanceledBurstOnset,nostopBurstOnset,...
@@ -175,6 +175,6 @@ burstDataNonCanc_late = [errorBeta_late.timing.noncanc.pTrials_burst];
 %     noncanceledBurstDuration, nostopBurstDuration,...
 %     noncanceledBurstVolume, nostopBurstVolume,...
 %     noncanceledBurstFreq, nostopBurstFreq, monkeyLabel);
-% 
+%
 % writetable(meanBurstTimeTable_late,...
 %     'D:\projectCode\project_stoppingLFP\data\exportJASP\LFP_errorBurstProperties_300_600.csv','WriteRowNames',true)

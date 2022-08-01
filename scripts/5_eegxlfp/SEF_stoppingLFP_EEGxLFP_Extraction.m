@@ -1,8 +1,8 @@
 %% Co-activation between SEF and MFC EEG
 % Set up parameters
-eventAlignments = {'target','saccade','stopSignal','tone'};
-eventWindows = {[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000]};
-eventBin = {1,1,1,1};
+eventAlignments = {'fixate','target','saccade','stopSignal','tone'};
+eventWindows = {[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000]};
+eventBin = {1,1,1,1,1};
 saveDir = fullfile(dataDir,'eeg_lfp');
 
 % Initialise arrays
@@ -17,7 +17,7 @@ for sessionIdx = 1:29
         fprintf('Analysing session %i of %i. \n',session, 29)
         
         % ... and for each epoch of interest
-    for alignmentIdx = 1:4
+    for alignmentIdx = 1:length(eventAlignments)
         % Get the desired alignment
         alignmentEvent = eventAlignments{alignmentIdx};
                

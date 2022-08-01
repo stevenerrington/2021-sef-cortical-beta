@@ -1,6 +1,6 @@
 %% Co-activation between SEF and MFC EEG
 % Set up parameters
-eventAlignments = {'target','saccade','stopSignal','tone'};
+eventAlignments = {'fixate','target','saccade','stopSignal','tone'};
 eventWindows = {[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000]};
 analysisWindows = {[-400:-200],[400:600],[0:200],[-400:-200]};
 eventBin = {1,1,1,1,1};
@@ -20,19 +20,17 @@ for sessionIdx = 14:29
     fprintf('Analysing session %i of %i. \n',session, 29)
     
     % ... and for each epoch of interest
-    for alignmentIdx = 1:4
+    for alignmentIdx = 1:5
         % Get the desired alignment
         alignmentEvent = eventAlignments{alignmentIdx};
         
         % Get trials of interest
         trials = []; trials_shuffled = [];
-        %         trials = ttx.activeTrials{sessionIdx};
-        %         trials_shuffled = trials(randperm(numel(trials)));
         
-        if alignmentIdx == 2
-            trials = executiveBeh.ttx.sNC{sessionIdx};
-        else
-            trials = executiveBeh.ttx_canc{sessionIdx};
+        if alignment_i == 2 % If aligning on saccade, then we will look at error trials
+            trials = executiveBeh.ttx.sNC{session_i};
+        else % Otherwise, we will just look at canceled trials
+            trials = executiveBeh.ttx_canc{session_i};
         end
         
         trials_shuffled = trials(randperm(numel(trials)));
