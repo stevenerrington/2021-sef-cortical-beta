@@ -1,48 +1,74 @@
-session = 14;
+clear all; clc
+getParameters
 
-lfp_i = 1;
-
-clear betaDir lfpDir ch_label file beta_data lfp_data betaOutput morletLFP
-
+% Set directories
 betaDir = 'D:\projectCode\project_stoppingLFP\data\lfp\betaBurst\target\';
 lfpDir = 'D:\projectCode\project_stoppingLFP\data\lfp\LFP\target\';
 
-ch_label = corticalLFPmap.channelNames(corticalLFPmap.session == session);
-ch_label = ch_label{1};
+% Set session
+session_i = 14;
+sessionName = FileNames{session_i};
 
-file = ['lfp_session' int2str(session) '_' ch_label '_betaOutput_target'];
+% Set alignment
+event_i = 2;
+eventLabel = eventNames{event_i};
+alignmentParameters.eventN = event_i;
+eventTimes = executiveBeh.TrialEventTimes_Overall{session_i};
+fprintf(['Analysing data aligned on ' eventLabel '. \n']);
 
-beta_data = load(fullfile(betaDir,file));
-lfp_data = load(fullfile(lfpDir,file));
+%% Local field potential filtering
+% Get raw data
+inputLFP = load(['D:\data\2012_Cmand_EuX\' sessionName '.mat'],...
+    'AD1*','AD2*','AD3*','AD4*');
+lfpChannels = fieldnames(inputLFP);
+lfp_i = 1;
+
+filter = 'all';
+filterFreq = filterBands.(filter);
+[~, rawData.filteredLFP.(filter)] = tidyRawSignal(inputLFP.(lfpChannels{lfp_i}), ephysParameters, filterFreq,...
+    eventTimes, alignmentParameters);
+[morletLFP.raw] = convMorletWaveform(rawData.filteredLFP.all,morletParameters);
+
+% Get processed data
+proc_file = ['lfp_session' int2str(session_i) '_' lfpChannels{lfp_i} '_betaOutput_' eventLabel];
+proc_data = load(fullfile(lfpDir, eventLabel ,proc_file));
+[morletLFP.proc] = convMorletWaveform(proc_data.filteredLFP.all,morletParameters);
 
 
-[betaOutput] = thresholdBursts(beta_data.betaOutput, beta_data.betaOutput.medianLFPpower*burstThreshold);
-[morletLFP] = convMorletWaveform(lfp_data.filteredLFP.beta,morletParameters);
+%% Extract beta-bursts
+
+burstThreshold_i = sessionBLpower(session_i)*burstThreshold;
+% Raw 
+[betaOutput.raw] = betaBurstCount_LFP(morletLFP.raw, morletParameters);
+[betaOutput.raw] = thresholdBursts(betaOutput.raw, burstThreshold_i);
+
+% Processed 
+[betaOutput.proc] = betaBurstCount_LFP(morletLFP.proc, morletParameters);
+[betaOutput.proc] = thresholdBursts(betaOutput.proc, burstThreshold_i);
+
+% Load-in
+load_data = load(fullfile(betaDir,proc_file));
+betaOutput.load = load_data.betaOutput;
+[betaOutput.load] = thresholdBursts(betaOutput.load, burstThreshold_i);
 
 
-for ii = 1:20
-    try
-        
-        trl_i = executiveBeh.ttx.GO{session}(ii);
-        
-        trl_burst_times = []; trl_burst_times = betaOutput.burstData.burstTime{trl_i};
-        trl_burst_on = []; trl_burst_on = betaOutput.burstData.burstOnset{trl_i}+betaOutput.burstData.burstTime{trl_i};
-        trl_burst_off = []; trl_burst_off = betaOutput.burstData.burstOffset{trl_i}+betaOutput.burstData.burstTime{trl_i};
-        trl_burst_freq = []; trl_burst_freq = betaOutput.burstData.burstFrequency{trl_i};
-        
-        figure;
-        subplot(2,1,1)
-        plot(-999:2000,lfp_data.filteredLFP.beta(trl_i,:))
-        vline(trl_burst_times,'r')
-        vline(trl_burst_on,'g--')
-        vline(trl_burst_off,'b--')
-        
-        subplot(2,1,2); hold on
-        imagesc(-999:2000,morletParameters.frequencies,squeeze(morletLFP(trl_i,:,:)))
-        xlim([-999 2000]); ylim([min(morletParameters.frequencies) max(morletParameters.frequencies)])
-        scatter(trl_burst_times,trl_burst_freq,'ro')
-                
-    catch
-        continue
-    end
-end
+%% Troubleshooting w. threshold
+betaOutput.load = load_data.betaOutput;
+[betaOutput.load] = thresholdBursts(betaOutput.load, sessionBLpower(session_i)*6);
+
+trl_i = 167;
+
+set = 'load';
+trl_burst_times = []; trl_burst_times = betaOutput.(set).burstData.burstTime{trl_i};
+trl_burst_on = []; trl_burst_on = betaOutput.(set).burstData.burstOnset{trl_i}+betaOutput.(set).burstData.burstTime{trl_i};
+trl_burst_off = []; trl_burst_off = betaOutput.(set).burstData.burstOffset{trl_i}+betaOutput.(set).burstData.burstTime{trl_i};
+trl_burst_freq = []; trl_burst_freq = betaOutput.(set).burstData.burstFrequency{trl_i};
+
+input_c_data = [];
+input_c_data = squeeze(morletLFP.proc(trl_i,:,:));
+
+figure; hold on
+imagesc(-999:2000,morletParameters.frequencies,input_c_data')
+xlim([-999 2000]); ylim([min(morletParameters.frequencies) max(morletParameters.frequencies)])
+scatter(trl_burst_times,trl_burst_freq,'ro')
+
