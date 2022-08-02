@@ -129,7 +129,7 @@ end
 
 %% Analysis: get proportion of bursts that occur in EEG, LFP
 
-bin = [-250:10:250];
+bin = [-250:5:250];
 pBurst_lfp_eeg.obs.upper = {}; pBurst_lfp_eeg.obs.lower = {};
 pBurst_lfp_eeg.shuf.upper = {}; pBurst_lfp_eeg.shuf.lower = {};
 
@@ -142,8 +142,9 @@ for session_i = 14:29
     
     % Find total number of EEG bursts (using first contact - tested and
     % verified the EEG burst is the same across channels).
-    nBursts_EEG = sum(~cellfun(@isempty,regexp(trl_burst_diff_lfp{session_i, 1}(:,2),'+eeg','once')));
-    
+    eeg_burst_array = [];
+    eeg_burst_array = ~cellfun(@isempty,regexp(trl_burst_diff_lfp{session_i, 1}(:,2),'+eeg','once'));
+    nBursts_EEG = sum(eeg_burst_array);
         
         % Go through the bins defined above
     for bin_i = 1:length(bin)-1
@@ -175,13 +176,18 @@ for session_i = 14:29
             lfp_bin_burst_shuf(:,lfp_i) = cell2mat(cellfun(@(x) any((x) == 1), input_window_flag_shuffled, 'UniformOutput', false));            
             
         end
+                
+        % Get trials with an EEG burst
+        eeg_burst_trls = []; eeg_burst_trls = find(eeg_burst_array == 1);
         
+        % Find p(trials) in which a burst occured in any channel in
+        % upper/lower layers separately, on trials in which an EEG burst
+        % was observed
+        pBurst_lfp_eeg.obs.upper{session_i-13}(:,bin_i) = nanmean(sum(lfp_bin_burst(eeg_burst_trls,1:8),2) > 0);
+        pBurst_lfp_eeg.obs.lower{session_i-13}(:,bin_i) = nanmean(sum(lfp_bin_burst(eeg_burst_trls,9:end),2) > 0);
         
-        pBurst_lfp_eeg.obs.upper{session_i-13}(:,bin_i) = sum(sum(lfp_bin_burst(:,1:8),2) > 0)/nBursts_EEG;
-        pBurst_lfp_eeg.obs.lower{session_i-13}(:,bin_i) = sum(sum(lfp_bin_burst(:,9:end),2) > 0)/nBursts_EEG;
-        
-        pBurst_lfp_eeg.shuf.upper{session_i-13}(:,bin_i) = sum(sum(lfp_bin_burst_shuf(:,1:8),2) > 0)/nBursts_EEG;
-        pBurst_lfp_eeg.shuf.lower{session_i-13}(:,bin_i) = sum(sum(lfp_bin_burst_shuf(:,9:end),2) > 0)/nBursts_EEG;
+        pBurst_lfp_eeg.shuf.upper{session_i-13}(:,bin_i) = nanmean(sum(lfp_bin_burst_shuf(eeg_burst_trls,1:8),2) > 0);
+        pBurst_lfp_eeg.shuf.lower{session_i-13}(:,bin_i) = nanmean(sum(lfp_bin_burst_shuf(eeg_burst_trls,9:end),2) > 0);
     end
     
     
@@ -259,7 +265,72 @@ figure('Renderer', 'painters', 'Position', [100 100 700 300]);
 pBurst_layer_epoch_plot.draw();
 
 
-%% 
+
+%% Analysis: Cumulative P(burst) through time relative to EEG burst
+
+clear cumul_eeg_pre_* cumul_eeg_post_* bin_preEEG bin_postEEG
+
+bin_preEEG = find(getMidBin(bin) < 0);
+bin_postEEG = find(getMidBin(bin) > 0);
+
+for session_i = 14:29
+    fprintf('Analysing session %i of %i. \n',session_i, 29)
+    
+    for bin_i_pre = 1:length(bin_preEEG)
+        cumul_eeg_pre_upper_obs{session_i - 13}(1,bin_i_pre) =...
+            sum(pBurst_lfp_eeg.obs.upper{session_i-13}(:,bin_preEEG(1):bin_preEEG(bin_i_pre)));
+        cumul_eeg_pre_upper_shuf{session_i - 13}(1,bin_i_pre) =...
+            sum(pBurst_lfp_eeg.shuf.upper{session_i-13}(:,bin_preEEG(1):bin_preEEG(bin_i_pre)));        
+        cumul_eeg_pre_lower_obs{session_i - 13}(1,bin_i_pre) =...
+            sum(pBurst_lfp_eeg.obs.lower{session_i-13}(:,bin_preEEG(1):bin_preEEG(bin_i_pre)));
+        cumul_eeg_pre_lower_shuf{session_i - 13}(1,bin_i_pre) =...
+            sum(pBurst_lfp_eeg.shuf.lower{session_i-13}(:,bin_preEEG(1):bin_preEEG(bin_i_pre)));    
+    end
+    
+    for bin_i_post = 1:length(bin_postEEG)
+        cumul_eeg_post_upper_obs{session_i - 13}(1,bin_i_post) =...
+            sum(pBurst_lfp_eeg.obs.upper{session_i-13}(:,bin_postEEG(1):bin_postEEG(bin_i_post)));
+        cumul_eeg_post_upper_shuf{session_i - 13}(1,bin_i_post) =...
+            sum(pBurst_lfp_eeg.shuf.upper{session_i-13}(:,bin_postEEG(1):bin_postEEG(bin_i_post)));        
+        cumul_eeg_post_lower_obs{session_i - 13}(1,bin_i_post) =...
+            sum(pBurst_lfp_eeg.obs.lower{session_i-13}(:,bin_postEEG(1):bin_postEEG(bin_i_post)));
+        cumul_eeg_post_lower_shuf{session_i - 13}(1,bin_i_post) =...
+            sum(pBurst_lfp_eeg.shuf.lower{session_i-13}(:,bin_postEEG(1):bin_postEEG(bin_i_post)));    
+    end
+    
+end
+
+%% Figure: Cumulative P(burst) through time relative to EEG burst 
+clear cumul_pBurst_figure % clear the gramm variable, incase it already exists
+
+% Input relevant data into the gramm function, and set the parameters
+% Fixation aligned
+cumul_pBurst_figure(1,1)=gramm('x',getMidBin(0:5:250),...
+    'y',[cumul_eeg_pre_upper_obs';cumul_eeg_pre_upper_shuf';...
+    cumul_eeg_pre_lower_obs';cumul_eeg_pre_lower_shuf'],...
+    'color',[repmat({'1_Upper'},16,1);repmat({'2_Upper - Shuffled'},16,1);...
+    repmat({'3_Lower'},16,1);repmat({'4_Lower - Shuffled'},16,1)]);
+
+cumul_pBurst_figure(1,2)=gramm('x',getMidBin(0:5:250),...
+    'y',[cumul_eeg_post_upper_obs';cumul_eeg_post_upper_shuf';...
+    cumul_eeg_post_lower_obs';cumul_eeg_post_lower_shuf'],...
+    'color',[repmat({'1_Upper'},16,1);repmat({'2_Upper - Shuffled'},16,1);...
+    repmat({'3_Lower'},16,1);repmat({'4_Lower - Shuffled'},16,1)]);
+
+cumul_pBurst_figure(1,1).stat_summary(); cumul_pBurst_figure(1,2).stat_summary();
+
+cumul_pBurst_figure(1,1).set_names('x','Time before EEG burst (ms)');
+ cumul_pBurst_figure(1,2).set_names('x','Time after EEG burst (ms)');
+cumul_pBurst_figure.set_names('y','Cumulative P(Burst)'); 
+
+% cumul_pBurst_figure(1,1).axe_property('XLim',[0 50]); 
+%cumul_pBurst_figure(1,1).axe_property('YLim',[0 1]);
+% cumul_pBurst_figure(1,2).axe_property('XLim',[0 20]); 
+%cumul_pBurst_figure(1,2).axe_property('YLim',[0 1]);
+
+
+figure('Renderer', 'painters', 'Position', [100 100 900 300]);
+cumul_pBurst_figure.draw();
 
 
 
@@ -277,29 +348,31 @@ pBurst_layer_epoch_plot.draw();
 
 
 
-figure; hold on
-plot(getMidBin(bin),nanmean(pBurst_LFP_upper),'r-')
-plot(getMidBin(bin),nanmean(pBurst_LFP_lower),'b-')
-plot(getMidBin(bin),nanmean(pBurst_LFPshuf_upper),'r--')
-plot(getMidBin(bin),nanmean(pBurst_LFPshuf_lower),'b--')
 
 
 
-% P(Bursts) in upper/lower layers in 0 to 50 ms period pre/post EEG burst,
-% for observed and shuffled conditions.
-
-sum(nanmean(pBurst_LFP_upper(:,find(getMidBin(bin) > -50 & getMidBin(bin) < 0))))
-sum(nanmean(pBurst_LFP_upper(:,find(getMidBin(bin) > 0 & getMidBin(bin) < 50))))
-
-sum(nanmean(pBurst_LFP_lower(:,find(getMidBin(bin) > -50 & getMidBin(bin) < 0))))
-sum(nanmean(pBurst_LFP_lower(:,find(getMidBin(bin) > 0 & getMidBin(bin) < 50))))
 
 
-sum(nanmean(pBurst_LFPshuf_upper(:,find(getMidBin(bin) > -50 & getMidBin(bin) < 0))))
-sum(nanmean(pBurst_LFPshuf_upper(:,find(getMidBin(bin) > 0 & getMidBin(bin) < 50))))
 
-sum(nanmean(pBurst_LFPshuf_lower(:,find(getMidBin(bin) > -50 & getMidBin(bin) < 0))))
-sum(nanmean(pBurst_LFPshuf_lower(:,find(getMidBin(bin) > 0 & getMidBin(bin) < 50))))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -543,4 +616,39 @@ sum(nanmean(pBurst_LFPshuf_lower(:,find(getMidBin(bin) > 0 & getMidBin(bin) < 50
 %     pBurst_LFP_upper{session_i-13}(find(bin >= -50 & bin <= 50))
 %     
 % end
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% figure; hold on
+% plot(getMidBin(bin),nanmean(pBurst_LFP_upper),'r-')
+% plot(getMidBin(bin),nanmean(pBurst_LFP_lower),'b-')
+% plot(getMidBin(bin),nanmean(pBurst_LFPshuf_upper),'r--')
+% plot(getMidBin(bin),nanmean(pBurst_LFPshuf_lower),'b--')
+% 
+% 
+% 
+% P(Bursts) in upper/lower layers in 0 to 50 ms period pre/post EEG burst,
+% for observed and shuffled conditions.
+% 
+% sum(nanmean(pBurst_LFP_upper(:,find(getMidBin(bin) > -50 & getMidBin(bin) < 0))))
+% sum(nanmean(pBurst_LFP_upper(:,find(getMidBin(bin) > 0 & getMidBin(bin) < 50))))
+% 
+% sum(nanmean(pBurst_LFP_lower(:,find(getMidBin(bin) > -50 & getMidBin(bin) < 0))))
+% sum(nanmean(pBurst_LFP_lower(:,find(getMidBin(bin) > 0 & getMidBin(bin) < 50))))
+% 
+% 
+% sum(nanmean(pBurst_LFPshuf_upper(:,find(getMidBin(bin) > -50 & getMidBin(bin) < 0))))
+% sum(nanmean(pBurst_LFPshuf_upper(:,find(getMidBin(bin) > 0 & getMidBin(bin) < 50))))
+% 
+% sum(nanmean(pBurst_LFPshuf_lower(:,find(getMidBin(bin) > -50 & getMidBin(bin) < 0))))
+% sum(nanmean(pBurst_LFPshuf_lower(:,find(getMidBin(bin) > 0 & getMidBin(bin) < 50))))
+% 
+% 
+% 
+% 
 % 
