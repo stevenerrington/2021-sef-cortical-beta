@@ -129,7 +129,7 @@ end
 
 %% Analysis: get proportion of bursts that occur in EEG, LFP
 
-bin = [-250:5:250];
+bin = [-250:10:250];
 pBurst_lfp_eeg.obs.upper = {}; pBurst_lfp_eeg.obs.lower = {};
 pBurst_lfp_eeg.shuf.upper = {}; pBurst_lfp_eeg.shuf.lower = {};
 
@@ -232,11 +232,46 @@ temporal_corr_figure(1,1)=gramm('x',getMidBin(bin),...
 temporal_corr_figure(1,1).stat_summary();
 temporal_corr_figure(1,1).geom_vline('xintercept',0,'style','k-'); 
 temporal_corr_figure.set_names('y','');
-temporal_corr_figure.axe_property('YLim',[0.1 0.4]);
+temporal_corr_figure.axe_property('YLim',[0.1 0.40]);
 
 
 figure('Renderer', 'painters', 'Position', [100 100 500 300]);
 temporal_corr_figure.draw();
+
+
+% Figure: Split by monkey
+monkeyLabels = {};
+monkeyLabels = repmat(executiveBeh.nhpSessions.monkeyNameLabel(14:29),4,1);
+
+temporal_corr_figure_monkey(1,1)=gramm('x',getMidBin(bin),...
+    'y',[pBurst_lfp_eeg.obs.upper'; pBurst_lfp_eeg.shuf.upper';...
+    pBurst_lfp_eeg.obs.lower'; pBurst_lfp_eeg.shuf.lower'],...
+    'color',[repmat({'Upper'},16,1);repmat({'Upper - Shuffled'},16,1);...
+    repmat({'Lower'},16,1);repmat({'Lower - Shuffled'},16,1)],...
+    'subset',strcmp(monkeyLabels,'Euler'));
+
+temporal_corr_figure_monkey(1,2)=gramm('x',getMidBin(bin),...
+    'y',[pBurst_lfp_eeg.obs.upper'; pBurst_lfp_eeg.shuf.upper';...
+    pBurst_lfp_eeg.obs.lower'; pBurst_lfp_eeg.shuf.lower'],...
+    'color',[repmat({'Upper'},16,1);repmat({'Upper - Shuffled'},16,1);...
+    repmat({'Lower'},16,1);repmat({'Lower - Shuffled'},16,1)],...
+    'subset',strcmp(monkeyLabels,'Xena'));
+
+
+
+temporal_corr_figure_monkey(1,1).stat_summary();
+temporal_corr_figure_monkey(1,2).stat_summary();
+temporal_corr_figure_monkey(1,1).geom_vline('xintercept',0,'style','k-'); 
+temporal_corr_figure_monkey(1,2).geom_vline('xintercept',0,'style','k-'); 
+temporal_corr_figure_monkey.set_names('y','');
+temporal_corr_figure_monkey.axe_property('YLim',[0.1 0.50]);
+
+
+figure('Renderer', 'painters', 'Position', [100 100 1000 300]);
+temporal_corr_figure_monkey.draw();
+
+
+
 
 %% Figure: 50 ms burst window
 data = [eeg_pre_upper'; eeg_pre_lower'; eeg_pre_upper_shuf'; eeg_pre_lower_shuf';...
@@ -247,25 +282,44 @@ label_obs_shuf = repmat([repmat({'Obs.'},nSessions*2,1);repmat({'Shuf'},nSession
 label_pre_post = [repmat({'1_pre-EEG'},nSessions*4,1);repmat({'2_post-EEG'},nSessions*4,1)];
 label_upper_lower = repmat([repmat({'Upper'},nSessions,1);repmat({'Lower'},nSessions,1)],4,1);
 
-
-
 pBurst_layer_epoch_plot(1,1) = gramm('x',label_pre_post,...
     'y',data,'color',label_obs_shuf,'subset',strcmp(label_upper_lower,'Upper'));
-
 pBurst_layer_epoch_plot(1,2) = gramm('x',label_pre_post,...
     'y',data,'color',label_obs_shuf,'subset',strcmp(label_upper_lower,'Lower'));
 
 
-pBurst_layer_epoch_plot(1,1).stat_summary('geom',{'point','line','black_errorbar'});
-pBurst_layer_epoch_plot(1,2).stat_summary('geom',{'point','line','black_errorbar'});
-
+pBurst_layer_epoch_plot(1,1).stat_summary('type','sem','geom',{'point','line','black_errorbar'});
+pBurst_layer_epoch_plot(1,2).stat_summary('type','sem','geom',{'point','line','black_errorbar'});
 pBurst_layer_epoch_plot(1,1).axe_property('YLim',[1.0 1.8]);
 pBurst_layer_epoch_plot(1,2).axe_property('YLim',[1.0 1.8]);
 figure('Renderer', 'painters', 'Position', [100 100 700 300]);
 pBurst_layer_epoch_plot.draw();
 
+% Figure: split by monkey
+monkeyLabels = {};
+monkeyLabels = repmat(executiveBeh.nhpSessions.monkeyNameLabel(14:29),8,1);
 
+pBurst_layer_epoch_plot(1,1) = gramm('x',label_pre_post,...
+    'y',data,'color',label_obs_shuf,'subset',strcmp(label_upper_lower,'Upper') & strcmp(monkeyLabels,'Euler'));
+pBurst_layer_epoch_plot(1,2) = gramm('x',label_pre_post,...
+    'y',data,'color',label_obs_shuf,'subset',strcmp(label_upper_lower,'Lower') & strcmp(monkeyLabels,'Euler'));
+pBurst_layer_epoch_plot(2,1) = gramm('x',label_pre_post,...
+    'y',data,'color',label_obs_shuf,'subset',strcmp(label_upper_lower,'Upper') & strcmp(monkeyLabels,'Euler'));
+pBurst_layer_epoch_plot(2,2) = gramm('x',label_pre_post,...
+    'y',data,'color',label_obs_shuf,'subset',strcmp(label_upper_lower,'Lower') & strcmp(monkeyLabels,'Xena'));
 
+pBurst_layer_epoch_plot(1,1).stat_summary('type','sem','geom',{'point','line','black_errorbar'});
+pBurst_layer_epoch_plot(1,2).stat_summary('type','sem','geom',{'point','line','black_errorbar'});
+pBurst_layer_epoch_plot(2,1).stat_summary('type','sem','geom',{'point','line','black_errorbar'});
+pBurst_layer_epoch_plot(2,2).stat_summary('type','sem','geom',{'point','line','black_errorbar'});
+
+pBurst_layer_epoch_plot(1,1).axe_property('YLim',[1.0 2]);
+pBurst_layer_epoch_plot(1,2).axe_property('YLim',[1.0 2]);
+pBurst_layer_epoch_plot(2,1).axe_property('YLim',[1.0 2]);
+pBurst_layer_epoch_plot(2,2).axe_property('YLim',[1.0 2]);
+
+figure('Renderer', 'painters', 'Position', [100 100 700 600]);
+pBurst_layer_epoch_plot.draw();
 %% Analysis: Cumulative P(burst) through time relative to EEG burst
 
 clear cumul_eeg_pre_* cumul_eeg_post_* bin_preEEG bin_postEEG
@@ -305,19 +359,20 @@ clear cumul_pBurst_figure % clear the gramm variable, incase it already exists
 
 % Input relevant data into the gramm function, and set the parameters
 % Fixation aligned
-cumul_pBurst_figure(1,1)=gramm('x',getMidBin(0:5:250),...
+cumul_pBurst_figure(1,1)=gramm('x',getMidBin(-[0:10:250]),...
     'y',[cumul_eeg_pre_upper_obs';cumul_eeg_pre_upper_shuf';...
     cumul_eeg_pre_lower_obs';cumul_eeg_pre_lower_shuf'],...
     'color',[repmat({'1_Upper'},16,1);repmat({'2_Upper - Shuffled'},16,1);...
     repmat({'3_Lower'},16,1);repmat({'4_Lower - Shuffled'},16,1)]);
 
-cumul_pBurst_figure(1,2)=gramm('x',getMidBin(0:5:250),...
+cumul_pBurst_figure(1,2)=gramm('x',getMidBin([0:10:250]),...
     'y',[cumul_eeg_post_upper_obs';cumul_eeg_post_upper_shuf';...
     cumul_eeg_post_lower_obs';cumul_eeg_post_lower_shuf'],...
     'color',[repmat({'1_Upper'},16,1);repmat({'2_Upper - Shuffled'},16,1);...
     repmat({'3_Lower'},16,1);repmat({'4_Lower - Shuffled'},16,1)]);
 
-cumul_pBurst_figure(1,1).stat_summary(); cumul_pBurst_figure(1,2).stat_summary();
+cumul_pBurst_figure(1,1).stat_summary('type','sem','geom',{'point','errorbar'}); 
+cumul_pBurst_figure(1,2).stat_summary('type','sem','geom',{'point','errorbar'}); 
 
 cumul_pBurst_figure(1,1).set_names('x','Time before EEG burst (ms)');
  cumul_pBurst_figure(1,2).set_names('x','Time after EEG burst (ms)');

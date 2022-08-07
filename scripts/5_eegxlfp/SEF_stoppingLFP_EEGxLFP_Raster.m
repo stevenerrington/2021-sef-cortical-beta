@@ -1,8 +1,8 @@
 %% Co-activation between SEF and MFC EEG
 % Set up parameters
 eventAlignments = {'fixate','target','saccade','stopSignal','tone'};
-eventWindows = {[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000]};
-analysisWindows = {[-400:-200],[400:600],[0:200],[-400:-200]};
+eventWindows = {[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000],};
+analysisWindows = {[200:400],[-400:-200],[400:600],[0:200],[-400:-200]};
 eventBin = {1,1,1,1,1};
 loadDir = fullfile(dataDir,'eeg_lfp');
 printFigFlag = 0;
@@ -27,10 +27,10 @@ for sessionIdx = 14:29
         % Get trials of interest
         trials = []; trials_shuffled = [];
         
-        if alignment_i == 2 % If aligning on saccade, then we will look at error trials
-            trials = executiveBeh.ttx.sNC{session_i};
+        if alignmentIdx == 3 % If aligning on saccade, then we will look at error trials
+            trials = executiveBeh.ttx.sNC{session};
         else % Otherwise, we will just look at canceled trials
-            trials = executiveBeh.ttx_canc{session_i};
+            trials = executiveBeh.ttx_canc{session};
         end
         
         trials_shuffled = trials(randperm(numel(trials)));
@@ -171,7 +171,7 @@ pBurst_combined_epoch = [];
 
 % Collate the data in a way to be used by gramm
 %   For each alignment:
-for alignmentIdx = 1:4
+for alignmentIdx = 1:length(eventAlignments)
     % Get the event label
     alignmentEvent = eventAlignments{alignmentIdx};
     
@@ -206,7 +206,7 @@ laminarJASPdata.label = [repmat({'EEG'},length(pBurst_EEG.(alignmentEvent)),1);.
 
 laminarJASPdata.monkey = repmat(executiveBeh.nhpSessions.monkeyNameLabel(14:29),3,1);
 
-for alignmentIdx = 1:4
+for alignmentIdx = 1:length(eventAlignments)
     % Get the event label
     alignmentEvent = eventAlignments{alignmentIdx};
 
@@ -224,7 +224,7 @@ clear eeg_lfp_burst_epoch % Clear the figure from matlabs memory as we're writin
 % Input data into the gramm library:
 eeg_lfp_burst_epoch(1,1)= gramm('x',pBurst_combined_epoch,'y',pBurst_combined,'color',pBurst_combined_labels);
 % Set the figure up as a point/line figure with 95% CI error bar:
-eeg_lfp_burst_epoch(1,1).stat_summary('geom',{'point','line','errorbar'});
+eeg_lfp_burst_epoch(1,1).stat_summary('type','sem','geom',{'point','line','errorbar'});
 % Set figure parameters:
 eeg_lfp_burst_epoch(1,1).axe_property('YLim',[0.0 1.00]);
 %... and print it!
@@ -233,7 +233,7 @@ eeg_lfp_burst_epoch.draw();
 
 % Figure Supp 1: Split by monkey
 clear eeg_lfp_burst_epoch % Clear the figure from matlabs memory as we're writing it new
-monkeyLabels_all = repmat(laminarJASPdata.monkey,4,1);
+monkeyLabels_all = repmat(laminarJASPdata.monkey,length(eventAlignments),1);
 
 % Input data into the gramm library:
 eeg_lfp_burst_epoch(1,1)= gramm('x',pBurst_combined_epoch,'y',pBurst_combined,'color',pBurst_combined_labels,'subset',strcmp(monkeyLabels_all,'Euler'));

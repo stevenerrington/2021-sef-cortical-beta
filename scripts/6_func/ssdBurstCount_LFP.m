@@ -1,6 +1,5 @@
 function [pTrl_burst] = ssdBurstCount_LFP(betaOutput, ssrt, trials, session, executiveBeh)
 
-
 for trl = 1:size(betaOutput.burstData,1)
     
     targetTime = executiveBeh.SessionInfo{session}.Curr_SSD (trl); 

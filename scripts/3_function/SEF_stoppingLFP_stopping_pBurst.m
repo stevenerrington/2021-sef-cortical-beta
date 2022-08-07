@@ -21,7 +21,7 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     trials.nostop = executiveBeh.ttx.GO{session};
     
     % Calculate p(trials) with burst
-    [betaOutput_stopSignal] = thresholdBursts(betaOutput_stopSignal.betaOutput, sessionThreshold(session))
+    [betaOutput_stopSignal] = thresholdBursts(betaOutput_stopSignal.betaOutput, sessionThreshold(session));
     [pTrl_burst] = ssdBurstCount_LFP(betaOutput_stopSignal, ssrt, trials, session, executiveBeh);
     
     baseline_canceled(lfpIdx,1) = pTrl_burst.baseline.canceled;

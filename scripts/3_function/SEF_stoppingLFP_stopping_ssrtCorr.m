@@ -116,7 +116,6 @@ for trlIdx = 1:3
     for metricIdx = 1:3
         a_R(metricIdx,trlIdx) = burstParameters_stoppingBeh(metricIdx, trlIdx).results.stat_glm.model.Rsquared.Ordinary;
         a_P(metricIdx,trlIdx) = burstParameters_stoppingBeh(metricIdx, trlIdx).results.stat_glm.model.Coefficients.pValue(2);
-        
     end
 end
 

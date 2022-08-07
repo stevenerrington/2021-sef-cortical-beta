@@ -38,7 +38,7 @@ for session_i = 14:29
     
 
     % Bin burst data 
-    binEdges = [-1000:50:1000];
+    binEdges = [-1000:10:1000];
 
     %  ... for data 1
     clear xc xd xe xf xg data1_bin data2_bin data3_bin
@@ -101,7 +101,8 @@ mi_layer_eeg_figure(1,1).stat_summary();
 
 mi_layer_eeg_figure(1,1).set_names('x','Time before EEG burst (ms)');
 mi_layer_eeg_figure.set_names('y','Mutual Information (bits)'); 
-mi_layer_eeg_figure(1,1).axe_property('XLim',[-100 500]); 
+mi_layer_eeg_figure(1,1).axe_property('XLim',[-100 1000]); 
+mi_layer_eeg_figure(1,1).axe_property('YLim',[0 0.005]); 
 
 
 figure('Renderer', 'painters', 'Position', [100 100 400 300]);
