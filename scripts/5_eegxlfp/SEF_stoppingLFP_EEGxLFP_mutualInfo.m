@@ -38,7 +38,7 @@ for session_i = 14:29
     
 
     % Bin burst data 
-    binEdges = [-1000:10:1000];
+    binEdges = [-1000:1:1000];
 
     %  ... for data 1
     clear xc xd xe xf xg data1_bin data2_bin data3_bin
@@ -47,6 +47,7 @@ for session_i = 14:29
     xe = cellfun(@(x) x - 1000, xd, 'Uni',0);
     [xf,~] = cellfun(@(x) histcounts(x,binEdges), xe, 'Uni',0);
     data1_bin = cell2mat(xf) > 0;
+    data1_bin = data1_bin + 1;
     
     %  ... for data 2
     clear xc xd xe xf xg
@@ -55,6 +56,7 @@ for session_i = 14:29
     xe = cellfun(@(x) x - 1000, xd, 'Uni',0);
     [xf,~] = cellfun(@(x) histcounts(x,binEdges), xe, 'Uni',0);
     data2_bin = cell2mat(xf) > 0;
+    data2_bin = data2_bin + 1;
     
     %  ... for data 3
     clear xc xd xe xf xg
@@ -63,17 +65,17 @@ for session_i = 14:29
     xe = cellfun(@(x) x - 1000, xd, 'Uni',0);
     [xf,~] = cellfun(@(x) histcounts(x,binEdges), xe, 'Uni',0);
     data3_bin = cell2mat(xf) > 0;
+    data3_bin = data3_bin + 1;
     
     % Calculate mutual information
-    
     [mutualInfo_upper_eeg(session_i-13,:),p_upper_eeg(session_i-13,:)] =...
-        quickMI(data1_bin',data2_bin','nBins', 4);
+        quickMI(data1_bin',data2_bin','nBins', 5, 'delay',0);
     
     [mutualInfo_lower_eeg(session_i-13,:),p_lower_eeg(session_i-13,:)] =...
-        quickMI(data1_bin',data3_bin','nBins', 4);
+        quickMI(data1_bin',data3_bin','nBins', 5, 'delay',0);
   
     [mutualInfo_upper_lower(session_i-13,:),p_upper_lower(session_i-13,:)] =...
-        quickMI(data2_bin',data3_bin','nBins', 4);
+        quickMI(data2_bin',data3_bin','nBins', 5, 'delay',0);
 end
 
 
@@ -107,6 +109,43 @@ mi_layer_eeg_figure(1,1).axe_property('YLim',[0 0.005]);
 
 figure('Renderer', 'painters', 'Position', [100 100 400 300]);
 mi_layer_eeg_figure.draw();
+
+% Figure: MI x monkey %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+monkeyLabels = {};
+monkeyLabels = repmat(executiveBeh.nhpSessions.monkeyNameLabel(14:29),3,1);
+
+clear mi_layer_eeg_monkey_figure % clear the gramm variable, incase it already exists
+
+% Input relevant data into the gramm function, and set the parameters
+% Fixation aligned
+mi_layer_eeg_monkey_figure(1,1)=gramm('x',getMidBin(binEdges),...
+    'y',[plotMI_upper_eeg';plotMI_lower_eeg';plotMI_upper_lower'],...
+    'color',[repmat({'1_Upper/EEG'},16,1);repmat({'2_Lower/EEG'},16,1);...
+    repmat({'3_Upper/Lower'},16,1)],...
+    'subset',strcmp(monkeyLabels,'Euler'));
+
+mi_layer_eeg_monkey_figure(1,2)=gramm('x',getMidBin(binEdges),...
+    'y',[plotMI_upper_eeg';plotMI_lower_eeg';plotMI_upper_lower'],...
+    'color',[repmat({'1_Upper/EEG'},16,1);repmat({'2_Lower/EEG'},16,1);...
+    repmat({'3_Upper/Lower'},16,1)],...
+    'subset',strcmp(monkeyLabels,'Xena'));
+
+mi_layer_eeg_monkey_figure(1,1).stat_summary(); 
+mi_layer_eeg_monkey_figure(1,2).stat_summary(); 
+
+mi_layer_eeg_monkey_figure(1,1).set_names('x','Time before EEG burst (ms)');
+mi_layer_eeg_monkey_figure(1,2).set_names('x','Time before EEG burst (ms)');
+
+mi_layer_eeg_monkey_figure.set_names('y','Mutual Information (bits)'); 
+mi_layer_eeg_monkey_figure(1,1).axe_property('XLim',[-100 1000]); 
+mi_layer_eeg_monkey_figure(1,2).axe_property('XLim',[-100 1000]); 
+mi_layer_eeg_monkey_figure(1,1).axe_property('YLim',[0 0.005]); 
+mi_layer_eeg_monkey_figure(1,2).axe_property('YLim',[0 0.005]); 
+
+
+figure('Renderer', 'painters', 'Position', [100 100 1000 300]);
+mi_layer_eeg_monkey_figure.draw();
+
 
 
 

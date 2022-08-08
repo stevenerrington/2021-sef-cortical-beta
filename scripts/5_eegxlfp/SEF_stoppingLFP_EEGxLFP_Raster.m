@@ -117,7 +117,9 @@ for sessionIdx = 14:29
         
         pBurst_upper_all.(alignmentEvent)(sessionIdx-13,1) = nanmean(sum(squeeze(sum(input(:,:,[laminarAlignment.l2,laminarAlignment.l3]) > 0,2)),2) > 0);
         pBurst_lower_all.(alignmentEvent)(sessionIdx-13,1) = nanmean(sum(squeeze(sum(input(:,:,[laminarAlignment.l5(1):end]) > 0,2)),2) > 0);
-        
+        pBurst_all_all.(alignmentEvent)(sessionIdx-13,1) = nanmean(sum(squeeze(sum(input(:,:,[1:end]) > 0,2)),2) > 0);
+        pBurst_ind_all.(alignmentEvent)(sessionIdx-13,1) = nanmean(nanmean(squeeze(sum(input(:,:,[1:end])>0,2)) > 0));
+                
         pBurst_L2_all.(alignmentEvent)(sessionIdx-13,1) = nanmean(sum(squeeze(sum(input(:,:,laminarAlignment.l2) > 0,2)),2) > 0);
         pBurst_L3_all.(alignmentEvent)(sessionIdx-13,1) = nanmean(sum(squeeze(sum(input(:,:,laminarAlignment.l3) > 0,2)),2) > 0);
         pBurst_L5_all.(alignmentEvent)(sessionIdx-13,1) = nanmean(sum(squeeze(sum(input(:,:,laminarAlignment.l5) > 0,2)),2) > 0);
@@ -179,19 +181,23 @@ for alignmentIdx = 1:length(eventAlignments)
     % in other alignments during the loop
     pBurst_combined = [pBurst_combined; ...
         pBurst_EEG.(alignmentEvent); pBurst_upper_all.(alignmentEvent);...
-        pBurst_lower_all.(alignmentEvent)];
+        pBurst_lower_all.(alignmentEvent);...
+        pBurst_all_all.(alignmentEvent);...
+        pBurst_ind_all.(alignmentEvent) ];
     
     % Apply the relevant EEG/depth labels
     pBurst_combined_labels =...
         [pBurst_combined_labels;...
         repmat({'EEG'},length(pBurst_EEG.(alignmentEvent)),1);...
         repmat({'Upper'},length(pBurst_upper_all.(alignmentEvent)),1);...
-        repmat({'Lower'},length(pBurst_lower_all.(alignmentEvent)),1)];
+        repmat({'Lower'},length(pBurst_lower_all.(alignmentEvent)),1);...
+        repmat({'All'},length(pBurst_lower_all.(alignmentEvent)),1);...
+        repmat({'Individual'},length(pBurst_ind_all.(alignmentEvent)),1)];
     
     % and get the epoch label
     pBurst_combined_epoch =...
         [pBurst_combined_epoch;...
-        repmat({[int2str(alignmentIdx) '_' alignmentEvent]},length(14:29)*3,1)];
+        repmat({[int2str(alignmentIdx) '_' alignmentEvent]},length(14:29)*5,1)];
         
 end
 
@@ -201,10 +207,12 @@ laminarJASPdata = struct();
 
 % Apply the relevant EEG/depth labels
 laminarJASPdata.label = [repmat({'EEG'},length(pBurst_EEG.(alignmentEvent)),1);...
-    repmat({'Upper'},length(pBurst_upper_all.(alignmentEvent)),1);...
-    repmat({'Lower'},length(pBurst_lower_all.(alignmentEvent)),1)];
+        repmat({'Upper'},length(pBurst_upper_all.(alignmentEvent)),1);...
+        repmat({'Lower'},length(pBurst_lower_all.(alignmentEvent)),1);...
+        repmat({'All'},length(pBurst_lower_all.(alignmentEvent)),1);...
+        repmat({'Individual'},length(pBurst_ind_all.(alignmentEvent)),1)];
 
-laminarJASPdata.monkey = repmat(executiveBeh.nhpSessions.monkeyNameLabel(14:29),3,1);
+laminarJASPdata.monkey = repmat(executiveBeh.nhpSessions.monkeyNameLabel(14:29),5,1);
 
 for alignmentIdx = 1:length(eventAlignments)
     % Get the event label
@@ -212,7 +220,9 @@ for alignmentIdx = 1:length(eventAlignments)
 
     laminarJASPdata.(alignmentEvent) =...
         [pBurst_EEG.(alignmentEvent); pBurst_upper_all.(alignmentEvent);...
-        pBurst_lower_all.(alignmentEvent)];
+        pBurst_lower_all.(alignmentEvent);...
+        pBurst_all_all.(alignmentEvent);...
+        pBurst_ind_all.(alignmentEvent)];
 end
 
 laminarJASPdata = struct2table(laminarJASPdata);
@@ -247,3 +257,4 @@ eeg_lfp_burst_epoch(1,2).axe_property('YLim',[0.0 1.00]);
 %... and print it!
 figure('Renderer', 'painters', 'Position', [100 100 800 300]);
 eeg_lfp_burst_epoch.draw();
+
