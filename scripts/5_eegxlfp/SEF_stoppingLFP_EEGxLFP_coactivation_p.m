@@ -138,9 +138,10 @@ for session_i = 14:29
 end
 
 %%
-clear p_eeg*
+clear p_eeg* sum_eeg* chisq_*
 for session_i = 14:29
     for laminar_i = 1:2
+        % Probability
         p_eegA_lfpA.obs(session_i-13,laminar_i) = nanmean(strcmp(trl_burst_diff_laminar{session_i, laminar_i}(:,2),'+eeg, +lfp'));
         p_eegA_lfpB.obs(session_i-13,laminar_i) = nanmean(strcmp(trl_burst_diff_laminar{session_i, laminar_i}(:,2),'+eeg, -lfp'));
         p_eegB_lfpA.obs(session_i-13,laminar_i) = nanmean(strcmp(trl_burst_diff_laminar{session_i, laminar_i}(:,2),'-eeg, +lfp'));
@@ -150,8 +151,48 @@ for session_i = 14:29
         p_eegA_lfpB.shuf(session_i-13,laminar_i) = nanmean(strcmp(trl_burst_diff_laminar_shuffled{session_i, laminar_i}(:,2),'+eeg, -lfp'));
         p_eegB_lfpA.shuf(session_i-13,laminar_i) = nanmean(strcmp(trl_burst_diff_laminar_shuffled{session_i, laminar_i}(:,2),'-eeg, +lfp'));
         p_eegB_lfpB.shuf(session_i-13,laminar_i) = nanmean(strcmp(trl_burst_diff_laminar_shuffled{session_i, laminar_i}(:,2),'-eeg, -lfp'));
+
+        % Number
+        sum_eegA_lfpA.obs(session_i-13,laminar_i) = sum(strcmp(trl_burst_diff_laminar{session_i, laminar_i}(:,2),'+eeg, +lfp'));
+        sum_eegA_lfpB.obs(session_i-13,laminar_i) = sum(strcmp(trl_burst_diff_laminar{session_i, laminar_i}(:,2),'+eeg, -lfp'));
+        sum_eegB_lfpA.obs(session_i-13,laminar_i) = sum(strcmp(trl_burst_diff_laminar{session_i, laminar_i}(:,2),'-eeg, +lfp'));
+        sum_eegB_lfpB.obs(session_i-13,laminar_i) = sum(strcmp(trl_burst_diff_laminar{session_i, laminar_i}(:,2),'-eeg, -lfp'));
+        
+        sum_eegA_lfpA.shuf(session_i-13,laminar_i) = sum(strcmp(trl_burst_diff_laminar_shuffled{session_i, laminar_i}(:,2),'+eeg, +lfp'));
+        sum_eegA_lfpB.shuf(session_i-13,laminar_i) = sum(strcmp(trl_burst_diff_laminar_shuffled{session_i, laminar_i}(:,2),'+eeg, -lfp'));
+        sum_eegB_lfpA.shuf(session_i-13,laminar_i) = sum(strcmp(trl_burst_diff_laminar_shuffled{session_i, laminar_i}(:,2),'-eeg, +lfp'));
+        sum_eegB_lfpB.shuf(session_i-13,laminar_i) = sum(strcmp(trl_burst_diff_laminar_shuffled{session_i, laminar_i}(:,2),'-eeg, -lfp'));
+        
+        % Chi-square
+        chisq_conttab{session_i-13,laminar_i} =...
+            [sum_eegA_lfpA.obs(session_i-13,laminar_i), sum_eegA_lfpB.obs(session_i-13,laminar_i);...
+            sum_eegB_lfpA.obs(session_i-13,laminar_i), sum_eegB_lfpB.obs(session_i-13,laminar_i)];
+        
+        [chisq_eeg_p(session_i-13,laminar_i), chisq_eeg_x2(session_i-13,laminar_i)] =...
+            chisquarecont(chisq_conttab{session_i-13,laminar_i});
     end
 end
+
+% Note: upper row of contab is +EEG, and bottom is -EEG.
+% Note: left column of contab is +LFP, and right is -EEG.
+
+% Concatenate and sum conttabs over all sessions for upper and lower layers
+for session_i = 14:29
+    for laminar_i = 1:2
+        chi_sq_all{laminar_i}(:,:,session_i) = chisq_conttab{session_i-13,laminar_i};
+    end
+end
+chi_sq_upper_sum = sum(chi_sq_all{1},3);
+chi_sq_lower_sum = sum(chi_sq_all{2},3);
+
+
+% Run Chi-square contingency test on these concatenated contabs.
+[chisq_p_upper, chisq_x2_upper] =...
+            chisquarecont(chi_sq_upper_sum);
+[chisq_p_lower, chisq_x2_lower] =...
+            chisquarecont(chi_sq_lower_sum);
+
+
 
 %% Generate figure
 data = [];
