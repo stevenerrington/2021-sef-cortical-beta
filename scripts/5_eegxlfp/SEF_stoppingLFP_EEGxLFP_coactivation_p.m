@@ -10,6 +10,7 @@ layerLabel = {'LFP_upper','LFP_lower'};
 
 window = [-400 -200];
 
+
 %% Extract data from files
 % For each session
 for session_i = 14:29
