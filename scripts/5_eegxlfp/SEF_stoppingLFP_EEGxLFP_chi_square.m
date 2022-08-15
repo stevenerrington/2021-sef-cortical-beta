@@ -4,7 +4,7 @@ eventAlignments = {'fixate','target','saccade','stopSignal','tone'};
 loadDir = fullfile(dataDir,'eeg_lfp');
 
 layerLabel = {'LFP_upper','LFP_lower'};
-window_edges = 0:30:600;
+window_edges = -600:50:200;
 n_windows = length(window_edges)-1;
 
 trl_burst_diff_lfp = {};
@@ -22,7 +22,7 @@ for window_i = 1:n_windows
 %         fprintf('Analysing session %i of %i. \n',session, 29)
         
         % ... and for each epoch of interest (just fixation here)
-        alignment_i = 1;
+        alignment_i = 2;
         % Get the desired alignment
         alignmentEvent = eventAlignments{alignment_i};
         
@@ -142,49 +142,58 @@ for window_i = 1:n_windows
 end
 
 
-%%
-
-clear p_eeg* sum_eeg* chisq_*
+%% 
+clear sum_eeg* chisq_*
 for session_i = 14:29
-    for lfp_i = 1:2
-        % Number
-        sum_eegA_lfpA.obs(session_i-13,lfp_i) = sum(strcmp(trl_burst_diff_lfp{session_i, lfp_i}(:,2),'+eeg, +lfp'));
-        sum_eegA_lfpB.obs(session_i-13,lfp_i) = sum(strcmp(trl_burst_diff_lfp{session_i, lfp_i}(:,2),'+eeg, -lfp'));
-        sum_eegB_lfpA.obs(session_i-13,lfp_i) = sum(strcmp(trl_burst_diff_lfp{session_i, lfp_i}(:,2),'-eeg, +lfp'));
-        sum_eegB_lfpB.obs(session_i-13,lfp_i) = sum(strcmp(trl_burst_diff_lfp{session_i, lfp_i}(:,2),'-eeg, -lfp'));
-        
-        sum_eegA_lfpA.shuf(session_i-13,lfp_i) = sum(strcmp(trl_burst_diff_lfp_shuffled{session_i, lfp_i}(:,2),'+eeg, +lfp'));
-        sum_eegA_lfpB.shuf(session_i-13,lfp_i) = sum(strcmp(trl_burst_diff_lfp_shuffled{session_i, lfp_i}(:,2),'+eeg, -lfp'));
-        sum_eegB_lfpA.shuf(session_i-13,lfp_i) = sum(strcmp(trl_burst_diff_lfp_shuffled{session_i, lfp_i}(:,2),'-eeg, +lfp'));
-        sum_eegB_lfpB.shuf(session_i-13,lfp_i) = sum(strcmp(trl_burst_diff_lfp_shuffled{session_i, lfp_i}(:,2),'-eeg, -lfp'));
-        
-        % Chi-square
-        chisq_conttab{session_i-13,lfp_i} =...
-            [sum_eegA_lfpA.obs(session_i-13,lfp_i), sum_eegA_lfpB.obs(session_i-13,lfp_i);...
-            sum_eegB_lfpA.obs(session_i-13,lfp_i), sum_eegB_lfpB.obs(session_i-13,lfp_i)];
-        
-        [chisq_eeg_p(session_i-13,lfp_i), chisq_eeg_x2(session_i-13,lfp_i)] =...
-            chisquarecont(chisq_conttab{session_i-13,lfp_i});
+    n_lfp = max(find(~cellfun(@isempty, trl_burst_diff_lfp_shuffled(session_i,:,1))));   
+    
+    for window_i = 1:n_windows
+        for lfp_i = 1:n_lfp
+            
+            % Number
+            sum_eegA_lfpA.obs(session_i-13,lfp_i,window_i) = sum(strcmp(trl_burst_diff_lfp{session_i,lfp_i,window_i}(:,2),'+eeg, +lfp'));
+            sum_eegA_lfpB.obs(session_i-13,lfp_i,window_i) = sum(strcmp(trl_burst_diff_lfp{session_i,lfp_i,window_i}(:,2),'+eeg, -lfp'));
+            sum_eegB_lfpA.obs(session_i-13,lfp_i,window_i) = sum(strcmp(trl_burst_diff_lfp{session_i,lfp_i,window_i}(:,2),'-eeg, +lfp'));
+            sum_eegB_lfpB.obs(session_i-13,lfp_i,window_i) = sum(strcmp(trl_burst_diff_lfp{session_i,lfp_i,window_i}(:,2),'-eeg, -lfp'));
+            
+            sum_eegA_lfpA.shuf(session_i-13,lfp_i,window_i) = sum(strcmp(trl_burst_diff_lfp_shuffled{session_i,lfp_i,window_i}(:,2),'+eeg, +lfp'));
+            sum_eegA_lfpB.shuf(session_i-13,lfp_i,window_i) = sum(strcmp(trl_burst_diff_lfp_shuffled{session_i,lfp_i,window_i}(:,2),'+eeg, -lfp'));
+            sum_eegB_lfpA.shuf(session_i-13,lfp_i,window_i) = sum(strcmp(trl_burst_diff_lfp_shuffled{session_i,lfp_i,window_i}(:,2),'-eeg, +lfp'));
+            sum_eegB_lfpB.shuf(session_i-13,lfp_i,window_i) = sum(strcmp(trl_burst_diff_lfp_shuffled{session_i,lfp_i,window_i}(:,2),'-eeg, -lfp'));
+                        
+            chisq_conttab{session_i-13,lfp_i,window_i} =...
+                table( [sum_eegA_lfpA.obs(session_i-13,lfp_i,window_i); sum_eegA_lfpB.obs(session_i-13,lfp_i,window_i)],...
+                [sum_eegB_lfpA.obs(session_i-13,lfp_i,window_i);sum_eegB_lfpB.obs(session_i-13,lfp_i,window_i)],...
+                'VariableNames',{'EEG_pos','EEG_neg'},'RowNames',{'LFP_pos','LFP_neg'});
+
+            clear h p stats;
+            [h,p,stats] = fishertest(chisq_conttab{session_i-13,lfp_i,window_i});
+            
+            fisherstats.h(session_i-13,lfp_i,window_i) = h;
+            fisherstats.p(session_i-13,lfp_i,window_i) = p;
+            fisherstats.odds(session_i-13,lfp_i,window_i) = stats.OddsRatio;
+        end
     end
 end
 
-% Note: upper row of contab is +EEG, and bottom is -EEG.
-% Note: left column of contab is +LFP, and right is -EEG.
 
-% Concatenate and sum conttabs over all sessions for upper and lower layers
-for session_i = 14:29
-    for lfp_i = 1:2
-        chi_sq_all{lfp_i}(:,:,session_i) = chisq_conttab{session_i-13,lfp_i};
-    end
-end
-chi_sq_upper_sum = sum(chi_sq_all{1},3);
-chi_sq_lower_sum = sum(chi_sq_all{2},3);
+%% Figure;
+figure('Renderer', 'painters', 'Position', [100 100 1000 200]);
+subplot(1,3,1)
+imagesc('XData',getMidBin(window_edges),'YData',1:17,'CData', squeeze(nanmin(fisherstats.odds)))
+set(gca,'YLim',[0.5 17.5],'YDir','Reverse')
+colormap(parula); colorbar
+xlabel('Time from target (ms)')
+ylabel('Depth (ch)')
 
+subplot(1,3,2)
+imagesc('XData',getMidBin(window_edges),'YData',1:17,'CData', squeeze(nanmean(fisherstats.odds)))
+set(gca,'YLim',[0.5 17.5],'YDir','Reverse')
+colormap(parula); colorbar
+xlabel('Time from target (ms)')
 
-% Run Chi-square contingency test on these concatenated contabs.
-[chisq_p_upper, chisq_x2_upper] =...
-            chisquarecont(chi_sq_upper_sum);
-[chisq_p_lower, chisq_x2_lower] =...
-            chisquarecont(chi_sq_lower_sum);
-
-
+subplot(1,3,3)
+imagesc('XData',getMidBin(window_edges),'YData',1:17,'CData', squeeze(nanmax(fisherstats.odds)))
+set(gca,'YLim',[0.5 17.5],'YDir','Reverse')
+colormap(parula); colorbar
+xlabel('Time from target (ms)')
