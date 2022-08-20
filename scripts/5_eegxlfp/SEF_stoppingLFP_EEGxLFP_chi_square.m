@@ -34,7 +34,14 @@ else
                 
                 % Get trials of interest
                 trials = []; trials_shuffled = [];
-                trials = executiveBeh.ttx.NC{session_i};
+                
+                if strcmp(alignmentEvent,'saccade')
+                    trials = executiveBeh.ttx.NC{session_i};
+                else
+                    trials = executiveBeh.ttx_canc{session_i};
+                end
+                
+                
                 n_trls = length(trials);
                 % We can then shuffled the conditions
                 trials_shuffled = trials(randperm(numel(trials)));
@@ -149,80 +156,181 @@ else
     
     save(fullfile(dataDir,'eeg_lfp','trl_burst_diff_lfp_chisquare.mat'),'trl_burst_diff_lfp','trl_burst_diff_lfp_shuf')
 end
-%%
-clear sum_eeg* chisq_*
+%% Analysis: extract the number of observations within each time bin, for each contact,
+%            across events and sessions.
 
+% Clear the workspace/loop variables
+clear sum_eeg*
+
+% For each alignment event
 for alignment_i = 1:length(eventAlignments)
     % Get the desired alignment
     alignmentEvent = eventAlignments{alignment_i};
     
-    fisherstats.(alignmentEvent).h = nan(16,17,17);
-    fisherstats.(alignmentEvent).p = nan(16,17,17);
-    fisherstats.(alignmentEvent).odds = nan(16,17,17);
-    
+    % For each session
     for session_i = 14:29
-        n_lfp = max(find(~cellfun(@isempty, trl_burst_diff_lfp_shuf.(alignmentEvent)(session_i,:,1))));        for window_i = 1:n_windows
+        
+        % Find the number of channels recorded within the session
+        n_lfp = max(find(~cellfun(@isempty, trl_burst_diff_lfp_shuf.target(session_i,:,1))));
+        
+        % Loop through each channel
+        for lfp_i = 1:n_lfp
             
-            for lfp_i = 1:n_lfp
+            % At each time bin
+            for window_i = 1:n_windows
                 
-                % Number
-                sum_eegA_lfpA.(alignmentEvent).obs(session_i-13,lfp_i,window_i) = sum(strcmp(trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i,window_i}(:,2),'+eeg, +lfp'));
-                sum_eegA_lfpB.(alignmentEvent).obs(session_i-13,lfp_i,window_i) = sum(strcmp(trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i,window_i}(:,2),'+eeg, -lfp'));
-                sum_eegB_lfpA.(alignmentEvent).obs(session_i-13,lfp_i,window_i) = sum(strcmp(trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i,window_i}(:,2),'-eeg, +lfp'));
-                sum_eegB_lfpB.(alignmentEvent).obs(session_i-13,lfp_i,window_i) = sum(strcmp(trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i,window_i}(:,2),'-eeg, -lfp'));
+                %.and find the number of observations in each bin (+/- EEG, +/- LFP):
+                sum_eegA_lfpA.(alignmentEvent).obs(session_i-13,lfp_i,window_i) =...
+                    sum(strcmp(trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i,window_i}(:,2),'+eeg, +lfp'));
+                sum_eegA_lfpB.(alignmentEvent).obs(session_i-13,lfp_i,window_i) =...
+                    sum(strcmp(trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i,window_i}(:,2),'+eeg, -lfp'));
+                sum_eegB_lfpA.(alignmentEvent).obs(session_i-13,lfp_i,window_i) =...
+                    sum(strcmp(trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i,window_i}(:,2),'-eeg, +lfp'));
+                sum_eegB_lfpB.(alignmentEvent).obs(session_i-13,lfp_i,window_i) =...
+                    sum(strcmp(trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i,window_i}(:,2),'-eeg, -lfp'));
                 
-                sum_eegA_lfpA.(alignmentEvent).shuf(session_i-13,lfp_i,window_i) = sum(strcmp(trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i,window_i}(:,2),'+eeg, +lfp'));
-                sum_eegA_lfpB.(alignmentEvent).shuf(session_i-13,lfp_i,window_i) = sum(strcmp(trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i,window_i}(:,2),'+eeg, -lfp'));
-                sum_eegB_lfpA.(alignmentEvent).shuf(session_i-13,lfp_i,window_i) = sum(strcmp(trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i,window_i}(:,2),'-eeg, +lfp'));
-                sum_eegB_lfpB.(alignmentEvent).shuf(session_i-13,lfp_i,window_i) = sum(strcmp(trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i,window_i}(:,2),'-eeg, -lfp'));
+                %.and find the number of observations in each bin (+/- EEG, +/- LFP):
+                sum_eegA_lfpA.(alignmentEvent).shuf(session_i-13,lfp_i,window_i) =...
+                    sum(strcmp(trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i,window_i}(:,2),'+eeg, +lfp'));
+                sum_eegA_lfpB.(alignmentEvent).shuf(session_i-13,lfp_i,window_i) =...
+                    sum(strcmp(trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i,window_i}(:,2),'+eeg, -lfp'));
+                sum_eegB_lfpA.(alignmentEvent).shuf(session_i-13,lfp_i,window_i) =...
+                    sum(strcmp(trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i,window_i}(:,2),'-eeg, +lfp'));
+                sum_eegB_lfpB.(alignmentEvent).shuf(session_i-13,lfp_i,window_i) =...
+                    sum(strcmp(trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i,window_i}(:,2),'-eeg, -lfp'));
                 
-                chisq_conttab.(alignmentEvent){session_i-13,lfp_i,window_i} =...
-                    table( [sum_eegA_lfpA.(alignmentEvent).obs(session_i-13,lfp_i,window_i);...
-                    sum_eegA_lfpB.(alignmentEvent).obs(session_i-13,lfp_i,window_i)],...
-                    [sum_eegB_lfpA.(alignmentEvent).obs(session_i-13,lfp_i,window_i);...
-                    sum_eegB_lfpB.(alignmentEvent).obs(session_i-13,lfp_i,window_i)]+1,...
-                    'VariableNames',{'EEG_pos','EEG_neg'},'RowNames',{'LFP_pos','LFP_neg'});
-                
-                clear h p stats;
-                [h,p,stats] = fishertest(chisq_conttab.(alignmentEvent){session_i-13,lfp_i,window_i},'tail','right');
-                
-                fisherstats.(alignmentEvent).h(session_i-13,lfp_i,window_i) = h;
-                fisherstats.(alignmentEvent).p(session_i-13,lfp_i,window_i) = p;
-                fisherstats.(alignmentEvent).odds(session_i-13,lfp_i,window_i) = stats.OddsRatio;
+            
             end
         end
     end
 end
 
+%% Analysis: Cross-tabulate these counts, and run Fisher Exact Test
 
-%% Figure: time-depth odds-ratio
-for alignment_i = 1:length(eventAlignments)
-    alignmentEvent = eventAlignments{alignment_i};
-    time_data = [];
-    time_data = getMidBin(window_edges{alignment_i});
+clear crosstab_lfp_eeg fisherstats
+
+% For each session
+for session_i = 14:29
+    n_lfp = max(find(~cellfun(@isempty, trl_burst_diff_lfp_shuf.target(session_i,:,1))));
     
-    figure('Renderer', 'painters', 'Position', [100 100 1000 200]);
-    subplot(1,3,1)
-    imagesc('XData',time_data,'YData',1:17,'CData', squeeze(nanmin(fisherstats.(alignmentEvent).odds)))
-    set(gca,'XLim', [time_data(1) time_data(end)],'YLim',[0.5 17.5],'YDir','Reverse')
-    colormap(parula); colorbar
-    xlabel(['Time from ' alignmentEvent '(ms)'])
-    ylabel('Depth (ch)')
-    
-    subplot(1,3,2)
-    imagesc('XData',time_data,'YData',1:17,'CData', squeeze(nanmedian(fisherstats.(alignmentEvent).odds)))
-    set(gca,'XLim', [time_data(1) time_data(end)],'YLim',[0.5 17.5],'YDir','Reverse')
-    colormap(parula); colorbar
-    xlabel(['Time from ' alignmentEvent '(ms)'])
-    
-    subplot(1,3,3)
-    imagesc('XData',time_data,'YData',1:17,'CData', squeeze(nanmax(fisherstats.(alignmentEvent).odds)))
-    set(gca,'XLim', [time_data(1) time_data(end)],'YLim',[0.5 17.5],'YDir','Reverse')
-    colormap(parula); colorbar
-    xlabel(['Time from ' alignmentEvent '(ms)'])
+    % Loop through each channel
+    for lfp_i = 1:n_lfp
+        lfp_count = lfp_count + 1;
+        
+        % For each alignment
+        for alignment_i = 1:length(eventAlignments)
+            alignmentEvent = eventAlignments{alignment_i};
+            
+            % ... and at each time bin
+            for window_i = 1:n_windows
+                
+                
+                % Get the cross-tab for this lfp-contact.
+                % Note: 1 is added to each cell to account for MATLAB issue
+                % with running Fisher with 0 count in cells.
+                
+                crosstab_lfp_eeg.obs.(alignmentEvent){session_i,lfp_i,window_i} =...
+                    table( [sum_eegA_lfpA.(alignmentEvent).obs(session_i-13,lfp_i,window_i)+1;...
+                    sum_eegA_lfpB.(alignmentEvent).obs(session_i-13,lfp_i,window_i)+1],...
+                    [sum_eegB_lfpA.(alignmentEvent).obs(session_i-13,lfp_i,window_i)+1;...
+                    sum_eegB_lfpB.(alignmentEvent).obs(session_i-13,lfp_i,window_i)+1],...
+                    'VariableNames',{'EEG_pos','EEG_neg'},'RowNames',{'LFP_pos','LFP_neg'});
+                
+                crosstab_lfp_eeg.shuf.(alignmentEvent){session_i,lfp_i,window_i} =...
+                    table( [sum_eegA_lfpA.(alignmentEvent).shuf(session_i-13,lfp_i,window_i)+1;...
+                    sum_eegA_lfpB.(alignmentEvent).shuf(session_i-13,lfp_i,window_i)+1],...
+                    [sum_eegB_lfpA.(alignmentEvent).shuf(session_i-13,lfp_i,window_i)+1;...
+                    sum_eegB_lfpB.(alignmentEvent).shuf(session_i-13,lfp_i,window_i)+1],...
+                    'VariableNames',{'EEG_pos','EEG_neg'},'RowNames',{'LFP_pos','LFP_neg'});
+                
+                
+                clear h_obs p_obs stats_obs h_shuf p_shuf stats_shuf
+                [h_obs,p_obs,stats_obs] = fishertest(crosstab_lfp_eeg.obs.(alignmentEvent){session_i,lfp_i,window_i},...
+                    'tail','right');
+                [h_shuf,p_shuf,stats_shuf] = fishertest(crosstab_lfp_eeg.shuf.(alignmentEvent){session_i,lfp_i,window_i},...
+                    'tail','right');
+                
+                fisherstats.(alignmentEvent).obs.h{session_i-13}(lfp_i,window_i) = h_obs;
+                fisherstats.(alignmentEvent).obs.p{session_i-13}(lfp_i,window_i) = p_obs;
+                fisherstats.(alignmentEvent).obs.odds{session_i-13}(lfp_i,window_i) = stats_obs.OddsRatio;
+                
+                fisherstats.(alignmentEvent).shuf.h{session_i-13}(lfp_i,window_i) = h_shuf;
+                fisherstats.(alignmentEvent).shuf.p{session_i-13}(lfp_i,window_i) = p_shuf;
+                fisherstats.(alignmentEvent).shuf.odds{session_i-13}(lfp_i,window_i) = stats_shuf.OddsRatio;
+                
+                
+            end
+        end
+    end
     
 end
 
-%%
+
+%% Figure
+clear eeg_lfp_OR fig_data
+
+loop_i = 0;
+
+for alignment_i = 1:length(eventAlignments)
+    alignmentEvent = eventAlignments{alignment_i};
+    for session_i = 14:29
+        loop_i = loop_i + 1;
+        
+        fig_data.alignment{loop_i,1} = alignmentEvent;
+        fig_data.OR_obs{loop_i,1} = nanmean(fisherstats.(alignmentEvent).obs.odds{session_i-13});
+        fig_data.H_obs{loop_i,1} = nanmean(fisherstats.(alignmentEvent).obs.h{session_i-13});
+        fig_data.OR_shuf{loop_i,1} = nanmean(fisherstats.(alignmentEvent).shuf.odds{session_i-13});
+        fig_data.H_shuf{loop_i,1} = nanmean(fisherstats.(alignmentEvent).shuf.h{session_i-13});
+        
+        fig_data.time{loop_i,1} = getMidBin(window_edges{alignment_i});
+        fig_data.session{loop_i,1} = executiveBeh.nhpSessions.monkeyNameLabel{session_i};
+        
+        eeg_lfp_OR.(alignmentEvent){session_i-13,:} = nanmean(fisherstats.(alignmentEvent).obs.odds{session_i-13});
+    end
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+obs_cond_label = [repmat({'obs'},loop_i,1);repmat({'shuf'},loop_i,1)];
+alignment_label = [fig_data.alignment;fig_data.alignment];
+monkey_label = [fig_data.session;fig_data.session];
+
+clear g
+
+g(1,1)=gramm('x',[fig_data.time;fig_data.time],'y',[fig_data.H_obs;fig_data.OR_shuf],'color',obs_cond_label);
+g(2,1)=gramm('x',[fig_data.time;fig_data.time],'y',[fig_data.OR_obs;fig_data.OR_shuf],'color',obs_cond_label);
+
+g(1,1).stat_summary(); g(2,1).stat_summary(); 
+
+g(1,1).facet_grid([],alignment_label,'scale','free_x');
+g(2,1).facet_grid(monkey_label,alignment_label,'scale','free_x');
+
+g(1,1).axe_property('YLim',[0 15]); g(2,1).axe_property('YLim',[0 20]);
+
+g(1,1).geom_hline('yintercept',1); g(2,1).geom_hline('yintercept',1)
+
+
+figure('Renderer', 'painters', 'Position', [100 100 1000 600]);
+g.draw();
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+clear g
+
+g(1,1)=gramm('x',[fig_data.time;fig_data.time],'y',[fig_data.H_obs;fig_data.H_shuf],'color',obs_cond_label);
+g(2,1)=gramm('x',[fig_data.time;fig_data.time],'y',[fig_data.H_obs;fig_data.H_shuf],'color',obs_cond_label);
+
+g(1,1).stat_summary('geom',{'point','errorbar'}); g(2,1).stat_summary('geom',{'point','errorbar'}); 
+
+g(1,1).facet_grid([],alignment_label,'scale','free_x');
+g(2,1).facet_grid(monkey_label,alignment_label,'scale','free_x');
+
+g(1,1).axe_property('YLim',[-0.1 0.5]); g(2,1).axe_property('YLim',[-0.1 0.5]);
+
+g(1,1).geom_hline('yintercept',1); g(2,1).geom_hline('yintercept',1)
+
+
+figure('Renderer', 'painters', 'Position', [100 100 1000 600]);
+g.draw();
 
 
