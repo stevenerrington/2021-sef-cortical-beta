@@ -49,9 +49,9 @@ for sessionIdx = 14:29
         % Here, some sessions don't have many contacts in lower layers. We
         % account for that here. I'm just plotting one channel per layer
         % for greater representitiveness. More channels = greater p(burst | time)
-        ch_l2 = 2;
-        ch_l3 = 6;
-        ch_l5 = 10;
+        ch_l2 = 1;
+        ch_l3 = 5;
+        ch_l5 = 9;
         ch_l6 = min([max(ch_depths) 14]);
         
         % For each trial of interest
@@ -139,21 +139,26 @@ for sessionIdx = 14:29
         eeg_lfp_raster(1,1)=gramm('x',rasterplot.collapsed.target,'color',rasterplot.collapsed.labels.target);
         eeg_lfp_raster(1,1).geom_raster('geom',{'point'});
         eeg_lfp_raster(1,1).axe_property('YDir','reverse');
-        
-        % Saccade aligned raster
-        eeg_lfp_raster(1,2)=gramm('x',rasterplot.collapsed.saccade,'color',rasterplot.collapsed.labels.saccade);
-        eeg_lfp_raster(1,2).geom_raster('geom',{'point'});
-        eeg_lfp_raster(1,2).axe_property('YDir','reverse');
+        eeg_lfp_raster(1,1).axe_property('XLim',[-600 200]);
         
         % Stop-signal aligned raster
-        eeg_lfp_raster(1,3)=gramm('x',rasterplot.collapsed.stopSignal,'color',rasterplot.collapsed.labels.stopSignal);
-        eeg_lfp_raster(1,3).geom_raster('geom',{'point'});
-        eeg_lfp_raster(1,3).axe_property('YDir','reverse');
+        eeg_lfp_raster(1,2)=gramm('x',rasterplot.collapsed.stopSignal,'color',rasterplot.collapsed.labels.stopSignal);
+        eeg_lfp_raster(1,2).geom_raster('geom',{'point'});
+        eeg_lfp_raster(1,2).axe_property('YDir','reverse');
+        eeg_lfp_raster(1,2).axe_property('XLim',[-200 600]);
         
         % Tone aligned raster
-        eeg_lfp_raster(1,4)=gramm('x',rasterplot.collapsed.tone,'color',rasterplot.collapsed.labels.tone);
+        eeg_lfp_raster(1,3)=gramm('x',rasterplot.collapsed.tone,'color',rasterplot.collapsed.labels.tone);
+        eeg_lfp_raster(1,3).geom_raster('geom',{'point'});
+        eeg_lfp_raster(1,3).axe_property('YDir','reverse');
+        eeg_lfp_raster(1,3).axe_property('XLim',[-600 200]);        
+        
+        
+        % Saccade aligned raster
+        eeg_lfp_raster(1,4)=gramm('x',rasterplot.collapsed.saccade,'color',rasterplot.collapsed.labels.saccade);
         eeg_lfp_raster(1,4).geom_raster('geom',{'point'});
         eeg_lfp_raster(1,4).axe_property('YDir','reverse');
+        eeg_lfp_raster(1,4).axe_property('XLim',[0 800]);
         
         % ... and then generate it
         figure('Position',[100 100 1200 300]);

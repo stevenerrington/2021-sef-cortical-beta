@@ -191,12 +191,15 @@ for session_i = 14:29
         % was observed
         pBurst_lfp_eeg.obs.upper{session_i-13}(:,bin_i) = nanmean(sum(lfp_bin_burst(eeg_burst_trls,1:8),2) > 0);
         pBurst_lfp_eeg.obs.lower{session_i-13}(:,bin_i) = nanmean(sum(lfp_bin_burst(eeg_burst_trls,9:end),2) > 0);
+        pBurst_lfp_eeg.obs.all{session_i-13}(:,bin_i) = nanmean(sum(lfp_bin_burst(eeg_burst_trls,1:end),2) > 0);
         
         pBurst_lfp_eeg.shuf.upper{session_i-13}(:,bin_i) = nanmean(sum(lfp_bin_burst_shuf(eeg_burst_trls,1:8),2) > 0);
         pBurst_lfp_eeg.shuf.lower{session_i-13}(:,bin_i) = nanmean(sum(lfp_bin_burst_shuf(eeg_burst_trls,9:end),2) > 0);
+        pBurst_lfp_eeg.shuf.all{session_i-13}(:,bin_i) = nanmean(sum(lfp_bin_burst_shuf(eeg_burst_trls,1:end),2) > 0);
     
         pBurst_lfp_eeg.diff.upper{session_i-13}(:,bin_i) =  pBurst_lfp_eeg.obs.upper{session_i-13}(:,bin_i) - pBurst_lfp_eeg.shuf.upper{session_i-13}(:,bin_i);
         pBurst_lfp_eeg.diff.lower{session_i-13}(:,bin_i) =  pBurst_lfp_eeg.obs.lower{session_i-13}(:,bin_i) - pBurst_lfp_eeg.shuf.lower{session_i-13}(:,bin_i);
+        pBurst_lfp_eeg.diff.all{session_i-13}(:,bin_i) =  pBurst_lfp_eeg.obs.all{session_i-13}(:,bin_i) - pBurst_lfp_eeg.shuf.all{session_i-13}(:,bin_i);
     
     
     end
@@ -216,14 +219,20 @@ for session_i = 14:29
     % Pre-EEG burst period
     eeg_pre_upper(session_i-13) = sum(pBurst_lfp_eeg.obs.upper{session_i-13}(:,bin_preEEG));
     eeg_pre_lower(session_i-13) = sum(pBurst_lfp_eeg.obs.lower{session_i-13}(:,bin_preEEG));
+    eeg_pre_all(session_i-13) = sum(pBurst_lfp_eeg.obs.all{session_i-13}(:,bin_preEEG));
+    
     eeg_pre_upper_shuf(session_i-13) = sum(pBurst_lfp_eeg.shuf.upper{session_i-13}(:,bin_preEEG));
     eeg_pre_lower_shuf(session_i-13) = sum(pBurst_lfp_eeg.shuf.lower{session_i-13}(:,bin_preEEG));  
+    eeg_pre_all_shuf(session_i-13) = sum(pBurst_lfp_eeg.shuf.all{session_i-13}(:,bin_preEEG));  
     
     % Post-EEG burst period
     eeg_post_upper(session_i-13) = sum(pBurst_lfp_eeg.obs.upper{session_i-13}(:,bin_postEEG));
     eeg_post_lower(session_i-13) = sum(pBurst_lfp_eeg.obs.lower{session_i-13}(:,bin_postEEG));
+    eeg_post_all(session_i-13) = sum(pBurst_lfp_eeg.obs.all{session_i-13}(:,bin_postEEG));
+    
     eeg_post_upper_shuf(session_i-13) = sum(pBurst_lfp_eeg.shuf.upper{session_i-13}(:,bin_postEEG));
     eeg_post_lower_shuf(session_i-13) = sum(pBurst_lfp_eeg.shuf.lower{session_i-13}(:,bin_postEEG));  
+    eeg_post_all_shuf(session_i-13) = sum(pBurst_lfp_eeg.shuf.all{session_i-13}(:,bin_postEEG));  
     
 end
 
@@ -287,35 +296,42 @@ for session_i = 14:29
     % 10 is the bin size: area is sum(bin height x bin width)
     eeg_pre_upper_obs_area(session_i-13) = sum(pBurst_lfp_eeg.obs.upper{session_i-13}(:,bin_preEEG)*10);
     eeg_pre_lower_obs_area(session_i-13) = sum(pBurst_lfp_eeg.obs.lower{session_i-13}(:,bin_preEEG)*10);
+    eeg_pre_all_obs_area(session_i-13) = sum(pBurst_lfp_eeg.obs.all{session_i-13}(:,bin_preEEG)*10);
     eeg_pre_upper_shuf_area(session_i-13) = sum(pBurst_lfp_eeg.shuf.upper{session_i-13}(:,bin_preEEG)*10);
     eeg_pre_lower_shuf_area(session_i-13) = sum(pBurst_lfp_eeg.shuf.lower{session_i-13}(:,bin_preEEG)*10);
+    eeg_pre_all_shuf_area(session_i-13) = sum(pBurst_lfp_eeg.shuf.all{session_i-13}(:,bin_preEEG)*10);
     
     eeg_post_upper_obs_area(session_i-13) = sum(pBurst_lfp_eeg.obs.upper{session_i-13}(:,bin_postEEG)*10);
     eeg_post_lower_obs_area(session_i-13) = sum(pBurst_lfp_eeg.obs.lower{session_i-13}(:,bin_postEEG)*10);
+    eeg_post_all_obs_area(session_i-13) = sum(pBurst_lfp_eeg.obs.all{session_i-13}(:,bin_postEEG)*10);
     eeg_post_upper_shuf_area(session_i-13) = sum(pBurst_lfp_eeg.shuf.upper{session_i-13}(:,bin_postEEG)*10);
     eeg_post_lower_shuf_area(session_i-13) = sum(pBurst_lfp_eeg.shuf.lower{session_i-13}(:,bin_postEEG)*10);
-        
-    
+    eeg_post_all_shuf_area(session_i-13) = sum(pBurst_lfp_eeg.shuf.all{session_i-13}(:,bin_postEEG)*10);
+
     eeg_pre_upper_diff_area(session_i-13) = eeg_pre_upper_obs_area(session_i-13) -  eeg_pre_upper_shuf_area(session_i-13);
     eeg_pre_lower_diff_area(session_i-13) = eeg_pre_lower_obs_area(session_i-13) -  eeg_pre_lower_shuf_area(session_i-13);
+    eeg_pre_all_diff_area(session_i-13) = eeg_pre_all_obs_area(session_i-13) -  eeg_pre_all_shuf_area(session_i-13);
     eeg_post_upper_diff_area(session_i-13) = eeg_post_upper_obs_area(session_i-13) -  eeg_post_upper_shuf_area(session_i-13);
     eeg_post_lower_diff_area(session_i-13) = eeg_post_lower_obs_area(session_i-13) -  eeg_post_lower_shuf_area(session_i-13);
+    eeg_post_all_diff_area(session_i-13) = eeg_post_all_obs_area(session_i-13) -  eeg_post_all_shuf_area(session_i-13);
 
     eeg_prepost_upper_area_diff(session_i-13) = eeg_post_upper_diff_area(session_i-13) - eeg_pre_upper_diff_area(session_i-13);
     eeg_prepost_lower_area_diff(session_i-13) = eeg_post_lower_diff_area(session_i-13) - eeg_pre_lower_diff_area(session_i-13);
+    eeg_prepost_all_area_diff(session_i-13) = eeg_post_all_diff_area(session_i-13) - eeg_pre_all_diff_area(session_i-13);
     
 end
 
 %% Figure: autocorrelation area
 data = [];
-data = [eeg_prepost_upper_area_diff';eeg_prepost_lower_area_diff'];
+data = [eeg_prepost_upper_area_diff';eeg_prepost_lower_area_diff';eeg_prepost_all_area_diff'];
 
 layer_label = {};
 layer_label = [repmat({'Upper'},length(eeg_prepost_upper_area_diff),1);...
-    repmat({'Lower'},length(eeg_prepost_lower_area_diff),1)];
+    repmat({'Lower'},length(eeg_prepost_lower_area_diff),1);...
+    repmat({'All'},length(eeg_prepost_all_area_diff),1)];
 
 monkey_label = {};
-monkey_label = repmat(executiveBeh.nhpSessions.monkeyNameLabel(14:29),2,1);
+monkey_label = repmat(executiveBeh.nhpSessions.monkeyNameLabel(14:29),3,1);
 
 clear test_figure
 autocorr_area_fig(1,1) = gramm('x',layer_label,'y',data,'color',layer_label);

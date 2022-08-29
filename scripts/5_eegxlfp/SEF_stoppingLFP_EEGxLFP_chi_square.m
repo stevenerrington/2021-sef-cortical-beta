@@ -1,10 +1,10 @@
 %% Co-activation between SEF and MFC EEG
 % Set up parameters
-eventAlignments = {'fixate','target','saccade','stopSignal','tone'};
+eventAlignments = {'target','saccade','stopSignal','tone'};
 loadDir = fullfile(dataDir,'eeg_lfp');
 
 layerLabel = {'LFP_upper','LFP_lower'};
-window_edges = {[200:50:1000],[-600:50:200],[200:50:1000],[-200:50:600],[-400:50:400]};
+window_edges = {[-600:50:200],[0:50:800],[-200:50:600],[-600:50:200]};
 
 n_windows = length(window_edges{1})-1;
 
@@ -208,7 +208,7 @@ end
 %% Analysis: Cross-tabulate these counts, and run Fisher Exact Test
 
 clear crosstab_lfp_eeg fisherstats
-
+lfp_count = 0;
 % For each session
 for session_i = 14:29
     n_lfp = max(find(~cellfun(@isempty, trl_burst_diff_lfp_shuf.target(session_i,:,1))));
@@ -246,9 +246,9 @@ for session_i = 14:29
                 
                 clear h_obs p_obs stats_obs h_shuf p_shuf stats_shuf
                 [h_obs,p_obs,stats_obs] = fishertest(crosstab_lfp_eeg.obs.(alignmentEvent){session_i,lfp_i,window_i},...
-                    'tail','right');
+                    'tail','right','alpha',0.05/n_windows);
                 [h_shuf,p_shuf,stats_shuf] = fishertest(crosstab_lfp_eeg.shuf.(alignmentEvent){session_i,lfp_i,window_i},...
-                    'tail','right');
+                    'tail','right','alpha',0.05/n_windows);
                 
                 fisherstats.(alignmentEvent).obs.h{session_i-13}(lfp_i,window_i) = h_obs;
                 fisherstats.(alignmentEvent).obs.p{session_i-13}(lfp_i,window_i) = p_obs;
@@ -276,11 +276,14 @@ for alignment_i = 1:length(eventAlignments)
     for session_i = 14:29
         loop_i = loop_i + 1;
         
-        fig_data.alignment{loop_i,1} = alignmentEvent;
+        fig_data.alignment{loop_i,1} = [int2str(alignment_i) '_' alignmentEvent];
         fig_data.OR_obs{loop_i,1} = nanmean(fisherstats.(alignmentEvent).obs.odds{session_i-13});
         fig_data.H_obs{loop_i,1} = nanmean(fisherstats.(alignmentEvent).obs.h{session_i-13});
         fig_data.OR_shuf{loop_i,1} = nanmean(fisherstats.(alignmentEvent).shuf.odds{session_i-13});
         fig_data.H_shuf{loop_i,1} = nanmean(fisherstats.(alignmentEvent).shuf.h{session_i-13});
+        
+        fig_data.OR_diff{loop_i,1} = fig_data.OR_obs{loop_i,1}-fig_data.OR_shuf{loop_i,1};
+        fig_data.H_diff{loop_i,1} =  fig_data.H_obs{loop_i,1} -  fig_data.H_shuf{loop_i,1};
         
         fig_data.time{loop_i,1} = getMidBin(window_edges{alignment_i});
         fig_data.session{loop_i,1} = executiveBeh.nhpSessions.monkeyNameLabel{session_i};
@@ -295,42 +298,84 @@ obs_cond_label = [repmat({'obs'},loop_i,1);repmat({'shuf'},loop_i,1)];
 alignment_label = [fig_data.alignment;fig_data.alignment];
 monkey_label = [fig_data.session;fig_data.session];
 
-clear g
+clear figure_oddsratio_eegxlfp
 
-g(1,1)=gramm('x',[fig_data.time;fig_data.time],'y',[fig_data.H_obs;fig_data.OR_shuf],'color',obs_cond_label);
-g(2,1)=gramm('x',[fig_data.time;fig_data.time],'y',[fig_data.OR_obs;fig_data.OR_shuf],'color',obs_cond_label);
+figure_oddsratio_eegxlfp(1,1)=gramm('x',[fig_data.time;fig_data.time],'y',[fig_data.OR_obs;fig_data.OR_shuf],'color',obs_cond_label);
+figure_oddsratio_eegxlfp(2,1)=gramm('x',[fig_data.time;fig_data.time],'y',[fig_data.H_obs;fig_data.H_shuf],'color',obs_cond_label);
 
-g(1,1).stat_summary(); g(2,1).stat_summary(); 
+figure_oddsratio_eegxlfp(1,1).stat_summary(); 
+figure_oddsratio_eegxlfp(1,1).facet_grid([],alignment_label,'scale','free_x');
 
-g(1,1).facet_grid([],alignment_label,'scale','free_x');
-g(2,1).facet_grid(monkey_label,alignment_label,'scale','free_x');
+figure_oddsratio_eegxlfp(2,1).stat_summary('geom',{'point','errorbar'}); 
+figure_oddsratio_eegxlfp(2,1).facet_grid([],alignment_label,'scale','free_x');
 
-g(1,1).axe_property('YLim',[0 15]); g(2,1).axe_property('YLim',[0 20]);
+figure_oddsratio_eegxlfp(1,1).axe_property('YLim',[0 15]); 
+figure_oddsratio_eegxlfp(2,1).axe_property('YLim',[0 0.25]); 
 
-g(1,1).geom_hline('yintercept',1); g(2,1).geom_hline('yintercept',1)
-
-
-figure('Renderer', 'painters', 'Position', [100 100 1000 600]);
-g.draw();
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-clear g
-
-g(1,1)=gramm('x',[fig_data.time;fig_data.time],'y',[fig_data.H_obs;fig_data.H_shuf],'color',obs_cond_label);
-g(2,1)=gramm('x',[fig_data.time;fig_data.time],'y',[fig_data.H_obs;fig_data.H_shuf],'color',obs_cond_label);
-
-g(1,1).stat_summary('geom',{'point','errorbar'}); g(2,1).stat_summary('geom',{'point','errorbar'}); 
-
-g(1,1).facet_grid([],alignment_label,'scale','free_x');
-g(2,1).facet_grid(monkey_label,alignment_label,'scale','free_x');
-
-g(1,1).axe_property('YLim',[-0.1 0.5]); g(2,1).axe_property('YLim',[-0.1 0.5]);
-
-g(1,1).geom_hline('yintercept',1); g(2,1).geom_hline('yintercept',1)
-
+figure_oddsratio_eegxlfp(1,1).geom_hline('yintercept',1); 
 
 figure('Renderer', 'painters', 'Position', [100 100 1000 600]);
-g.draw();
+figure_oddsratio_eegxlfp.draw();
 
+%% 
+clear figure_oddsratio_eegxlfp_monkey
 
+figure_oddsratio_eegxlfp_monkey(1,1)=gramm('x',[fig_data.time;fig_data.time],'y',[fig_data.OR_obs;fig_data.OR_shuf],'color',obs_cond_label);
+figure_oddsratio_eegxlfp_monkey(2,1)=gramm('x',[fig_data.time;fig_data.time],'y',[fig_data.H_obs;fig_data.H_shuf],'color',obs_cond_label);
+
+figure_oddsratio_eegxlfp_monkey(1,1).stat_summary(); 
+figure_oddsratio_eegxlfp_monkey(1,1).facet_grid(monkey_label,alignment_label,'scale','free');
+
+figure_oddsratio_eegxlfp_monkey(2,1).stat_summary('geom',{'point','errorbar'}); 
+figure_oddsratio_eegxlfp_monkey(2,1).facet_grid(monkey_label,alignment_label,'scale','free_x');
+
+% figure_oddsratio_eegxlfp_monkey(1,1).axe_property('YLim',[0 25]); 
+figure_oddsratio_eegxlfp_monkey(2,1).axe_property('YLim',[0 0.25]); 
+
+figure_oddsratio_eegxlfp_monkey(1,1).geom_hline('yintercept',1); 
+
+figure('Renderer', 'painters', 'Position', [100 100 1000 600]);
+figure_oddsratio_eegxlfp_monkey.draw();
+
+%% Diff 
+
+clear figure_oddsratio_eegxlfp_diff
+
+figure_oddsratio_eegxlfp_diff(1,1)=gramm('x',[fig_data.time],'y',[fig_data.OR_diff]);
+figure_oddsratio_eegxlfp_diff(2,1)=gramm('x',[fig_data.time],'y',[fig_data.H_diff]);
+
+figure_oddsratio_eegxlfp_diff(1,1).stat_summary(); 
+figure_oddsratio_eegxlfp_diff(1,1).facet_grid([],fig_data.alignment,'scale','free');
+
+figure_oddsratio_eegxlfp_diff(2,1).stat_summary('geom',{'point','errorbar'}); 
+figure_oddsratio_eegxlfp_diff(2,1).facet_grid([],fig_data.alignment,'scale','free_x');
+
+figure_oddsratio_eegxlfp_diff(1,1).axe_property('YLim',[-5 5]); 
+figure_oddsratio_eegxlfp_diff(2,1).axe_property('YLim',[-0.2 0.2]); 
+
+figure_oddsratio_eegxlfp_diff(1,1).geom_hline('yintercept',0); 
+figure_oddsratio_eegxlfp_diff(2,1).geom_hline('yintercept',0); 
+
+figure('Renderer', 'painters', 'Position', [100 100 1000 600]);
+figure_oddsratio_eegxlfp_diff.draw();
+
+%% 
+clear figure_oddsratio_eegxlfp_diff_monkey
+
+figure_oddsratio_eegxlfp_diff_monkey(1,1)=gramm('x',[fig_data.time],'y',[fig_data.OR_diff]);
+figure_oddsratio_eegxlfp_diff_monkey(2,1)=gramm('x',[fig_data.time],'y',[fig_data.H_diff]);
+
+figure_oddsratio_eegxlfp_diff_monkey(1,1).stat_summary(); 
+figure_oddsratio_eegxlfp_diff_monkey(1,1).facet_grid(fig_data.session,fig_data.alignment,'scale','free');
+
+figure_oddsratio_eegxlfp_diff_monkey(2,1).stat_summary('geom',{'point','errorbar'}); 
+figure_oddsratio_eegxlfp_diff_monkey(2,1).facet_grid(fig_data.session,fig_data.alignment,'scale','free_x');
+
+figure_oddsratio_eegxlfp_diff_monkey(1,1).axe_property('YLim',[-6 6]); 
+figure_oddsratio_eegxlfp_diff_monkey(2,1).axe_property('YLim',[-0.3 0.3]); 
+
+figure_oddsratio_eegxlfp_diff_monkey(1,1).geom_hline('yintercept',0); 
+figure_oddsratio_eegxlfp_diff_monkey(2,1).geom_hline('yintercept',0); 
+
+figure('Renderer', 'painters', 'Position', [100 100 1000 600]);
+figure_oddsratio_eegxlfp_diff_monkey.draw();
