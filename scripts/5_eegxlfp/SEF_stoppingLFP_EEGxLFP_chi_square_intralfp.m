@@ -8,16 +8,17 @@ window_edges = {[-600:50:200],[0:50:800],[-200:50:600],[-600:50:200]};
 
 n_windows = length(window_edges{1})-1;
 
-trl_burst_diff_lfp = {};
-trl_burst_diff_lfp_shuffled = {};
 
 
-%%% STARTED 9:55AM on Aug 29th 2022;
+
+%%% STARTED 19:59 on Sept 1st 2022;
 
 %% Extract data from files
 tic
 % For each session
 for session_i = 14:29
+    trl_burst_diff_lfp = {};
+    trl_burst_diff_lfp_shuffled = {};
     % Get the admin/details
     session = session_i;
     fprintf('Analysing session %i of %i. \n',session, 29)
@@ -52,9 +53,6 @@ for session_i = 14:29
             % Get zero point
             alignmentZero = abs(data_in.eeg_lfp_burst.eventWindows{alignment_i}(1));
             n_lfps = size(data_in.eeg_lfp_burst.LFP_raw{1,1},3);
-
-            
-            
             
             for trl_i = 1:n_trls
                 %   Get trial index
@@ -90,37 +88,37 @@ for session_i = 14:29
                         lfp_j_burst_times_shuffled = lfp_j_burst_times_shuffled(lfp_j_burst_times_shuffled > window(1) & lfp_j_burst_times_shuffled < window(2));
                         
                         
-                        lfp_ij_label{session_i,lfp_i_i,lfp_i_j,window_i} = [lfp_i_i lfp_i_j];
+                        lfp_ij_label{lfp_i_i,lfp_i_j,window_i} = [lfp_i_i lfp_i_j];
                         
                         % If there is: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                         % No beta-burst in EEG, then label trial as 'no eeg burst'
                         if isempty(lfp_i_burst_times) && ~isempty(lfp_j_burst_times)
-                            trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}{trl_i,1} = NaN;
-                            trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}{trl_i,2} = '-lfp_i, +lfp_j';
+                            trl_burst_diff_lfp.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}{trl_i,1} = NaN;
+                            trl_burst_diff_lfp.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}{trl_i,2} = '-lfp_i, +lfp_j';
                         end
                         if isempty(lfp_i_burst_times) && ~isempty(lfp_i_burst_times_shuffled)
-                            trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}{trl_i,1} = NaN;
-                            trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}{trl_i,2} = '-lfp_i, +lfp_j';
+                            trl_burst_diff_lfp_shuf.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}{trl_i,1} = NaN;
+                            trl_burst_diff_lfp_shuf.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}{trl_i,2} = '-lfp_i, +lfp_j';
                         end
                         
                         % No beta-burst in LFP, then label trial as 'no lfp burst'
                         if ~isempty(lfp_i_burst_times) && isempty(lfp_j_burst_times)
-                            trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}{trl_i,1} = NaN;
-                            trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}{trl_i,2} = '+lfp_i, -lfp_j';
+                            trl_burst_diff_lfp.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}{trl_i,1} = NaN;
+                            trl_burst_diff_lfp.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}{trl_i,2} = '+lfp_i, -lfp_j';
                         end
                         if ~isempty(lfp_i_burst_times) && isempty(lfp_i_burst_times_shuffled)
-                            trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}{trl_i,1} = NaN;
-                            trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}{trl_i,2} = '+lfp_i, -lfp_j';
+                            trl_burst_diff_lfp_shuf.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}{trl_i,1} = NaN;
+                            trl_burst_diff_lfp_shuf.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}{trl_i,2} = '+lfp_i, -lfp_j';
                         end
                         
                         % No beta-burst in EEG or LFP, then label trial as 'no lfp or eeg burst'
                         if isempty(lfp_i_burst_times) && isempty(lfp_j_burst_times)
-                            trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}{trl_i,1} = NaN;
-                            trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}{trl_i,2} = '-lfp_i, -lfp_j';
+                            trl_burst_diff_lfp.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}{trl_i,1} = NaN;
+                            trl_burst_diff_lfp.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}{trl_i,2} = '-lfp_i, -lfp_j';
                         end
                         if isempty(lfp_i_burst_times) && isempty(lfp_i_burst_times_shuffled)
-                            trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}{trl_i,1} = NaN;
-                            trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}{trl_i,2} = '-lfp_i, -lfp_j';
+                            trl_burst_diff_lfp_shuf.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}{trl_i,1} = NaN;
+                            trl_burst_diff_lfp_shuf.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}{trl_i,2} = '-lfp_i, -lfp_j';
                         end
                         
                         % Otherwise, find the difference between the burst times
@@ -138,8 +136,8 @@ for session_i = 14:29
                                     lfp_j_burst_times(lfp_burst_i);
                             end
                             
-                            trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}{trl_i,1} = lfp_diff_burst_time;
-                            trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}{trl_i,2} = '+lfp_i, +lfp_j';
+                            trl_burst_diff_lfp.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}{trl_i,1} = lfp_diff_burst_time;
+                            trl_burst_diff_lfp.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}{trl_i,2} = '+lfp_i, +lfp_j';
                         end
                         
                         % and for shuffled LFP bursts
@@ -154,28 +152,20 @@ for session_i = 14:29
                                     lfp_i_burst_times(shuf_nearest_eeg_burst_i(shuf_lfp_burst_i)) -...
                                     lfp_i_burst_times_shuffled(shuf_lfp_burst_i);
                             end
-                            trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}{trl_i,1} = lfp_diff_burst_time_shuf;
-                            trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}{trl_i,2} = '+lfp_i, +lfp_j';
+                            trl_burst_diff_lfp_shuf.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}{trl_i,1} = lfp_diff_burst_time_shuf;
+                            trl_burst_diff_lfp_shuf.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}{trl_i,2} = '+lfp_i, +lfp_j';
                         end
                     end
                 end
             end
         end
     end
+    
+    save(fullfile(dataDir,'eeg_lfp','intra_lfp',...
+        ['trl_burst_diff_intraLFP_session_' int2str(session_i) '.mat']),'trl_burst_diff_lfp','trl_burst_diff_lfp_shuf')
 end
 
 toc
-
-
-
-
-
-
-
-
-
-
-
 
 
 %% Analysis: extract the number of observations within each time bin, for each contact,
@@ -197,117 +187,98 @@ for alignment_i = 1:length(eventAlignments)
         
         % Loop through each channel
         for lfp_i_i = 1:n_lfp
-            
-            % At each time bin
-            for window_i = 1:n_windows
+            for lfp_i_j = 1:n_lfp
                 
-                %.and find the number of observations in each bin (+/- EEG, +/- LFP):
-                sum_eegA_lfpA.(alignmentEvent).obs(session_i-13,lfp_i_i,window_i) =...
-                    sum(strcmp(trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}(:,2),'+eeg, +lfp'));
-                sum_eegA_lfpB.(alignmentEvent).obs(session_i-13,lfp_i_i,window_i) =...
-                    sum(strcmp(trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}(:,2),'+eeg, -lfp'));
-                sum_eegB_lfpA.(alignmentEvent).obs(session_i-13,lfp_i_i,window_i) =...
-                    sum(strcmp(trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}(:,2),'-eeg, +lfp'));
-                sum_eegB_lfpB.(alignmentEvent).obs(session_i-13,lfp_i_i,window_i) =...
-                    sum(strcmp(trl_burst_diff_lfp.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}(:,2),'-eeg, -lfp'));
-                
-                %.and find the number of observations in each bin (+/- EEG, +/- LFP):
-                sum_eegA_lfpA.(alignmentEvent).shuf(session_i-13,lfp_i_i,window_i) =...
-                    sum(strcmp(trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}(:,2),'+eeg, +lfp'));
-                sum_eegA_lfpB.(alignmentEvent).shuf(session_i-13,lfp_i_i,window_i) =...
-                    sum(strcmp(trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}(:,2),'+eeg, -lfp'));
-                sum_eegB_lfpA.(alignmentEvent).shuf(session_i-13,lfp_i_i,window_i) =...
-                    sum(strcmp(trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}(:,2),'-eeg, +lfp'));
-                sum_eegB_lfpB.(alignmentEvent).shuf(session_i-13,lfp_i_i,window_i) =...
-                    sum(strcmp(trl_burst_diff_lfp_shuf.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i}(:,2),'-eeg, -lfp'));
-                
-                
+                % At each time bin
+                for window_i = 1:n_windows
+                    
+                    %.and find the number of observations in each bin (+/- EEG, +/- LFP):
+                    sum_eegA_lfpA.(alignmentEvent).obs(session_i-13,lfp_i_i,lfp_i_j,window_i) =...
+                        sum(strcmp(trl_burst_diff_lfp.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}(:,2),'+lfp_i, +lfp_j'));
+                    sum_eegA_lfpB.(alignmentEvent).obs(session_i-13,lfp_i_i,lfp_i_j,window_i) =...
+                        sum(strcmp(trl_burst_diff_lfp.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}(:,2),'+lfp_i, -lfp_j'));
+                    sum_eegB_lfpA.(alignmentEvent).obs(session_i-13,lfp_i_i,lfp_i_j,window_i) =...
+                        sum(strcmp(trl_burst_diff_lfp.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}(:,2),'-lfp_i, +lfp_j'));
+                    sum_eegB_lfpB.(alignmentEvent).obs(session_i-13,lfp_i_i,lfp_i_j,window_i) =...
+                        sum(strcmp(trl_burst_diff_lfp.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}(:,2),'-lfp_i, -lfp_j'));
+                    
+                    %.and find the number of observations in each bin (+/- EEG, +/- LFP):
+                    sum_eegA_lfpA.(alignmentEvent).shuf(session_i-13,lfp_i_i,lfp_i_j,window_i) =...
+                        sum(strcmp(trl_burst_diff_lfp_shuf.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}(:,2),'+lfp_i, +lfp_j'));
+                    sum_eegA_lfpB.(alignmentEvent).shuf(session_i-13,lfp_i_i,lfp_i_j,window_i) =...
+                        sum(strcmp(trl_burst_diff_lfp_shuf.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}(:,2),'+lfp_i, -lfp_j'));
+                    sum_eegB_lfpA.(alignmentEvent).shuf(session_i-13,lfp_i_i,lfp_i_j,window_i) =...
+                        sum(strcmp(trl_burst_diff_lfp_shuf.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}(:,2),'-lfp_i, +lfp_j'));
+                    sum_eegB_lfpB.(alignmentEvent).shuf(session_i-13,lfp_i_i,lfp_i_j,window_i) =...
+                        sum(strcmp(trl_burst_diff_lfp_shuf.(alignmentEvent){lfp_i_i,lfp_i_j,window_i}(:,2),'-lfp_i, -lfp_j'));
+                    
+                end
             end
         end
     end
 end
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 %% Analysis: Cross-tabulate these counts, and run Fisher Exact Test
 
-clear crosstab_lfp_eeg fisherstats
+clear crosstab_lfpi_lfpj fisherstats
 lfp_count = 0;
 % For each session
 for session_i = 14:29
     n_lfp = max(find(~cellfun(@isempty, trl_burst_diff_lfp_shuf.target(session_i,:,1))));
+    fprintf('Analysing session %i of %i. \n',session_i, 29)
     
     % Loop through each channel
     for lfp_i_i = 1:n_lfp
         lfp_count = lfp_count + 1;
         
-        % For each alignment
-        for alignment_i = 1:length(eventAlignments)
-            alignmentEvent = eventAlignments{alignment_i};
-            
-            % ... and at each time bin
-            for window_i = 1:n_windows
+        for lfp_i_j = 1:n_lfp
+            % For each alignment
+            for alignment_i = 1:length(eventAlignments)
+                alignmentEvent = eventAlignments{alignment_i};
                 
-                
-                % Get the cross-tab for this lfp-contact.
-                % Note: 1 is added to each cell to account for MATLAB issue
-                % with running Fisher with 0 count in cells.
-                
-                crosstab_lfp_eeg.obs.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i} =...
-                    table( [sum_eegA_lfpA.(alignmentEvent).obs(session_i-13,lfp_i_i,window_i)+1;...
-                    sum_eegA_lfpB.(alignmentEvent).obs(session_i-13,lfp_i_i,window_i)+1],...
-                    [sum_eegB_lfpA.(alignmentEvent).obs(session_i-13,lfp_i_i,window_i)+1;...
-                    sum_eegB_lfpB.(alignmentEvent).obs(session_i-13,lfp_i_i,window_i)+1],...
-                    'VariableNames',{'EEG_pos','EEG_neg'},'RowNames',{'LFP_pos','LFP_neg'});
-                
-                crosstab_lfp_eeg.shuf.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i} =...
-                    table( [sum_eegA_lfpA.(alignmentEvent).shuf(session_i-13,lfp_i_i,window_i)+1;...
-                    sum_eegA_lfpB.(alignmentEvent).shuf(session_i-13,lfp_i_i,window_i)+1],...
-                    [sum_eegB_lfpA.(alignmentEvent).shuf(session_i-13,lfp_i_i,window_i)+1;...
-                    sum_eegB_lfpB.(alignmentEvent).shuf(session_i-13,lfp_i_i,window_i)+1],...
-                    'VariableNames',{'EEG_pos','EEG_neg'},'RowNames',{'LFP_pos','LFP_neg'});
-                
-                
-                clear h_obs p_obs stats_obs h_shuf p_shuf stats_shuf
-                [h_obs,p_obs,stats_obs] = fishertest(crosstab_lfp_eeg.obs.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i},...
-                    'tail','right','alpha',0.05/n_windows);
-                [h_shuf,p_shuf,stats_shuf] = fishertest(crosstab_lfp_eeg.shuf.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i},...
-                    'tail','right','alpha',0.05/n_windows);
-                
-                fisherstats.(alignmentEvent).obs.h{session_i-13}(lfp_i_i,window_i) = h_obs;
-                fisherstats.(alignmentEvent).obs.p{session_i-13}(lfp_i_i,window_i) = p_obs;
-                fisherstats.(alignmentEvent).obs.odds{session_i-13}(lfp_i_i,window_i) = stats_obs.OddsRatio;
-                
-                fisherstats.(alignmentEvent).shuf.h{session_i-13}(lfp_i_i,window_i) = h_shuf;
-                fisherstats.(alignmentEvent).shuf.p{session_i-13}(lfp_i_i,window_i) = p_shuf;
-                fisherstats.(alignmentEvent).shuf.odds{session_i-13}(lfp_i_i,window_i) = stats_shuf.OddsRatio;
-                
-                
+                % ... and at each time bin
+                for window_i = 1:n_windows
+                    
+                    
+                    % Get the cross-tab for this lfp-contact.
+                    % Note: 1 is added to each cell to account for MATLAB issue
+                    % with running Fisher with 0 count in cells.
+                    
+                    crosstab_lfpi_lfpj.obs.(alignmentEvent){lfp_i_i,lfp_i_j,window_i} =...
+                        table( [sum_eegA_lfpA.(alignmentEvent).obs(session_i-13,lfp_i_i,lfp_i_j,window_i)+1;...
+                        sum_eegA_lfpB.(alignmentEvent).obs(session_i-13,lfp_i_i,lfp_i_j,window_i)+1],...
+                        [sum_eegB_lfpA.(alignmentEvent).obs(session_i-13,lfp_i_i,lfp_i_j,window_i)+1;...
+                        sum_eegB_lfpB.(alignmentEvent).obs(session_i-13,lfp_i_i,lfp_i_j,window_i)+1],...
+                        'VariableNames',{'LFP_i_pos','LFP_i_neg'},'RowNames',{'LFP_j_pos','LFP_j_neg'});
+                    
+                    crosstab_lfpi_lfpj.shuf.(alignmentEvent){lfp_i_i,lfp_i_j,window_i} =...
+                        table( [sum_eegA_lfpA.(alignmentEvent).shuf(session_i-13,lfp_i_i,lfp_i_j,window_i)+1;...
+                        sum_eegA_lfpB.(alignmentEvent).shuf(session_i-13,lfp_i_i,lfp_i_j,window_i)+1],...
+                        [sum_eegB_lfpA.(alignmentEvent).shuf(session_i-13,lfp_i_i,lfp_i_j,window_i)+1;...
+                        sum_eegB_lfpB.(alignmentEvent).shuf(session_i-13,lfp_i_i,lfp_i_j,window_i)+1],...
+                        'VariableNames',{'LFP_i_pos','LFP_i_neg'},'RowNames',{'LFP_j_pos','LFP_j_neg'});
+                    
+                    
+                    clear h_obs p_obs stats_obs h_shuf p_shuf stats_shuf
+                    [h_obs,p_obs,stats_obs] = fishertest(crosstab_lfpi_lfpj.obs.(alignmentEvent){lfp_i_i,lfp_i_j,window_i},...
+                        'tail','right','alpha',0.05/n_windows);
+                    [h_shuf,p_shuf,stats_shuf] = fishertest(crosstab_lfpi_lfpj.shuf.(alignmentEvent){lfp_i_i,lfp_i_j,window_i},...
+                        'tail','right','alpha',0.05/n_windows);
+                    
+                    fisherstats.(alignmentEvent).obs.h{session_i-13}(lfp_i_i,lfp_i_j,window_i) = h_obs;
+                    fisherstats.(alignmentEvent).obs.p{session_i-13}(lfp_i_i,lfp_i_j,window_i) = p_obs;
+                    fisherstats.(alignmentEvent).obs.odds{session_i-13}(lfp_i_i,lfp_i_j,window_i) = stats_obs.OddsRatio;
+                    
+                    fisherstats.(alignmentEvent).shuf.h{session_i-13}(lfp_i_i,lfp_i_j,window_i) = h_shuf;
+                    fisherstats.(alignmentEvent).shuf.p{session_i-13}(lfp_i_i,lfp_i_j,window_i) = p_shuf;
+                    fisherstats.(alignmentEvent).shuf.odds{session_i-13}(lfp_i_i,lfp_i_j,window_i) = stats_shuf.OddsRatio;
+                    
+                end
             end
         end
     end
     
 end
 
+save('D:\projectCode\project_stoppingLFP\data\eeg_lfp\lfpxlfp_temp.mat','fisherstats','crosstab_lfpi_lfpj')
