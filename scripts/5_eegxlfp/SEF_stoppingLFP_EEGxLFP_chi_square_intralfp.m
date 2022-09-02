@@ -1,4 +1,4 @@
-%% Co-activation between SEF and MFC EEG
+%% Co-activation between channels in SEF
 % Set up parameters
 eventAlignments = {'target','saccade','stopSignal','tone'};
 loadDir = fullfile(dataDir,'eeg_lfp');
@@ -8,9 +8,6 @@ window_edges = {[-600:50:200],[0:50:800],[-200:50:600],[-600:50:200]};
 
 n_windows = length(window_edges{1})-1;
 
-
-
-
 %%% STARTED 19:59 on Sept 1st 2022;
 
 %% Extract data from files
@@ -18,7 +15,7 @@ tic
 % For each session
 for session_i = 14:29
     trl_burst_diff_lfp = {};
-    trl_burst_diff_lfp_shuffled = {};
+    trl_burst_diff_lfp_shuf = {};
     % Get the admin/details
     session = session_i;
     fprintf('Analysing session %i of %i. \n',session, 29)
@@ -27,6 +24,7 @@ for session_i = 14:29
     for alignment_i = 1:length(eventAlignments)
         % Get the desired alignment
         alignmentEvent = eventAlignments{alignment_i};
+        fprintf(['Alignment: ' alignmentEvent '     \n'])
         
         % Save output for each alignment on each session
         loadfile_label = ['eeg_lfp_session' int2str(session) '_' alignmentEvent '.mat'];
@@ -34,6 +32,7 @@ for session_i = 14:29
         
         for window_i = 1:n_windows
             % Get analysis time epoch
+            window = [];
             window = [window_edges{alignment_i}(window_i), window_edges{alignment_i}(window_i+1)];
             
             % Get trials of interest
@@ -173,17 +172,20 @@ toc
 
 % Clear the workspace/loop variables
 clear sum_eeg*
+% For each session
+for session_i = 14:29
+    fprintf('Analysing session %i of %i. \n',session_i, 29)
 
-% For each alignment event
-for alignment_i = 1:length(eventAlignments)
-    % Get the desired alignment
-    alignmentEvent = eventAlignments{alignment_i};
-    
-    % For each session
-    for session_i = 14:29
-        
+    load(fullfile(dataDir,'eeg_lfp','intra_lfp',...
+        ['trl_burst_diff_intraLFP_session_' int2str(session_i) '.mat']));
+
+    % For each alignment event
+    for alignment_i = 1:length(eventAlignments)
+        % Get the desired alignment
+        alignmentEvent = eventAlignments{alignment_i};
+
         % Find the number of channels recorded within the session
-        n_lfp = max(find(~cellfun(@isempty, trl_burst_diff_lfp_shuf.target(session_i,:,1))));
+        n_lfp = size(trl_burst_diff_lfp_shuf.target,1);
         
         % Loop through each channel
         for lfp_i_i = 1:n_lfp
@@ -225,7 +227,7 @@ clear crosstab_lfpi_lfpj fisherstats
 lfp_count = 0;
 % For each session
 for session_i = 14:29
-    n_lfp = max(find(~cellfun(@isempty, trl_burst_diff_lfp_shuf.target(session_i,:,1))));
+        n_lfp = size(sum_eegA_lfpA.target.obs,2);
     fprintf('Analysing session %i of %i. \n',session_i, 29)
     
     % Loop through each channel
@@ -245,14 +247,14 @@ for session_i = 14:29
                     % Note: 1 is added to each cell to account for MATLAB issue
                     % with running Fisher with 0 count in cells.
                     
-                    crosstab_lfpi_lfpj.obs.(alignmentEvent){lfp_i_i,lfp_i_j,window_i} =...
+                    crosstab_lfpi_lfpj.obs.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i} =...
                         table( [sum_eegA_lfpA.(alignmentEvent).obs(session_i-13,lfp_i_i,lfp_i_j,window_i)+1;...
                         sum_eegA_lfpB.(alignmentEvent).obs(session_i-13,lfp_i_i,lfp_i_j,window_i)+1],...
                         [sum_eegB_lfpA.(alignmentEvent).obs(session_i-13,lfp_i_i,lfp_i_j,window_i)+1;...
                         sum_eegB_lfpB.(alignmentEvent).obs(session_i-13,lfp_i_i,lfp_i_j,window_i)+1],...
                         'VariableNames',{'LFP_i_pos','LFP_i_neg'},'RowNames',{'LFP_j_pos','LFP_j_neg'});
                     
-                    crosstab_lfpi_lfpj.shuf.(alignmentEvent){lfp_i_i,lfp_i_j,window_i} =...
+                    crosstab_lfpi_lfpj.shuf.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i} =...
                         table( [sum_eegA_lfpA.(alignmentEvent).shuf(session_i-13,lfp_i_i,lfp_i_j,window_i)+1;...
                         sum_eegA_lfpB.(alignmentEvent).shuf(session_i-13,lfp_i_i,lfp_i_j,window_i)+1],...
                         [sum_eegB_lfpA.(alignmentEvent).shuf(session_i-13,lfp_i_i,lfp_i_j,window_i)+1;...
@@ -261,9 +263,9 @@ for session_i = 14:29
                     
                     
                     clear h_obs p_obs stats_obs h_shuf p_shuf stats_shuf
-                    [h_obs,p_obs,stats_obs] = fishertest(crosstab_lfpi_lfpj.obs.(alignmentEvent){lfp_i_i,lfp_i_j,window_i},...
+                    [h_obs,p_obs,stats_obs] = fishertest(crosstab_lfpi_lfpj.obs.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i},...
                         'tail','right','alpha',0.05/n_windows);
-                    [h_shuf,p_shuf,stats_shuf] = fishertest(crosstab_lfpi_lfpj.shuf.(alignmentEvent){lfp_i_i,lfp_i_j,window_i},...
+                    [h_shuf,p_shuf,stats_shuf] = fishertest(crosstab_lfpi_lfpj.shuf.(alignmentEvent){session_i,lfp_i_i,lfp_i_j,window_i},...
                         'tail','right','alpha',0.05/n_windows);
                     
                     fisherstats.(alignmentEvent).obs.h{session_i-13}(lfp_i_i,lfp_i_j,window_i) = h_obs;
@@ -281,4 +283,41 @@ for session_i = 14:29
     
 end
 
-save('D:\projectCode\project_stoppingLFP\data\eeg_lfp\lfpxlfp_temp.mat','fisherstats','crosstab_lfpi_lfpj')
+save('D:\projectCode\project_stoppingLFP\data\eeg_lfp\lfpxlfp_fisher_crosstab.mat','fisherstats','crosstab_lfpi_lfpj')
+
+%%
+load('D:\projectCode\project_stoppingLFP\data\eeg_lfp\lfpxlfp_fisher_crosstab.mat', 'fisherstats')
+
+
+clear odd_ratio_intracontact
+alignmentEvent_list = {'target','saccade','stopSignal','tone'};
+figure('Renderer', 'painters', 'Position', [100 100 1000 600]);
+for alignmentEvent_i = 1:length(alignmentEvent_list)
+    alignmentEvent = alignmentEvent_list{alignmentEvent_i};
+    
+    for session_i = 14:29
+        for window_i = 1:n_windows
+            for lfp_i_i = 1:18
+                for lfp_i_j = 1:18
+                    if lfp_i_i == lfp_i_j
+                        odd_ratio_intracontact.(alignmentEvent)(lfp_i_i,lfp_i_j,session_i-13,window_i) = NaN;
+                    else
+                        try
+                            odd_ratio_intracontact.(alignmentEvent)(lfp_i_i,lfp_i_j,session_i-13,window_i) = ...
+                                fisherstats.(alignmentEvent).obs.odds{session_i-13}(lfp_i_i,lfp_i_j,window_i)-...
+                                fisherstats.(alignmentEvent).shuf.odds{session_i-13}(lfp_i_i,lfp_i_j,window_i);
+                        catch
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    subplot(2,2,alignmentEvent_i)
+    imagesc(nanmean(nanmean(odd_ratio_intracontact.(alignmentEvent),4),3))
+    title(alignmentEvent)
+    set(gca,'CLim',[0 50])
+    hline(8.5,'r'); vline(8.5,'r')
+    colorbar
+end
