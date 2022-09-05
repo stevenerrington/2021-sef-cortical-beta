@@ -8,7 +8,6 @@ window_edges = {[-600:50:200],[0:50:800],[-200:50:600],[-600:50:200]};
 
 n_windows = length(window_edges{1})-1;
 
-%%% STARTED 19:59 on Sept 1st 2022;
 
 %% Extract data from files
 tic
@@ -289,9 +288,9 @@ save('D:\projectCode\project_stoppingLFP\data\eeg_lfp\lfpxlfp_fisher_crosstab.ma
 load('D:\projectCode\project_stoppingLFP\data\eeg_lfp\lfpxlfp_fisher_crosstab.mat', 'fisherstats')
 
 
-clear odd_ratio_intracontact
+clear odd_ratio_intracontact h_intracontact
 alignmentEvent_list = {'target','saccade','stopSignal','tone'};
-figure('Renderer', 'painters', 'Position', [100 100 1000 600]);
+figure('Renderer', 'painters', 'Position', [100 100 1500 800]);
 for alignmentEvent_i = 1:length(alignmentEvent_list)
     alignmentEvent = alignmentEvent_list{alignmentEvent_i};
     
@@ -303,8 +302,12 @@ for alignmentEvent_i = 1:length(alignmentEvent_list)
                         odd_ratio_intracontact.(alignmentEvent)(lfp_i_i,lfp_i_j,session_i-13,window_i) = NaN;
                     else
                         try
+                            h_intracontact.(alignmentEvent)(lfp_i_i,lfp_i_j,session_i-13,window_i) = ...
+                                fisherstats.(alignmentEvent).obs.h{session_i-13}(lfp_i_i,lfp_i_j,window_i) > ...
+                                fisherstats.(alignmentEvent).shuf.h{session_i-13}(lfp_i_i,lfp_i_j,window_i);
+                            
                             odd_ratio_intracontact.(alignmentEvent)(lfp_i_i,lfp_i_j,session_i-13,window_i) = ...
-                                fisherstats.(alignmentEvent).obs.odds{session_i-13}(lfp_i_i,lfp_i_j,window_i)-...
+                                fisherstats.(alignmentEvent).obs.odds{session_i-13}(lfp_i_i,lfp_i_j,window_i) - ...
                                 fisherstats.(alignmentEvent).shuf.odds{session_i-13}(lfp_i_i,lfp_i_j,window_i);
                         catch
                         end
@@ -312,12 +315,98 @@ for alignmentEvent_i = 1:length(alignmentEvent_list)
                 end
             end
         end
+        
+        mean_or_upper_upper_all = [];  mean_or_lower_lower_all = [];
+        mean_or_upper_lower_all = [];  mean_or_lower_upper_all = [];
+        
+        mean_or_upper_upper_all = nanmean(squeeze(odd_ratio_intracontact.(alignmentEvent)(1:8,1:8,session_i-13,:)),3);
+        mean_or_upper_lower_all = nanmean(squeeze(odd_ratio_intracontact.(alignmentEvent)(1:8,9:end,session_i-13,:)),3);
+        mean_or_lower_lower_all = nanmean(squeeze(odd_ratio_intracontact.(alignmentEvent)(9:end,9:end,session_i-13,:)),3);
+        mean_or_lower_upper_all = nanmean(squeeze(odd_ratio_intracontact.(alignmentEvent)(9:end,1:8,session_i-13,:)),3);
+        
+        mean_or_upper_upper_session.(alignmentEvent)(session_i-13,1) = nanmean(mean_or_upper_upper_all(:));
+        mean_or_upper_lower_session.(alignmentEvent)(session_i-13,1) = nanmean(mean_or_upper_lower_all(:));
+        mean_or_lower_lower_session.(alignmentEvent)(session_i-13,1) = nanmean(mean_or_lower_lower_all(:));
+        mean_or_lower_upper_session.(alignmentEvent)(session_i-13,1) = nanmean(mean_or_lower_upper_all(:));
+        
+
+        
     end
     
-    subplot(2,2,alignmentEvent_i)
-    imagesc(nanmean(nanmean(odd_ratio_intracontact.(alignmentEvent),4),3))
+    odd_ratio_plot_data = nanmean(odd_ratio_intracontact.(alignmentEvent),4);
+    euSessions = executiveBeh.nhpSessions.EuSessions(executiveBeh.nhpSessions.EuSessions > 13)-13;
+    xSessions = executiveBeh.nhpSessions.XSessions(executiveBeh.nhpSessions.XSessions > 13)-13;
+    
+    subplot(3,4,alignmentEvent_i)
+    imagesc(nanmean(odd_ratio_plot_data,3))
     title(alignmentEvent)
     set(gca,'CLim',[0 50])
     hline(8.5,'r'); vline(8.5,'r')
+    colormap(viridis)
     colorbar
+    
+    subplot(3,4,alignmentEvent_i+4)
+    imagesc(nanmean(odd_ratio_plot_data(:,:,euSessions),3))
+    title(alignmentEvent)
+    set(gca,'CLim',[0 50])
+    hline(8.5,'r'); vline(8.5,'r')
+    colormap(viridis)
+    colorbar   
+    
+    subplot(3,4,alignmentEvent_i+8)
+    imagesc(nanmean(odd_ratio_plot_data(:,:,xSessions),3))
+    title(alignmentEvent)
+    set(gca,'CLim',[0 50])
+    hline(8.5,'r'); vline(8.5,'r')
+    colormap(viridis)
+    colorbar       
 end
+
+%%
+
+data = []; alignLabel = []; monkeyLabel = []; measureLabel = [];
+
+nSessions = length(14:29);
+
+for alignmentEvent_i = 1:length(alignmentEvent_list)
+    alignmentEvent = alignmentEvent_list{alignmentEvent_i};
+    
+    data = [data; mean_or_upper_upper_session.(alignmentEvent); ...
+        mean_or_lower_lower_session.(alignmentEvent);...
+        mean_or_upper_lower_session.(alignmentEvent);...
+        mean_or_lower_upper_session.(alignmentEvent)];
+    
+    alignLabel = [alignLabel; repmat({[int2str(alignmentEvent_i) '_' alignmentEvent_list{alignmentEvent_i}]},nSessions*4,1)];
+    
+    monkeyLabel = [monkeyLabel; repmat(executiveBeh.nhpSessions.monkeyNameLabel(14:29),4,1)];
+
+    measureLabel = [measureLabel; repmat({'1_upper_upper'},nSessions,1);...
+        repmat({'2_lower_lower'},nSessions,1); repmat({'3_upper_lower'},nSessions,1);...
+        repmat({'4_lower_upper'},nSessions,1)];
+
+end
+
+clear intraLFP_odds_figure
+intraLFP_odds_figure(1,1) = gramm('x',measureLabel,'y',data);
+intraLFP_odds_figure(1,1).stat_summary('geom',{'point','line','errorbar'});
+intraLFP_odds_figure(1,1).axe_property('YLim',[0 25]);
+intraLFP_odds_figure.facet_grid([],alignLabel)
+figure('Renderer', 'painters', 'Position', [100 100 1000 300]);
+intraLFP_odds_figure.draw();
+
+clear intraLFP_odds_figure
+intraLFP_odds_figure(1,1) = gramm('x',measureLabel,'y',data);
+intraLFP_odds_figure(1,1).stat_summary('geom',{'point','line','errorbar'});
+intraLFP_odds_figure(1,1).axe_property('YLim',[0 35]);
+intraLFP_odds_figure.facet_grid(monkeyLabel,alignLabel)
+figure('Renderer', 'painters', 'Position', [100 100 1000 600]);
+intraLFP_odds_figure.draw();
+
+
+
+
+
+
+
+
+
