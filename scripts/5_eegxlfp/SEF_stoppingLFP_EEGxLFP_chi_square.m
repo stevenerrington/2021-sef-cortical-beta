@@ -158,6 +158,7 @@ else
 end
 %% Analysis: extract the number of observations within each time bin, for each contact,
 %            across events and sessions.
+load(fullfile(dataDir,'eeg_lfp','trl_burst_diff_lfp_chisquare.mat'));
 
 % Clear the workspace/loop variables
 clear sum_eeg*
@@ -379,3 +380,32 @@ figure_oddsratio_eegxlfp_diff_monkey(2,1).geom_hline('yintercept',0);
 
 figure('Renderer', 'painters', 'Position', [100 100 1000 600]);
 figure_oddsratio_eegxlfp_diff_monkey.draw();
+
+
+%%
+
+for alignment_i = 1:length(eventAlignments)
+    alignmentEvent = eventAlignments{alignment_i};
+    test.(alignmentEvent) = NaN(length(14:29),18);
+    
+    for session_i = 14:29
+        n_lfp = max(find(~cellfun(@isempty, trl_burst_diff_lfp_shuf.target(session_i,:,1))));
+        
+        % Loop through each channel
+        for lfp_i = 1:n_lfp
+            test.(alignmentEvent)(session_i-13,lfp_i) = ...
+                nanmean(fisherstats.(alignmentEvent).obs.odds{session_i-13}(lfp_i,:))-...
+                nanmean(fisherstats.(alignmentEvent).shuf.odds{session_i-13}(lfp_i,:));
+        end
+    end
+    
+end
+
+
+figure;
+for alignment_i = 1:length(eventAlignments)
+    alignmentEvent = eventAlignments{alignment_i};
+    subplot(4,1,alignment_i)
+    imagesc(nanmean(test.(alignmentEvent)))
+    colormap(viridis);% set(gca,'CLim', [0 50])
+end

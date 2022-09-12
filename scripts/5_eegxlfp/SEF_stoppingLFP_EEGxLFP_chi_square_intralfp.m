@@ -404,9 +404,9 @@ intraLFP_odds_figure.draw();
 
 
 
+intraLFP_burst_table = table(data,alignLabel,monkeyLabel,measureLabel);
 
 
-
-
+writetable(intraLFP_burst_table,fullfile(rootDir,'results','jasp_tables','intraLFP_burst_table.csv'),'WriteRowNames',true)
 
 
