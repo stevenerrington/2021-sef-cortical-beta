@@ -324,7 +324,7 @@ clear figure_oddsratio_eegxlfp_monkey
 figure_oddsratio_eegxlfp_monkey(1,1)=gramm('x',[fig_data.time;fig_data.time],'y',[fig_data.OR_obs;fig_data.OR_shuf],'color',obs_cond_label);
 figure_oddsratio_eegxlfp_monkey(2,1)=gramm('x',[fig_data.time;fig_data.time],'y',[fig_data.H_obs;fig_data.H_shuf],'color',obs_cond_label);
 
-figure_oddsratio_eegxlfp_monkey(1,1).stat_summary(); 
+figure_oddsratio_eegxlfp_monkey(1,1).stat_summary('geom',{'point','errorbar'}); 
 figure_oddsratio_eegxlfp_monkey(1,1).facet_grid(monkey_label,alignment_label,'scale','free');
 
 figure_oddsratio_eegxlfp_monkey(2,1).stat_summary('geom',{'point','errorbar'}); 
@@ -345,7 +345,7 @@ clear figure_oddsratio_eegxlfp_diff
 figure_oddsratio_eegxlfp_diff(1,1)=gramm('x',[fig_data.time],'y',[fig_data.OR_diff]);
 figure_oddsratio_eegxlfp_diff(2,1)=gramm('x',[fig_data.time],'y',[fig_data.H_diff]);
 
-figure_oddsratio_eegxlfp_diff(1,1).stat_summary(); 
+figure_oddsratio_eegxlfp_diff(1,1).stat_summary('geom',{'point','errorbar'}); 
 figure_oddsratio_eegxlfp_diff(1,1).facet_grid([],fig_data.alignment,'scale','free');
 
 figure_oddsratio_eegxlfp_diff(2,1).stat_summary('geom',{'point','errorbar'}); 
@@ -366,7 +366,7 @@ clear figure_oddsratio_eegxlfp_diff_monkey
 figure_oddsratio_eegxlfp_diff_monkey(1,1)=gramm('x',[fig_data.time],'y',[fig_data.OR_diff]);
 figure_oddsratio_eegxlfp_diff_monkey(2,1)=gramm('x',[fig_data.time],'y',[fig_data.H_diff]);
 
-figure_oddsratio_eegxlfp_diff_monkey(1,1).stat_summary(); 
+figure_oddsratio_eegxlfp_diff_monkey(1,1).stat_summary('geom',{'point','errorbar'}); 
 figure_oddsratio_eegxlfp_diff_monkey(1,1).facet_grid(fig_data.session,fig_data.alignment,'scale','free');
 
 figure_oddsratio_eegxlfp_diff_monkey(2,1).stat_summary('geom',{'point','errorbar'}); 

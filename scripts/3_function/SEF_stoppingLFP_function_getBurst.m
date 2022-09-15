@@ -38,6 +38,8 @@ else % Otherwise, extract the data
         (corticalLFPcontacts.all,executiveBeh.ttx_canc, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,fullfile(dataDir,'lfp'));
     ssrtBeta.timing.nostop = SEF_stoppingLFP_function_getBurst_ssrt...
         (corticalLFPcontacts.all,executiveBeh.ttx.GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,fullfile(dataDir,'lfp'));
+    ssrtBeta.timing.noncanceled = SEF_stoppingLFP_function_getBurst_ssrt...
+        (corticalLFPcontacts.all,executiveBeh.ttx.sNC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold,fullfile(dataDir,'lfp'));
     
     %% For pretone period (-400 to -200, pre-tone) %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     fprintf('Extracting beta-burst information aligned on tone (pre-tone)... | \n')
