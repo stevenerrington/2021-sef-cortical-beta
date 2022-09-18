@@ -1,25 +1,3 @@
-% Clear the main variable
-clear proactiveBeta
-
-% Find the no-stop trials after no-stop, canceled, and non-canceled trials
-% by session.
-for ii = 1:29
-    % No-stop after non-canceled
-    ttx.GO_after_NC{ii} = executiveBeh.Trials.all{ii}.t_GO_after_NC;
-    % No-stop after canceled
-    ttx.GO_after_C{ii} = executiveBeh.Trials.all{ii}.t_GO_after_C;
-    % No-stop after no-stop
-    ttx.GO_after_GO{ii} = executiveBeh.Trials.all{ii}.t_GO_after_GO;
-end
-
-%% Get beta-burst timings
-% Extracted by:
-proactiveBeta.timing.bl_canceled = SEF_stoppingLFP_function_getBurst_baseline...
-    (corticalLFPcontacts.all, ttx.GO_after_C, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, dataDir);
-proactiveBeta.timing.bl_noncanceled = SEF_stoppingLFP_function_getBurst_baseline...
-    (corticalLFPcontacts.all,ttx.GO_after_NC, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, dataDir);
-proactiveBeta.timing.bl_nostop = SEF_stoppingLFP_function_getBurst_baseline...
-    (corticalLFPcontacts.all,ttx.GO_after_GO, bayesianSSRT, sessionLFPmap, sessionBLpower, burstThreshold, dataDir);
 
 %% Average beta-properties by session
 % Define trial types
@@ -114,11 +92,11 @@ proactiveBurst_figure(1,1)=gramm('x',[repmat({'Canceled'},length(inContacts),1);
     repmat({'No-stop'},length(inContacts),1)]);
 
 % Setup figure: boxplot with points
-proactiveBurst_figure(1,1).stat_boxplot();
-proactiveBurst_figure(1,1).geom_point('alpha',0.1);
+proactiveBurst_figure(1,1).stat_summary('geom',{'point','line','errorbar'});
+% proactiveBurst_figure(1,1).geom_point('alpha',0.1);
 proactiveBurst_figure(1,1).no_legend();
 proactiveBurst_figure.set_color_options('map',[colors.canceled;colors.nostop;colors.noncanc]);
-
+proactiveBurst_figure(1,1).axe_property('YLim',[0.20 0.24]);
 % Generate figure
 figure('Renderer', 'painters', 'Position', [100 100 300 300]);
 proactiveBurst_figure.draw();

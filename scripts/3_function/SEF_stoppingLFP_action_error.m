@@ -61,8 +61,8 @@ error_figure(2,2).stat_summary('geom',{'point','line','black_errorbar'});
 error_figure(3,2).stat_summary('geom',{'point','line','black_errorbar'});
 
 % Define figure parameters
-error_figure(1,1).axe_property('YLim',[0.15 0.45]); error_figure(2,1).axe_property('YLim',[0.15 0.60]); error_figure(3,1).axe_property('YLim',[0.15 0.35]);
-error_figure(1,2).axe_property('YLim',[0.15 0.45]); error_figure(2,2).axe_property('YLim',[0.15 0.60]); error_figure(3,2).axe_property('YLim',[0.15 0.35]);
+error_figure(1,1).axe_property('YLim',[0.10 0.35]); error_figure(2,1).axe_property('YLim',[0.10 0.50]); error_figure(3,1).axe_property('YLim',[0.1 0.25]);
+error_figure(1,2).axe_property('YLim',[0.10 0.35]); error_figure(2,2).axe_property('YLim',[0.10 0.50]); error_figure(3,2).axe_property('YLim',[0.1 0.25]);
 error_figure(1,1).no_legend();error_figure(2,1).no_legend();error_figure(3,1).no_legend();
 error_figure(1,2).no_legend();error_figure(2,2).no_legend();error_figure(3,2).no_legend();
 error_figure.set_color_options('map',[colors.nostop;colors.noncanc]);
