@@ -25,7 +25,7 @@ parfor lfpIdx = 1:length(laminarContacts)
     % Set analysis windows    
     fixationWindow = 1000+[-400:-200];
     stoppingWindow = 1000+[0:ssrt];
-    ssrtWindow = 1000+[ssrt+200:ssrt+400];
+    ssrtWindow = 1000+[ssrt+100:ssrt+300];
     
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -141,42 +141,29 @@ writetable(depthTable,fullfile(rootDir,'results','jasp_tables','depth_power_epoc
 %  Here we are plotting a point and 95% CI plot for each layer. We then
 %  create 3 figures for each epoch.
 % ... Stopping beta-power on canceled/no-stop trials across layers
-clear fig_stopping_depth
-fig_stopping_depth = [depthTable.laminar; depthTable.laminar];
+clear fig_stopping_depth fig_stopping_gramm
+fig_stopping_depth = [depthTable.upper_lower; depthTable.upper_lower];
 fig_stopping_label = [repmat({'Canceled'},249,1); repmat({'No-stop'},249,1)];
 fig_stopping_data = [depthTable.stopSignal_power_canceled;depthTable.stopSignal_power_nostop];
 fig_stopping_gramm(1,1) = gramm('x',fig_stopping_depth,'y',fig_stopping_data,'color',fig_stopping_label);
 fig_stopping_gramm(1,1).stat_summary('geom',{'point','errorbar'});
 fig_stopping_gramm(1,1).axe_property('YLim',[0 1]);
 fig_stopping_gramm(1,1).set_title('Stopping');
-figure('Position',[100 100 500 200]);
+figure('Position',[100 100 500  400]);
 fig_stopping_gramm.draw();
 
-% ... Stopping beta-power on canceled/no-stop trials across layers
-ref_eu = find(strcmp(depthTable.monkeyName,'Euler') == 1);
-clear fig_stopping_gramm
-fig_stopping_depth = [depthTable.laminar(ref_eu); depthTable.laminar(ref_eu)];
-fig_stopping_label = [repmat({'Canceled'},length(ref_eu),1); repmat({'No-stop'},length(ref_eu),1)];
-fig_stopping_data = [depthTable.stopSignal_power_canceled(ref_eu);depthTable.stopSignal_power_nostop(ref_eu)];
+
+clear fig_stopping_depth fig_stopping_gramm
+fig_stopping_depth = [depthTable.upper_lower; depthTable.upper_lower];
+fig_stopping_label = [repmat({'Canceled'},249,1); repmat({'No-stop'},249,1)];
+fig_stopping_data = [depthTable.stopSignal_power_canceled;depthTable.stopSignal_power_nostop];
 fig_stopping_gramm(1,1) = gramm('x',fig_stopping_depth,'y',fig_stopping_data,'color',fig_stopping_label);
 fig_stopping_gramm(1,1).stat_summary('geom',{'point','errorbar'});
-fig_stopping_gramm(1,1).axe_property('YLim',[0 1.1]);
-fig_stopping_gramm(1,1).set_title('Monkey Eu');
-% figure('Position',[100 100 500 200]);
-% fig_stopping_gramm.draw();
-
-% ... Stopping beta-power on canceled/no-stop trials across layers
-ref_x = find(strcmp(depthTable.monkeyName,'Xena') == 1);
-clear fig_stopping_depth
-fig_stopping_depth = [depthTable.laminar(ref_x); depthTable.laminar(ref_x)];
-fig_stopping_label = [repmat({'Canceled'},length(ref_x),1); repmat({'No-stop'},length(ref_x),1)];
-fig_stopping_data = [depthTable.stopSignal_power_canceled(ref_x);depthTable.stopSignal_power_nostop(ref_x)];
-fig_stopping_gramm(2,1) = gramm('x',fig_stopping_depth,'y',fig_stopping_data,'color',fig_stopping_label);
-fig_stopping_gramm(2,1).stat_summary('geom',{'point','errorbar'});
-fig_stopping_gramm(2,1).axe_property('YLim',[0 1.1]);
-fig_stopping_gramm(2,1).set_title('Monkey X');
+fig_stopping_gramm(1,1).axe_property('YLim',[0 1]);
+fig_stopping_gramm(1,1).facet_grid(repmat(depthTable.monkeyName,2,1),[]);
 figure('Position',[100 100 500 600]);
 fig_stopping_gramm.draw();
+
 
 %%
 

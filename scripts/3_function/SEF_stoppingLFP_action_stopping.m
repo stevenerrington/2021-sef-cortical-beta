@@ -2,7 +2,11 @@
 clear poststop_Figure
 % Generate labels for the conditions
 nConds = 5;
- % - trial labels
+allChannels = 1:length(corticalLFPcontacts.all);
+euChannels = corticalLFPcontacts.subset.eu;
+xChannels = corticalLFPcontacts.subset.x;
+
+% - trial labels
 groupLabels_nostop = repmat({'1_No-stop'},length(allChannels)*nConds,1);
 groupLabels_canc = repmat({'2_Canceled'},length(allChannels)*nConds,1);
 groupLabels_noncanc = repmat({'3_Noncanceled'},length(allChannels)*nConds,1);
@@ -38,8 +42,9 @@ trialLabels = [groupLabels_nostop;groupLabels_canc;groupLabels_noncanc];
 eventLabels = repmat([eventLabel_fixation;eventLabel_target;...
     eventLabel_postaction_early;eventLabel_postaction_late;eventLabel_postTone],3,1);
 burstData = [burstDataNoStop; burstDataCanc;burstDataNoncanc];
+monkeyLabel = repmat(corticalLFPmap.monkeyName,15,1);
 
-
+clear poststop_Figure
 % Input information into gramm function for:
 poststop_Figure(1,1) = gramm('x',eventLabels,'y',burstData,'color',trialLabels);
 
@@ -54,23 +59,52 @@ poststop_Figure.set_names('y','');
 figure('Renderer', 'painters', 'Position', [100 100 700 300]);
 poststop_Figure.draw();
 
-%% Output data to JASP: code works but needs cleaned!
-eventList = {'fixation','SSRT','pretone','posttone'};
-eventData = {fixationBeta.timing, ssrtBeta.timing, pretoneBeta.timing,posttoneBeta.timing};
-trialList = {'canceled','nostop'};
 
-stoppingMonitoring = table();
-for ii = 1:509
-    stoppingMonitoring.channel(ii) = ii;
-    stoppingMonitoring.monkey(ii) = corticalLFPmap.monkeyName(ii);
-    for eventIdx = 1:4
-        for trltypeIdx = 1:2
-            label = [eventList{eventIdx} '_' trialList{trltypeIdx}];
-            
-            stoppingMonitoring.(label)(ii) = eventData{eventIdx}.(trialList{trltypeIdx}).pTrials_burst(ii);
-        end
+
+clear poststop_Figure_monkey
+% Input information into gramm function for:
+poststop_Figure_monkey(1,1) = gramm('x',eventLabels,'y',burstData,'color',trialLabels);
+
+% Set figure properties
+poststop_Figure_monkey(1,1).stat_summary('geom',{'point','line','errorbar'});
+poststop_Figure_monkey(1,1).axe_property('YLim',[0.1 0.5]); 
+
+poststop_Figure_monkey.set_color_options('map',[colors.nostop; colors.canceled; colors.noncanc]);
+poststop_Figure_monkey.set_names('y','');
+poststop_Figure_monkey.facet_grid([], monkeyLabel,'scale','free_y');
+
+% Generate figure
+figure('Renderer', 'painters', 'Position', [100 100 1200 300]);
+poststop_Figure_monkey.draw();
+
+
+
+
+
+
+%% Output data to JASP: code works but needs cleaned!
+eventList = {'fixation','target','postaction_early','postaction_late','tone'};
+trialList = {'nostop','canceled','noncanceled'};
+
+clear label; count= 0;
+for eventIdx = 1:length(eventList)
+    for trltypeIdx = 1:length(trialList)
+        count = count + 1;
+        label{1,count} = [eventList{eventIdx} '_' trialList{trltypeIdx}];
     end
 end
+
+
+stoppingMonitoring = table();
+
+stoppingMonitoring = table(corticalLFPmap.channelN, corticalLFPmap.session,corticalLFPmap.monkeyName,...
+    fixationBeta.timing.nostop.pTrials_burst,fixationBeta.timing.canceled.pTrials_burst,fixationBeta.timing.noncanceled.pTrials_burst,...
+    targetBeta.timing.nostop.pTrials_burst, targetBeta.timing.canceled.pTrials_burst, targetBeta.timing.noncanceled.pTrials_burst,...
+    errorBeta_early.timing.nostop.pTrials_burst, ssrtBeta.timing.canceled.pTrials_burst, errorBeta_early.timing.noncanc.pTrials_burst,...
+    errorBeta_late.timing.nostop.pTrials_burst,  pretoneBeta.timing.canceled.pTrials_burst, errorBeta_late.timing.noncanc.pTrials_burst,...
+    posttoneBeta.timing.nostop.pTrials_burst, posttoneBeta.timing.canceled.pTrials_burst, posttoneBeta.timing.noncanceled.pTrials_burst,...
+    'VariableNames',[{'Channel','Session','Monkey'}, label]);
+
 
 writetable(stoppingMonitoring,fullfile(rootDir,'results','jasp_tables','canc_nostop_epochComp.csv'),'WriteRowNames',true)
 
@@ -101,7 +135,6 @@ for bootstrap_i = 1:n_bootstrap_iter
     cohen_d.error_early(bootstrap_i,1) =...
         computeCohen_d(errorBeta_early.timing.noncanc.pTrials_burst(lfp_in),...
         errorBeta_early.timing.nostop.pTrials_burst(lfp_in));
-    
     cohen_d.error_late(bootstrap_i,1) =...
         computeCohen_d(errorBeta_late.timing.noncanc.pTrials_burst(lfp_in),...
         errorBeta_late.timing.nostop.pTrials_burst(lfp_in));
@@ -140,9 +173,16 @@ effectSize_Figure.draw();
 
 
 
+effectSize_epoch = table(...
+    cohen_d.fixation_stopping, cohen_d.fixation_error,...
+    cohen_d.stopping_inh, cohen_d.error_early,...
+     cohen_d.stopping_ssrt, cohen_d.error_late,...
+     'VariableNames',{'Fix_stopping','Fix_error','Stopping_inh','Error_early',...
+     'Stopping_ssrt','Error_late'});
 
 
 
+writetable(effectSize_epoch,fullfile(rootDir,'results','jasp_tables','effectSize_epoch.csv'),'WriteRowNames',true)
 
 
 

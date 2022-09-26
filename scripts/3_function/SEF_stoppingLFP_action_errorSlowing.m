@@ -33,7 +33,7 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     for trlIdx = 1:length(trialGO)
         % Get whether a burst occured within the given time window
         % post-saccade (no burst = 0, burst = 1)
-        window = [300 600]
+        window = [400 600]
         burstFlag(trlIdx,1) = double(sum((betaOutput.burstData.burstTime{trialNC(trlIdx)} < window(2) &...
             betaOutput.burstData.burstTime{trialNC(trlIdx)} > window(1)) == 1) > 0);
         % Get the change in RT from the NC to the GO trial

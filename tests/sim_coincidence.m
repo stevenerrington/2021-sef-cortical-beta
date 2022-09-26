@@ -14,6 +14,7 @@ for cond_i = 1:length(cond_list)
         for lfp_i = 1:18
             for lfp_j = 1:18
                 
+                    
                 % Get conditional mapping.
                 % For low across all contacts:
                 if strcmp(cond_list{cond_i},'low')
@@ -86,9 +87,10 @@ end
 figure('Renderer', 'painters', 'Position', [100 100 1500 400]);
 for plot_i = 1:5
     
-    plot_data = []; plot_data = nanmean(fisherstats.simulated.odds{plot_i},3);
+    plot_data = []; plot_data = tril(nanmean(fisherstats.simulated.odds{plot_i},3),-1);
+    plot_data(plot_data == 0) = NaN;
     subplot(2,5,plot_i)
-    imagesc(plot_data)
+    imagesc(plot_data,'AlphaData',~isnan(plot_data))
     colorbar
     colormap(viridis)
     set(gca,'Clim',[0 25])

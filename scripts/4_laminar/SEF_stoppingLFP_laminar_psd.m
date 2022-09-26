@@ -25,7 +25,7 @@ parfor lfpIdx = 1:length(laminarContacts)
     % Initialise arrays
     c_temp = []; nc_temp = []; ns_temp = [];
     % Set window to calculate power over [SSRT + [200:400])
-    window = [1000+round(ssrt)+200:1000+round(ssrt)+400];
+    window = [1000+round(ssrt)+100:1000+round(ssrt)+300];
     
     % For each SSD
     for ii = 1:length(executiveBeh.inh_SSD{session})

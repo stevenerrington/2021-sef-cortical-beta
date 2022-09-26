@@ -23,7 +23,7 @@ for sessionIdx = 1:length(perpSessions)
         fixTime_pBurst_depth(depth,sessionIdx) = fixationBeta.timing.canceled.pTrials_burst(lfp);
         stopTime_pBurst_depth(depth,sessionIdx) = stoppingBeta.timing.canceled.pTrials_burst(lfp);
         cancelTime_pBurst_depth(depth,sessionIdx) = ssrtBeta.timing.canceled.pTrials_burst(lfp);
-        toneTime_pBurst_depth(depth,sessionIdx) = toneBeta.timing.canceled.pTrials_burst(lfp);
+        toneTime_pBurst_depth(depth,sessionIdx) = pretoneBeta.timing.canceled.pTrials_burst(lfp);
     end
 end
 
@@ -42,7 +42,7 @@ for lfpIdx = 1:length(laminarContacts)
     fixTime_pBurst_lfp(lfpIdx,1) = fixationBeta.timing.canceled.pTrials_burst(lfp);
     stopTime_pBurst_lfp(lfpIdx,1) = stoppingBeta.timing.canceled.pTrials_burst(lfp);
     cancelTime_pBurst_lfp(lfpIdx,1) = ssrtBeta.timing.canceled.pTrials_burst(lfp);
-    toneTime_pBurst_lfp(lfpIdx,1) = toneBeta.timing.canceled.pTrials_burst(lfp);   
+    toneTime_pBurst_lfp(lfpIdx,1) = pretoneBeta.timing.canceled.pTrials_burst(lfp);   
     errorTime_pBurst_lfp(lfpIdx,1) = errorBeta_late.timing.noncanc.pTrials_burst(lfp);   
 end
 

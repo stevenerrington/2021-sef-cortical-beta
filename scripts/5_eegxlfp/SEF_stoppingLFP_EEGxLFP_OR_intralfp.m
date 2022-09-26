@@ -197,7 +197,6 @@ for alignmentEvent_i = 1:length(alignmentEvent_list)
         mean_or_upper_upper_session.(alignmentEvent)(session_i-13,1) = nanmean(mean_or_upper_upper_all(:));
         mean_or_upper_lower_session.(alignmentEvent)(session_i-13,1) = nanmean(mean_or_upper_lower_all(:));
         mean_or_lower_lower_session.(alignmentEvent)(session_i-13,1) = nanmean(mean_or_lower_lower_all(:));
-        mean_or_lower_upper_session.(alignmentEvent)(session_i-13,1) = nanmean(mean_or_lower_upper_all(:));
         
         
         
