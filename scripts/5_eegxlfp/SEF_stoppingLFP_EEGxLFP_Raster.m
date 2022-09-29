@@ -1,9 +1,10 @@
 %% Co-activation between SEF and MFC EEG
 % Set up parameters
-eventAlignments = {'fixate','target','saccade','stopSignal','tone'};
-eventWindows = {[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000],};
-analysisWindows = {[200:400],[-400:-200],[400:600],[0:200],[-400:-200]};
-eventBin = {1,1,1,1,1};
+eventLabels = {'1_Fixation','2_Target','3_Stopping','4_EarlyPA','5_Late PA','6_Tone'};
+eventAlignments = {'target','target','stopSignal','saccade','saccade','tone'};
+eventWindows = {[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000]};
+analysisWindows = {[-400:-200],[0:200],[0:200],[100:300],[400:600],[100:300]};
+eventBin = {1,1,1,1,1,1};
 loadDir = fullfile(dataDir,'eeg_lfp');
 printFigFlag = 0;
 
@@ -20,14 +21,14 @@ for sessionIdx = 14:29
     fprintf('Analysing session %i of %i. \n',session, 29)
     
     % ... and for each epoch of interest
-    for alignmentIdx = 1:5
+    for alignmentIdx = 1:length(eventAlignments)
         % Get the desired alignment
         alignmentEvent = eventAlignments{alignmentIdx};
         
         % Get trials of interest
         trials = []; trials_shuffled = [];
         
-        if alignmentIdx == 3 % If aligning on saccade, then we will look at error trials
+        if alignmentIdx > 3 % If aligning on saccade, then we will look at error trials
             trials = executiveBeh.ttx.sNC{session};
         else % Otherwise, we will just look at canceled trials
             trials = executiveBeh.ttx_canc{session};
@@ -40,8 +41,10 @@ for sessionIdx = 14:29
         loadfile_label = ['eeg_lfp_session' int2str(session) '_' alignmentEvent '.mat'];
         load(fullfile(loadDir, loadfile_label));
         
-        % Get zero point
-        alignmentZero = abs(eeg_lfp_burst.eventWindows{alignmentIdx}(1));
+        % Get zero point: NOTE: THIS WILL NEED TO BE LESS HARDCODED -
+        % CURRENTLY ALL WINDOWS ARE THE SAME, BUT WILL NEED CHANGED
+        % OTHERWISE
+        alignmentZero = abs(eeg_lfp_burst.eventWindows{1}(1));
         
         % Find channels in L2, L3, L5, L6
         ch_depths = []; ch_depths = corticalLFPmap.depth(corticalLFPmap.session == session);
