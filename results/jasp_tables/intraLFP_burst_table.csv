@@ -3,7 +3,7 @@ data,alignLabel,monkeyLabel,measureLabel
 22.7480823864267,1_target,Euler,1_upper_upper
 18.2140648651441,1_target,Euler,1_upper_upper
 12.1932308976911,1_target,Euler,1_upper_upper
-20.5681261242627,1_target,Euler,1_upper_upper
+20.5681261242628,1_target,Euler,1_upper_upper
 16.2374921472052,1_target,Euler,1_upper_upper
 11.6989837004915,1_target,Xena,1_upper_upper
 8.70241358697925,1_target,Xena,1_upper_upper
@@ -95,7 +95,7 @@ data,alignLabel,monkeyLabel,measureLabel
 4.62449103488967,2_saccade,Xena,1_upper_upper
 25.3326305959426,2_saccade,Xena,1_upper_upper
 39.4820430932465,2_saccade,Xena,1_upper_upper
-6.18989824525183,2_saccade,Euler,2_lower_lower
+6.18989824525182,2_saccade,Euler,2_lower_lower
 9.5746062655846,2_saccade,Euler,2_lower_lower
 18.1066897535535,2_saccade,Euler,2_lower_lower
 4.38157103618067,2_saccade,Euler,2_lower_lower
@@ -192,7 +192,7 @@ data,alignLabel,monkeyLabel,measureLabel
 1.09537814068817,3_stopSignal,Xena,2_lower_lower
 4.43442355243494,3_stopSignal,Xena,2_lower_lower
 0.717899042173477,3_stopSignal,Euler,3_upper_lower
-9.73544098364484,3_stopSignal,Euler,3_upper_lower
+9.73544098364485,3_stopSignal,Euler,3_upper_lower
 5.65598521511922,3_stopSignal,Euler,3_upper_lower
 1.43455335010504,3_stopSignal,Euler,3_upper_lower
 2.87716074933919,3_stopSignal,Euler,3_upper_lower
@@ -240,7 +240,7 @@ data,alignLabel,monkeyLabel,measureLabel
 -0.398393747547964,3_stopSignal,Xena,5_lower_eeg
 -0.0941043412196397,3_stopSignal,Xena,5_lower_eeg
 28.6650121588965,4_tone,Euler,1_upper_upper
-41.8400041555054,4_tone,Euler,1_upper_upper
+41.8400041555053,4_tone,Euler,1_upper_upper
 16.2834192208667,4_tone,Euler,1_upper_upper
 12.5873335735659,4_tone,Euler,1_upper_upper
 23.8529431941776,4_tone,Euler,1_upper_upper
@@ -270,9 +270,9 @@ data,alignLabel,monkeyLabel,measureLabel
 8.81480604929585,4_tone,Xena,2_lower_lower
 6.57062292897037,4_tone,Xena,2_lower_lower
 1.41083772576766,4_tone,Xena,2_lower_lower
-3.81305773396715,4_tone,Xena,2_lower_lower
+3.81305773396716,4_tone,Xena,2_lower_lower
 -0.232811930909011,4_tone,Euler,3_upper_lower
-19.0481653781119,4_tone,Euler,3_upper_lower
+19.0481653781118,4_tone,Euler,3_upper_lower
 3.56251835268919,4_tone,Euler,3_upper_lower
 1.6259098046202,4_tone,Euler,3_upper_lower
 3.29232589951207,4_tone,Euler,3_upper_lower

@@ -1,4 +1,4 @@
-fullfile(dataDir,'lfp') = 'D:\projectCode\project_stoppingLFP\data\lfp\';
+fullfile(dataDir,'lfp') = 'D:\projectCode\2021-sef-cortical-beta\data\lfp\';
 % Load parameters for analysis
 getAnalysisParameters; % Separate script holding all key parameters.
    

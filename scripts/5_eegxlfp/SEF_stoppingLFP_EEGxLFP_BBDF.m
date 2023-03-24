@@ -128,7 +128,7 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     ssrt = round(bayesianSSRT.ssrt_mean(session));
     
     % Load in the prior extracted beta-burst density function
-    bbdf = parload(['D:\projectCode\project_stoppingLFP\data\bbdf\bbdf_' int2str(lfpIdx)]);
+    bbdf = parload(['D:\projectCode\2021-sef-cortical-beta\data\bbdf\bbdf_' int2str(lfpIdx)]);
     fprintf('Analysing LFP number %i of %i. \n',lfpIdx,length(corticalLFPcontacts.all));
     
     %   We are then going to latency match, so let's initialise the arrays!

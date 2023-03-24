@@ -42,7 +42,7 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     bbdf.ssd = SessionBDF_ssd;
     bbdf.tone = SessionBDF_tone;
     
-    parsave_bbdf(['D:\projectCode\project_stoppingLFP\data\bbdf\bbdf_' int2str(lfpIdx)], bbdf)
+    parsave_bbdf(['D:\projectCode\2021-sef-cortical-beta\data\bbdf\bbdf_' int2str(lfpIdx)], bbdf)
     
 end
 toc

@@ -5,7 +5,7 @@ eventWindows = {[-800 200],[-200 800],[-200 800],[-800 200]};
 analysisWindows = {[-400:-200],[400:600],[400:600],[-400:-200]};
 eventBin = {1,1,1,1,1};
 jpsthBin = 50;
-loadDir = 'D:\projectCode\project_stoppingLFP\data\eeg_lfp\';
+loadDir = 'D:\projectCode\2021-sef-cortical-beta\data\eeg_lfp\';
 printFigFlag = 0;
 binSize = 1;
 warning off

@@ -4,7 +4,7 @@ eventAlignments = {'target','saccade','stopSignal','tone'};
 eventWindows = {[-1000 1000],[-1000 1000],[-1000 1000],[-1000 1000]};
 analysisWindows = {[-400:-200],[400:600],[0:200],[-400:-200]};
 eventBin = {1,1,1,1};
-loadDir = 'D:\projectCode\project_stoppingLFP\data\eeg_lfp\';
+loadDir = 'D:\projectCode\2021-sef-cortical-beta\data\eeg_lfp\';
 printFigFlag = 0;
 
 %%
@@ -146,7 +146,7 @@ for sessionIdx = 14:29
     end
 end
 
-writetable(lfpxeeg_prepost_burst,'D:\projectCode\project_stoppingLFP\data\exportJASP\lfpxeeg_prepost_burst.csv','WriteRowNames',true)
+writetable(lfpxeeg_prepost_burst,'D:\projectCode\2021-sef-cortical-beta\data\exportJASP\lfpxeeg_prepost_burst.csv','WriteRowNames',true)
 
 %%
 

@@ -177,4 +177,4 @@ error_figure.draw();
 %     noncanceledBurstFreq, nostopBurstFreq, monkeyLabel);
 %
 % writetable(meanBurstTimeTable_late,...
-%     'D:\projectCode\project_stoppingLFP\data\exportJASP\LFP_errorBurstProperties_300_600.csv','WriteRowNames',true)
+%     'D:\projectCode\2021-sef-cortical-beta\data\exportJASP\LFP_errorBurstProperties_300_600.csv','WriteRowNames',true)

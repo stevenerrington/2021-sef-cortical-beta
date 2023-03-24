@@ -133,9 +133,9 @@ if ~exist('lfpxlfp_fisher_crosstab.mat')
     end
     
     % We then save the output for future use.
-    save('D:\projectCode\project_stoppingLFP\data\eeg_lfp\lfpxlfp_fisher_crosstab.mat','fisherstats','crosstab_lfpi_lfpj')
+    save('D:\projectCode\2021-sef-cortical-beta\data\eeg_lfp\lfpxlfp_fisher_crosstab.mat','fisherstats','crosstab_lfpi_lfpj')
 else
-    load('D:\projectCode\project_stoppingLFP\data\eeg_lfp\lfpxlfp_fisher_crosstab.mat', 'fisherstats')
+    load('D:\projectCode\2021-sef-cortical-beta\data\eeg_lfp\lfpxlfp_fisher_crosstab.mat', 'fisherstats')
 end
 %% Figure: produce heatmaps of odds ratios across contacts
 

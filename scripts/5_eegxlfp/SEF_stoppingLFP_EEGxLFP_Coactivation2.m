@@ -4,7 +4,7 @@ eventAlignments = {'target','saccade','stopSignal','tone'};
 eventWindows = {[-800 200],[-200 800],[-200 800],[-800 200]};
 analysisWindows = {[-400:-200],[400:600],[0:200],[-400:-200]};
 eventBin = {1,1,1,1};
-loadDir = 'D:\projectCode\project_stoppingLFP\data\eeg_lfp\';
+loadDir = 'D:\projectCode\2021-sef-cortical-beta\data\eeg_lfp\';
 
 windowBins = [-500:50:500];
 
