@@ -2,8 +2,8 @@ clear all; clc
 getParameters
 
 % Set directories
-betaDir = 'D:\projectCode\2021-sef-cortical-beta\data\lfp\betaBurst\target\';
-lfpDir = 'D:\projectCode\2021-sef-cortical-beta\data\lfp\LFP\target\';
+betaDir = 'D:\projects\2021-sef-cortical-beta\data\lfp\betaBurst\target\';
+lfpDir = 'D:\projects\2021-sef-cortical-beta\data\lfp\LFP\target\';
 
 % Set session
 session_i = 14;

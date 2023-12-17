@@ -1,11 +1,11 @@
 % Load relevant behavioral data
 if ispc()
-    driveDir = 'D:\projectCode\';
-    rootDir = 'D:\projectCode\2021-sef-cortical-beta\';
+    driveDir = 'D:\projects\';
+    rootDir = 'D:\projects\2021-sef-cortical-beta\';
     dataDir = fullfile(rootDir,'data');    
 else
     driveDir = '/Volumes/Alpha/';
-    rootDir = '/Volumes/Alpha/projectCode/2021-sef-cortical-beta/';
+    rootDir = '/Volumes/Alpha/projects/2021-sef-cortical-beta/';
     dataDir = fullfile(rootDir,'data');
 end
 

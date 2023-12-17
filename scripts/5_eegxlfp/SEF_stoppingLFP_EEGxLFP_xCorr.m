@@ -8,7 +8,7 @@ eventData_LFP = {LFPbbdf_canceled_fix,LFPbbdf_noncanceled_saccade,LFPbbdf_cancel
 eventData_LFPshuffled = {shuffledLFPbbdf_canceled_fix,shuffledLFPbbdf_noncanceled_saccade,shuffledLFPbbdf_canceled_ssd,shuffledLFPbbdf_canceled_tone};
 analysisWindows = {[-400:-200],[400:600],[400:600],[-400:-200]};
 eventBin = {1,1,1,1,1};
-loadDir = 'D:\projectCode\2021-sef-cortical-beta\data\eeg_lfp\';
+loadDir = 'D:\projects\2021-sef-cortical-beta\data\eeg_lfp\';
 printFigFlag = 0;
 
 clear xcorr_out xcorr_plot

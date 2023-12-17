@@ -12,7 +12,7 @@ parfor sessionIdx = 14:29
     
     % Load in EEG data
     %   Define directories:
-    eegDir = 'D:\projectCode\project_stoppingEEG\data\monkeyEEG\'; % Directory of EEG data (from prev manuscript)
+    eegDir = 'D:\projects\project_stoppingEEG\data\monkeyEEG\'; % Directory of EEG data (from prev manuscript)
     eeg_target = ['betaBurst\eeg_session' int2str(session) '_' FileNames{session} '_betaOutput_target'];
     eeg_stopSignal = ['betaBurst\eeg_session' int2str(session) '_' FileNames{session} '_betaOutput_stopSignal'];
     eeg_saccade = ['betaBurst\eeg_session' int2str(session) '_' FileNames{session} '_betaOutput_saccade'];
@@ -128,7 +128,7 @@ parfor lfpIdx = 1:length(corticalLFPcontacts.all)
     ssrt = round(bayesianSSRT.ssrt_mean(session));
     
     % Load in the prior extracted beta-burst density function
-    bbdf = parload(['D:\projectCode\2021-sef-cortical-beta\data\bbdf\bbdf_' int2str(lfpIdx)]);
+    bbdf = parload(['D:\projects\2021-sef-cortical-beta\data\bbdf\bbdf_' int2str(lfpIdx)]);
     fprintf('Analysing LFP number %i of %i. \n',lfpIdx,length(corticalLFPcontacts.all));
     
     %   We are then going to latency match, so let's initialise the arrays!
